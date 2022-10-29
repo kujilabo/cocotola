@@ -1,0 +1,7 @@
+go 1.18
+
+use (
+	./cocotola-api
+	./cocotola-translator-api
+	./lib
+)
