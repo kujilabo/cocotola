@@ -30,7 +30,7 @@ jobs:
         working-directory: ${{ matrix.workdir }}
         run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
       - name: Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ matrix.workdir }}/coverage.txt
