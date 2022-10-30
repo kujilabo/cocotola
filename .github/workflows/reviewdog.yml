@@ -9,7 +9,7 @@ jobs:
     name: runner / staticcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: staticcheck
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -28,7 +28,7 @@ jobs:
     name: runner / golangci-lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -45,7 +45,7 @@ jobs:
     name: runner / errcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: errcheck
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -64,7 +64,7 @@ jobs:
     name: runner / gosec
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: gosec
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -79,7 +79,7 @@ jobs:
   #   name: runner / dupl
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3
   #     - name: dupl
   #       uses: reviewdog/action-golangci-lint@v2
   #       with:
@@ -97,7 +97,7 @@ jobs:
     name: runner / gofmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: gofmt
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -116,7 +116,7 @@ jobs:
     name: runner / unconvert
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: unconvert
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -135,7 +135,7 @@ jobs:
     name: runner / gomnd
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: gomnd
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -154,7 +154,7 @@ jobs:
     name: runner / errorlint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: errorlint
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -174,7 +174,7 @@ jobs:
     name: runner / gocyclo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: gocyclo
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -193,7 +193,7 @@ jobs:
     name: runner / goimports
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: goimports
         uses: reviewdog/action-golangci-lint@v2
         with:
@@ -208,7 +208,7 @@ jobs:
     name: runner / misspell
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: misspell
         uses: reviewdog/action-misspell@v1
         with:
@@ -221,7 +221,7 @@ jobs:
     name: runner / yamllint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: yamllint
         uses: reviewdog/action-yamllint@v1
         with:

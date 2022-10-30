@@ -19,18 +19,18 @@ jobs:
           mysql user: "user"
           mysql password: "password"
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v1.0.1
+        uses: bazelbuild/setup-bazelisk@v2.0.0
       - name: Test
         working-directory: ${{ matrix.workdir }}
         run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
       - name: Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ matrix.workdir }}/coverage.txt

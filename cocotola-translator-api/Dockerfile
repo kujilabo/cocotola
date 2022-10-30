@@ -5,7 +5,7 @@ RUN apk add --no-cache build-base
 WORKDIR /go/app
 COPY . .
 
-RUN go build -o cocotola ./main.go
+RUN go build -o cocotola ./src/main.go
 
 # Application image.
 FROM alpine:latest
