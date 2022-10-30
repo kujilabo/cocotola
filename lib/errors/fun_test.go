@@ -10,7 +10,7 @@ func TestAbc(t *testing.T) {
 	}{
 		{
 			"a",
-			3,
+			2,
 			4,
 		},
 	}
