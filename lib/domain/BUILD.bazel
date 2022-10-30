@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "error.go",
+        "validator.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/lib/domain",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_go_playground_validator_v10//:validator"],
+)

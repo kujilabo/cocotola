@@ -1,6 +1,6 @@
 .PHONY lint:
 lint:
-	golangci-lint run cocotola-api cocotola-translator-api
+	golangci-lint run cocotola-api/src cocotola-translator-api/src
 
 update-deps:
 	bazel run //tools/update-deps
@@ -12,13 +12,11 @@ gazelle:
 build:
 	bazel build //...
 
-run:
-	bazel run //...
-
 run-api:
-	bazel run //cocotola-api
+	bazel run //cocotola-api/src
+
 run-translator-api:
-	bazel run //cocotola-translator-api
+	bazel run //cocotola-translator-api/src
 
 test:
 	bazel test //... --test_output=all
