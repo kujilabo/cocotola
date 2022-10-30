@@ -5,7 +5,7 @@ steps:
     args: ['version']
   - name: 'gcr.io/cloud-builders/bazel'
     entrypoint: 'bazel'
-    args: ['build', '//coctola-translator-api']
+    args: ['build', '//...']
 
 #   - name: "gcr.io/cloud-builders/docker"
 #     id: "docker build"
