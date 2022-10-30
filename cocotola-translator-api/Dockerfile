@@ -2,10 +2,10 @@ FROM golang:1.18-alpine as builder
 
 RUN apk add --no-cache build-base
 
-WORKDIR /go/src/app
-ADD . .
+WORKDIR /go/app
+COPY . .
 
-RUN go build -o cocotola ./src/main.go
+RUN go build -o cocotola ./main.go
 
 # Application image.
 FROM alpine:latest
@@ -14,9 +14,9 @@ RUN apk --no-cache add tzdata
 
 WORKDIR /app
 
-COPY --from=builder /go/src/app/cocotola .
-COPY --from=builder /go/src/app/configs ./configs
-COPY --from=builder /go/src/app/sqls ./sqls
+COPY --from=builder /go/app/cocotola .
+COPY --from=builder /go/app/configs ./configs
+COPY --from=builder /go/app/sqls ./sqls
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
