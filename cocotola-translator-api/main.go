@@ -16,6 +16,8 @@ import (
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
+const metricsPort = 8081
+const gracefulShutdownTime = 10
 
 // @securityDefinitions.basic BasicAuth
 func main() {
@@ -35,7 +37,7 @@ func run(ctx context.Context) int {
 		return httpServer(ctx)
 	})
 	eg.Go(func() error {
-		return libG.MetricsServerProcess(ctx, 8081, 10)
+		return libG.MetricsServerProcess(ctx, metricsPort, gracefulShutdownTime)
 	})
 	eg.Go(func() error {
 		return libG.SignalWatchProcess(ctx)
