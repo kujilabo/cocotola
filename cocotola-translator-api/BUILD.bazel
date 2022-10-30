@@ -33,3 +33,14 @@ go_image(
         "@org_golang_x_sync//errgroup",
     ],
 )
+
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+
+container_push(
+    name = "cocotola-translator-api_image-push",
+    image = ":cocotola-translator-api_image",
+    format = "Docker",
+    registry = "gcr.io",
+    repository = "cocotola-001/cocotola-translator-api-2",
+    tag = "latest",
+)
