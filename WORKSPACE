@@ -351,8 +351,8 @@ go_repository(
     name = "com_github_azure_azure_sdk_for_go",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/Azure/azure-sdk-for-go",
-    sum = "h1:KnPIugL51v3N3WwvaSmZbxukD1WuWXOiE9fRdu32f2I=",
-    version = "v16.2.1+incompatible",
+    sum = "h1:SVBwznSETB0Sipd0uyGJr7khLhJOFRUEUb+0JgkCvDo=",
+    version = "v67.0.0+incompatible",
 )
 
 go_repository(
@@ -383,16 +383,16 @@ go_repository(
     name = "com_github_azure_go_autorest_autorest",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/Azure/go-autorest/autorest",
-    sum = "h1:90Y4srNYrwOtAgVo3ndrQkTYn6kf1Eg/AjTFJ8Is2aM=",
-    version = "v0.11.18",
+    sum = "h1:ndAExarwr5Y+GaHE6VCaY1kyS/HwwGGyuimVhWsHOEM=",
+    version = "v0.11.28",
 )
 
 go_repository(
     name = "com_github_azure_go_autorest_autorest_adal",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/Azure/go-autorest/autorest/adal",
-    sum = "h1:P8An8Z9rH1ldbOLdFpxYorgOt2sywL9V24dAwWHPuGc=",
-    version = "v0.9.16",
+    sum = "h1:jjQnVFXPfekaqb8vIsv2G1lxshoW+oGv4MDlhRtnYZk=",
+    version = "v0.9.21",
 )
 
 go_repository(
@@ -407,8 +407,8 @@ go_repository(
     name = "com_github_azure_go_autorest_autorest_mocks",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/Azure/go-autorest/autorest/mocks",
-    sum = "h1:K0laFcLE6VLTOwNgSxaGbUcLPuGXlNkbVvq4cW4nIHk=",
-    version = "v0.4.1",
+    sum = "h1:PGN4EDXnuQbojHbU0UWoNvmu9AGVwYHG9/fkDYhtAfw=",
+    version = "v0.4.2",
 )
 
 go_repository(
@@ -1431,24 +1431,24 @@ go_repository(
     name = "com_github_go_openapi_jsonreference",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/go-openapi/jsonreference",
-    sum = "h1:1WJP/wi4OjB4iV8KVbH73rQaoialJrqv8gitZLxGLtM=",
-    version = "v0.19.5",
+    sum = "h1:MYlu0sBgChmCfJxxUKZ8g1cPWFOB37YSZqewK7OKeyA=",
+    version = "v0.20.0",
 )
 
 go_repository(
     name = "com_github_go_openapi_spec",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/go-openapi/spec",
-    sum = "h1:0XRyw8kguri6Yw4SxhsQA/atC88yqrk0+G4YhI2wabc=",
-    version = "v0.19.3",
+    sum = "h1:1Rlu/ZrOCCob0n+JKKJAWhNWMPW8bOZRg8FJaY+0SKI=",
+    version = "v0.20.7",
 )
 
 go_repository(
     name = "com_github_go_openapi_swag",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/go-openapi/swag",
-    sum = "h1:gm3vOOXfiuw5i9p5N9xJvfjvuofpyvLA9Wr6QfK5Fng=",
-    version = "v0.19.14",
+    sum = "h1:yMBqmnQ0gyZvEb/+KzuWZOXgllrXT4SADYbvDaXHv/g=",
+    version = "v0.22.3",
 )
 
 go_repository(
@@ -1695,8 +1695,8 @@ go_repository(
     name = "com_github_golang_jwt_jwt_v4",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/golang-jwt/jwt/v4",
-    sum = "h1:XUgk2Ex5veyVFVeLm0xhusUTQybEbexJXrvPNOKkSY0=",
-    version = "v4.1.0",
+    sum = "h1:rcc4lwaZgFMCZ5jxF9ABolDcIHdBytAFgqFPbSJQAYs=",
+    version = "v4.4.2",
 )
 
 go_repository(
@@ -2503,8 +2503,8 @@ go_repository(
     name = "com_github_mailru_easyjson",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/mailru/easyjson",
-    sum = "h1:8yTIVnZgCoiM1TgqoeTl+LfU5Jg6/xL3QhGQnimLYnA=",
-    version = "v0.7.6",
+    sum = "h1:UGYAvKxe3sBsEDzO8ZeWOSlIQfWFlxbzLZe7hwFURr0=",
+    version = "v0.7.7",
 )
 
 go_repository(
@@ -3583,8 +3583,8 @@ go_repository(
     name = "com_github_yuin_goldmark",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/yuin/goldmark",
-    sum = "h1:dPmz1Snjq0kmkz159iL7S6WzdahUTHnHB5M56WFVifs=",
-    version = "v1.3.5",
+    sum = "h1:fVcFKWvrslecOb/tg+Cc05dkeYx540o0FuFt3nUVDoE=",
+    version = "v1.4.13",
 )
 
 go_repository(
@@ -4047,8 +4047,8 @@ go_repository(
     name = "io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc",
     build_file_proto_mode = "disable_global",
     importpath = "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
-    sum = "h1:Ky1MObd188aGbgb5OgNnwGuEEwI9MVIcc7rBW6zk5Ak=",
-    version = "v0.28.0",
+    sum = "h1:PNEMW4EvpNQ7SuoPFNkvbZqi1STkTPKq+8vfoMl/6AE=",
+    version = "v0.34.0",
 )
 
 go_repository(
@@ -4311,8 +4311,8 @@ go_repository(
     name = "org_golang_x_mod",
     build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/mod",
-    sum = "h1:UG21uOlmZabA4fW5i7ZX6bjw1xELEGg/ZLgZq9auk/Q=",
-    version = "v0.5.0",
+    sum = "h1:6zppjxzCulZykYSLyVDYbneBfbaBIQPYMevg0bEwv2s=",
+    version = "v0.6.0-dev.0.20220419223038-86c51ed26bb4",
 )
 
 go_repository(
@@ -4375,8 +4375,8 @@ go_repository(
     name = "org_golang_x_tools",
     build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/tools",
-    sum = "h1:ouewzE6p+/VEB31YYnTbEJdi8pFqKp4P4n85vwo3DHA=",
-    version = "v0.1.5",
+    sum = "h1:VveCTK38A2rkS8ZqFY25HIDFscX5X9OoEhJd3quQmXU=",
+    version = "v0.1.12",
 )
 
 go_repository(

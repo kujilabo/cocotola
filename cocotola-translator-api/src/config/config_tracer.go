@@ -11,7 +11,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 
-	libD "github.com/kujilabo/cocotola/lib/domain"
+	libD "github.com/kujilabo/cocotola-translator-api/src/lib/domain"
 )
 
 func initTracerExporter(cfg *Config) (sdktrace.SpanExporter, error) {

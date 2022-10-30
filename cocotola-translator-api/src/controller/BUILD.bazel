@@ -1,0 +1,53 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "controller",
+    srcs = [
+        "admin_handler.go",
+        "admin_server.go",
+        "app_router.go",
+        "user_handler.go",
+        "user_server.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/controller",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-translator-api/src/config",
+        "//cocotola-translator-api/src/controller/converter",
+        "//cocotola-translator-api/src/controller/entity",
+        "//cocotola-translator-api/src/controller/helper",
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
+        "//cocotola-translator-api/src/usecase",
+        "//lib/controller/helper",
+        "//lib/controller/middleware",
+        "//lib/errors",
+        "//lib/log",
+        "//lib/proto",
+        "@com_github_gin_contrib_cors//:cors",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_onrik_logrus//gin",
+        "@io_opentelemetry_go_contrib_instrumentation_github_com_gin_gonic_gin_otelgin//:otelgin",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+    ],
+)
+
+go_test(
+    name = "controller_test",
+    srcs = ["admin_handler_test.go"],
+    deps = [
+        ":controller",
+        "//cocotola-translator-api/src/config",
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/usecase",
+        "//cocotola-translator-api/src/usecase/mock",
+        "@com_github_gin_contrib_cors//:cors",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_ohler55_ojg//jp",
+        "@com_github_ohler55_ojg//oj",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+    ],
+)

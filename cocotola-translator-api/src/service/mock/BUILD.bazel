@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "AzureTranslationClient.go",
+        "AzureTranslationRepository.go",
+        "CustomTranslationRepository.go",
+        "RepositoryFactory.go",
+        "TranslationUpdateParameter.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/service/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

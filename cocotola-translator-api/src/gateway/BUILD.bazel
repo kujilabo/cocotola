@@ -1,0 +1,56 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "azure_translation_repository.go",
+        "azure_translator.go",
+        "custom_translation_repository.go",
+        "init.go",
+        "repository_factory.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/gateway",
+        "//lib/log",
+        "@com_github_azure_azure_sdk_for_go//services/cognitiveservices/v3.0/translatortext",
+        "@com_github_azure_go_autorest_autorest//:autorest",
+        "@com_github_azure_go_autorest_autorest_to//:to",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "azure_translator_test.go",
+        "custom_translation_repository_test.go",
+        "db_mysql_test.go",
+        "db_sqlite_test.go",
+        "db_test.go",
+        "gateway_test.go",
+    ],
+    deps = [
+        ":gateway",
+        "//cocotola-translator-api/src/domain",
+        "//lib/errors",
+        "@com_github_golang_migrate_migrate_v4//:migrate",
+        "@com_github_golang_migrate_migrate_v4//database",
+        "@com_github_golang_migrate_migrate_v4//database/mysql",
+        "@com_github_golang_migrate_migrate_v4//database/sqlite3",
+        "@com_github_golang_migrate_migrate_v4//source/file",
+        "@com_github_mattn_go_sqlite3//:go-sqlite3",
+        "@com_github_onrik_gorm_logrus//:gorm-logrus",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@io_gorm_driver_mysql//:mysql",
+        "@io_gorm_driver_sqlite//:sqlite",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
