@@ -1,0 +1,46 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "src_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//lib/gateway",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@org_golang_x_sync//errgroup",
+    ],
+)
+
+go_binary(
+    name = "src",
+    embed = [":src_lib"],
+    visibility = ["//visibility:public"],
+)
+
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+
+go_image(
+    name = "cocotola-translator-api_image",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//lib/gateway",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@org_golang_x_sync//errgroup",
+    ],
+)
+
+load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+
+container_push(
+    name = "cocotola-translator-api_image-push",
+    format = "Docker",
+    image = ":cocotola-translator-api_image",
+    registry = "gcr.io",
+    repository = "cocotola-001/cocotola-translator-api-2",
+    tag = "latest",
+)
