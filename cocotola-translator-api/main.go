@@ -16,12 +16,15 @@ import (
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
+const serverPort = 8180
+const metricsPort = 8081
+const gracefulShutdownTime = 10
 
 // @securityDefinitions.basic BasicAuth
 func main() {
 	result := run(context.Background())
 
-	gracefulShutdownTime2 := time.Duration(10) * time.Second
+	gracefulShutdownTime2 := time.Duration(gracefulShutdownTime) * time.Second
 	time.Sleep(gracefulShutdownTime2)
 	logrus.Info("exited")
 	os.Exit(result)
@@ -35,7 +38,7 @@ func run(ctx context.Context) int {
 		return httpServer(ctx)
 	})
 	eg.Go(func() error {
-		return libG.MetricsServerProcess(ctx, 8081, 10)
+		return libG.MetricsServerProcess(ctx, metricsPort, gracefulShutdownTime)
 	})
 	eg.Go(func() error {
 		return libG.SignalWatchProcess(ctx)
@@ -56,7 +59,7 @@ func httpServer(ctx context.Context) error {
 	router := gin.Default()
 
 	httpServer := http.Server{
-		Addr:              ":" + strconv.Itoa(8180),
+		Addr:              ":" + strconv.Itoa(serverPort),
 		Handler:           router,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
@@ -74,7 +77,7 @@ func httpServer(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		gracefulShutdownTime1 := time.Duration(10) * time.Second
+		gracefulShutdownTime1 := time.Duration(gracefulShutdownTime) * time.Second
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
 		defer shutdownCancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {

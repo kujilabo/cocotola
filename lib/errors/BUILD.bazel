@@ -1,9 +1,18 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "errors",
-    srcs = ["errors.go"],
+    srcs = [
+        "errors.go",
+        "fun.go",
+    ],
     importpath = "github.com/kujilabo/cocotola/lib/errors",
     visibility = ["//visibility:public"],
     deps = ["@org_golang_x_xerrors//:xerrors"],
+)
+
+go_test(
+    name = "errors_test",
+    srcs = ["fun_test.go"],
+    embed = [":errors"],
 )
