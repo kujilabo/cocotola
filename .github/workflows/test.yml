@@ -23,8 +23,14 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Setup Bazelisk
+        uses: bazelbuild/setup-bazelisk@v1.0.1
       - name: Test
+        working-directory: ./lib
         run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
-      - uses: codecov/codecov-action@v2
+      - name: Coverage lib
+        uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: lib/coverage.txt
+          flags: lib
