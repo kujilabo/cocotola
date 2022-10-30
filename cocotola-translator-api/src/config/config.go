@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 
-	lib "github.com/kujilabo/cocotola-translator-api/src/lib/domain"
+	lib "github.com/kujilabo/cocotola/lib/domain"
 )
 
 type AppConfig struct {

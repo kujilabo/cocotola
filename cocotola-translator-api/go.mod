@@ -6,8 +6,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.10.1
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
-	github.com/kujilabo/cocotola-translator-api v0.0.0-20221016150244-273c5a815555
-	github.com/kujilabo/cocotola/lib v0.0.0-20221029161324-8f85acffddfb
+	github.com/kujilabo/cocotola/lib v0.0.0-20221030095144-4797eb0c1923
 	github.com/sirupsen/logrus v1.9.0
 	go.opentelemetry.io/otel v1.11.1
 	go.opentelemetry.io/otel/exporters/jaeger v1.11.1
