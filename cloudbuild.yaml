@@ -142,4 +142,4 @@ availableSecrets:
       env: "SSH_KEY"
 
 images:
-  - "gcr.io/$PROJECT_ID/cocotola-translator-api-2"
+  - "gcr.io/$PROJECT_ID/cocotola-translator-api"
