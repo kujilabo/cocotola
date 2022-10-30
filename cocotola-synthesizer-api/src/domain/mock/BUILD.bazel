@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = ["AudioModel.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/domain/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-synthesizer-api/src/domain",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

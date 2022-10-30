@@ -1,0 +1,40 @@
+---
+app:
+  name: cocotola-synthesizer-api
+  httpPort: 8380
+  metricsPort: 8381
+db:
+  # driverName: sqlite3
+  # sqlite3:
+  #   file: app.db
+  driverName: mysql
+  mysql:
+    username: user
+    password: password
+    host: 127.0.0.1
+    port: 3336
+    database: development
+auth:
+  username: user
+  password: password
+synthesizer:
+  key: $SYNTHESIZER_KEY
+  timeoutSec: 10
+trace:
+  exporter: jaeger
+  jaeger:
+    endpoint: http://localhost:14268/api/traces
+cors:
+  allowOrigins:
+    - "*"
+shutdown:
+  timeSec1: 1
+  timeSec2: 1
+log:
+  level: info
+swagger:
+  host: localhost:8380
+  schema: http
+debug:
+  ginMode: true
+  wait: false

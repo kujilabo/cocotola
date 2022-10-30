@@ -1,0 +1,33 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "src_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//cocotola-synthesizer-api/docs",
+        "//cocotola-synthesizer-api/src/config",
+        "//cocotola-synthesizer-api/src/controller",
+        "//cocotola-synthesizer-api/src/gateway",
+        "//cocotola-synthesizer-api/src/service",
+        "//cocotola-synthesizer-api/src/usecase",
+        "//lib/errors",
+        "//lib/gateway",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_swaggo_files//:files",
+        "@com_github_swaggo_gin_swagger//:gin-swagger",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+        "@io_opentelemetry_go_otel//propagation",
+        "@io_opentelemetry_go_otel_sdk//trace",
+        "@org_golang_x_sync//errgroup",
+    ],
+)
+
+go_binary(
+    name = "src",
+    embed = [":src_lib"],
+    visibility = ["//visibility:public"],
+)

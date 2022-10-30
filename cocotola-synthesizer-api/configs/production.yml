@@ -1,0 +1,38 @@
+---
+app:
+  name: cocotola-synthesizer-api
+  httpPort: 8080
+  metricsPort: 8081
+db:
+  # driverName: sqlite3
+  # sqlite3:
+  #   file: app.db
+  driverName: mysql
+  mysql:
+    username: $MYSQL_USERNAME
+    password: $MYSQL_PASSWORD
+    host: $MYSQL_HOST
+    port: $MYSQL_PORT
+    database: $MYSQL_DATABASE
+auth:
+  username: $AUTH_USERNAME
+  password: $AUTH_PASSWORD
+synthesizer:
+  key: $SYNTHESIZER_KEY
+  timeoutSec: 10
+trace:
+  exporter: gcp
+cors:
+  allowOrigins:
+    - "https://www.cocotola.com"
+shutdown:
+  timeSec1: 10
+  timeSec2: 10
+log:
+  level: $LOG_LEVEL
+swagger:
+  host: cocotola.com
+  schema: https
+debug:
+  ginMode: false
+  wait: false

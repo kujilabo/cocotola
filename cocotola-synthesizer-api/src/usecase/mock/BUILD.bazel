@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "AdminUsecase.go",
+        "UserUsecase.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/usecase/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-synthesizer-api/src/domain",
+        "//cocotola-synthesizer-api/src/service",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

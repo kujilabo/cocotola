@@ -7,7 +7,7 @@ jobs:
       matrix:
         go-version: [1.18.x]
         os: [ubuntu-latest]
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Setup MySQL

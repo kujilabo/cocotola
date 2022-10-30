@@ -87,16 +87,16 @@ go_repository(
     name = "com_github_stretchr_objx",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/stretchr/objx",
-    sum = "h1:M2gUjqZET1qApGOWNSnZ49BAIMX4F/1plDv3+l31EJ4=",
-    version = "v0.4.0",
+    sum = "h1:1zr/of2m5FGMsad5YfcqgdqdWrIhu+EBEJRhR1U7z/c=",
+    version = "v0.5.0",
 )
 
 go_repository(
     name = "com_github_stretchr_testify",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/stretchr/testify",
-    sum = "h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=",
-    version = "v1.8.0",
+    sum = "h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKsk=",
+    version = "v1.8.1",
 )
 
 go_repository(
@@ -1215,8 +1215,8 @@ go_repository(
     name = "com_github_felixge_httpsnoop",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/felixge/httpsnoop",
-    sum = "h1:lvB5Jl89CsZtGIWuTcDM1E/vkVs49/Ml7JJe07l8SPQ=",
-    version = "v1.0.1",
+    sum = "h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=",
+    version = "v1.0.3",
 )
 
 go_repository(
@@ -4055,8 +4055,8 @@ go_repository(
     name = "io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp",
     build_file_proto_mode = "disable_global",
     importpath = "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp",
-    sum = "h1:Q3C9yzW6I9jqEc8sawxzxZmY48fs9u220KXq6d5s3XU=",
-    version = "v0.20.0",
+    sum = "h1:aUEBEdCa6iamGzg6fuYxDA8ThxvOG240mAvWDU+XLio=",
+    version = "v0.36.4",
 )
 
 go_repository(
@@ -4111,8 +4111,8 @@ go_repository(
     name = "io_opentelemetry_go_otel_metric",
     build_file_proto_mode = "disable_global",
     importpath = "go.opentelemetry.io/otel/metric",
-    sum = "h1:4kzhXFP+btKm4jwxpjIqjs41A7MakRFUS86bqLHTIw8=",
-    version = "v0.20.0",
+    sum = "h1:xQAyl7uGEYvrLAiV/09iTJlp1pZnQ9Wl793qbVvED1E=",
+    version = "v0.33.0",
 )
 
 go_repository(
@@ -4747,6 +4747,41 @@ go_repository(
     importpath = "go.opentelemetry.io/otel/exporters/stdout/stdouttrace",
     sum = "h1:3Yvzs7lgOw8MmbxmLRsQGwYdCubFmUHSooKaEhQunFQ=",
     version = "v1.11.1",
+)
+
+go_repository(
+    name = "com_github_google_go_github_v35",
+    importpath = "github.com/google/go-github/v35",
+    sum = "h1:s/soW8jauhjUC3rh8JI0FePuocj0DEI9DNBg/bVplE8=",
+    version = "v35.2.0",
+)
+
+go_repository(
+    name = "com_github_googleinterns_cloud_operations_api_mock",
+    importpath = "github.com/googleinterns/cloud-operations-api-mock",
+    sum = "h1:eHv/jVY/JNop1xg2J9cBb4EzyMpWZoNCP1BslSAIkOI=",
+    version = "v0.0.0-20200709193332-a1e58c29bdd3",
+)
+
+go_repository(
+    name = "com_github_kujilabo_cocotola_synthesizer_api",
+    importpath = "github.com/kujilabo/cocotola-synthesizer-api",
+    sum = "h1:uUh42nt/8AfKb1wRFpE2xcOT3My+LONK/QCCWqQK5oc=",
+    version = "v0.0.0-20221016141555-e0d14af1da19",
+)
+
+go_repository(
+    name = "in_gopkg_go_playground_assert_v1",
+    importpath = "gopkg.in/go-playground/assert.v1",
+    sum = "h1:xoYuJVE7KT85PYWrN730RguIQO0ePzVRfFMXadIrXTM=",
+    version = "v1.2.1",
+)
+
+go_repository(
+    name = "in_gopkg_go_playground_validator_v9",
+    importpath = "gopkg.in/go-playground/validator.v9",
+    sum = "h1:SvGtYmN60a5CVKTOzMSyfzWDeZRxRuGvRQyEAKbw1xc=",
+    version = "v9.29.1",
 )
 
 # gazelle:repository_macro go_repositories.bzl%go_repositories

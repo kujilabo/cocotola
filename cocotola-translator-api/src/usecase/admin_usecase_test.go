@@ -7,11 +7,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/kujilabo/cocotola-translator-api/src/app/domain"
-	"github.com/kujilabo/cocotola-translator-api/src/app/service"
-	service_mock "github.com/kujilabo/cocotola-translator-api/src/app/service/mock"
-	"github.com/kujilabo/cocotola-translator-api/src/app/usecase"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
+	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
+	service_mock "github.com/kujilabo/cocotola/cocotola-translator-api/src/service/mock"
+	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
 )
 
 func matchErrorFunc(expected error) assert.ErrorAssertionFunc {
