@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "azure_translation_client.go",
+        "azure_translation_repository.go",
+        "custom_translation_repository.go",
+        "repository_factory.go",
+        "translation.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-translator-api/src/domain",
+        "//lib/domain",
+    ],
+)

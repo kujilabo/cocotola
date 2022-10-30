@@ -1,0 +1,38 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "usecase",
+    srcs = [
+        "admin_usecase.go",
+        "user_usecase.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
+        "//lib/errors",
+        "//lib/log",
+    ],
+)
+
+go_test(
+    name = "usecase_test",
+    srcs = [
+        "admin_usecase_test.go",
+        "init_test.go",
+        "user_usecase_test.go",
+    ],
+    deps = [
+        ":usecase",
+        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
+        "//cocotola-translator-api/src/service/mock",
+        "@com_github_kujilabo_cocotola_translator_api//src/app/domain",
+        "@com_github_kujilabo_cocotola_translator_api//src/app/service",
+        "@com_github_kujilabo_cocotola_translator_api//src/app/service/mock",
+        "@com_github_kujilabo_cocotola_translator_api//src/app/usecase",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

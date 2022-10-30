@@ -1,6 +1,7 @@
 package config
 
 import (
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -92,7 +93,7 @@ type Config struct {
 }
 
 func LoadConfig(env string) (*Config, error) {
-	confContent, err := os.ReadFile("./configs/" + env + ".yml")
+	confContent, err := ioutil.ReadFile("./configs/" + env + ".yml")
 	if err != nil {
 		return nil, err
 	}
