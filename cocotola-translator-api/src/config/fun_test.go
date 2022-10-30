@@ -15,7 +15,7 @@ func TestAbc(t *testing.T) {
 		{
 			"a",
 			2,
-			6,
+			4,
 		},
 	}
 	for _, tt := range tests {
