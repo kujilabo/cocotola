@@ -16,6 +16,7 @@ import (
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
+const serverPort = 8180
 const metricsPort = 8081
 const gracefulShutdownTime = 10
 
@@ -58,7 +59,7 @@ func httpServer(ctx context.Context) error {
 	router := gin.Default()
 
 	httpServer := http.Server{
-		Addr:              ":" + strconv.Itoa(8180),
+		Addr:              ":" + strconv.Itoa(serverPort),
 		Handler:           router,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
@@ -76,7 +77,7 @@ func httpServer(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		gracefulShutdownTime1 := time.Duration(10) * time.Second
+		gracefulShutdownTime1 := time.Duration(gracefulShutdownTime) * time.Second
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
 		defer shutdownCancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
