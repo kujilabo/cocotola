@@ -7,6 +7,7 @@ jobs:
       matrix:
         go-version: [1.18.x]
         os: [ubuntu-latest]
+        workdir: [lib, cocotola-api, cocotola-translator-api]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Setup MySQL
@@ -26,11 +27,11 @@ jobs:
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v1.0.1
       - name: Test
-        working-directory: ./lib
+        working-directory: ${{ matrix.workdir }}
         run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
-      - name: Coverage lib
+      - name: Coverage
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: lib/coverage.txt
-          flags: lib
+          files: ${{ matrix.workdir }}/coverage.txt
+          flags: ${{ matrix.workdir }}
