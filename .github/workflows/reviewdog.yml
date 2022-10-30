@@ -5,7 +5,7 @@ jobs:
   staticcheck:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / staticcheck
     runs-on: ubuntu-latest
     steps:
@@ -24,7 +24,7 @@ jobs:
   golangci-lint:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / golangci-lint
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +41,7 @@ jobs:
   errcheck:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / errcheck
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +60,7 @@ jobs:
   gosec:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / gosec
     runs-on: ubuntu-latest
     steps:
@@ -93,7 +93,7 @@ jobs:
   gofmt:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / gofmt
     runs-on: ubuntu-latest
     steps:
@@ -112,7 +112,7 @@ jobs:
   unconvert:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / unconvert
     runs-on: ubuntu-latest
     steps:
@@ -131,7 +131,7 @@ jobs:
   gomnd:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / gomnd
     runs-on: ubuntu-latest
     steps:
@@ -150,7 +150,7 @@ jobs:
   errorlint:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / errorlint
     runs-on: ubuntu-latest
     steps:
@@ -170,7 +170,7 @@ jobs:
   gocyclo:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / gocyclo
     runs-on: ubuntu-latest
     steps:
@@ -189,7 +189,7 @@ jobs:
   goimports:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-translator-api]
+        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
     name: runner / goimports
     runs-on: ubuntu-latest
     steps:

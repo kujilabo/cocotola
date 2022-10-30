@@ -7,6 +7,19 @@ steps:
   #   entrypoint: 'bazel'
   #   args: ['build', '//...']
 
+  # synthesizer
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker build"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "./cocotola-synthesizer-api"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker tag"
+    args: ["tag", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker push"
+    args: ["push", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
+
   # translator
   - name: "gcr.io/cloud-builders/docker"
     id: "docker build"
@@ -59,6 +72,25 @@ steps:
   #     - |
   #       ls
 
+  # synthesizer
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/production"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        ls
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/production"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/development"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
   # translator
   - name: "gcr.io/cloud-builders/git"
     dir: "kujilabo-manifests/cocotola-translator-api/overlays/production"
@@ -104,4 +136,5 @@ availableSecrets:
       env: "SSH_KEY"
 
 images:
+  - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api"
   - "gcr.io/$PROJECT_ID/cocotola-translator-api"

@@ -1,0 +1,7 @@
+info:
+  contact: {}
+paths: {}
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

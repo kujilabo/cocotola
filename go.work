@@ -2,6 +2,7 @@ go 1.18
 
 use (
 	./cocotola-api
+	./cocotola-synthesizer-api
 	./cocotola-translator-api
 	./lib
 )

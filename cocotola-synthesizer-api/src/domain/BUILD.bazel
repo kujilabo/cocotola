@@ -1,0 +1,23 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "audio_model.go",
+        "init.go",
+        "lang.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/domain",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//lib/domain",
+        "//lib/errors",
+    ],
+)
+
+go_test(
+    name = "domain_test",
+    srcs = ["audio_model_test.go"],
+    embed = [":domain"],
+    deps = ["@com_github_stretchr_testify//assert"],
+)
