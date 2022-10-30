@@ -24,7 +24,7 @@ const gracefulShutdownTime = 10
 func main() {
 	result := run(context.Background())
 
-	gracefulShutdownTime2 := time.Duration(10) * time.Second
+	gracefulShutdownTime2 := time.Duration(gracefulShutdownTime) * time.Second
 	time.Sleep(gracefulShutdownTime2)
 	logrus.Info("exited")
 	os.Exit(result)
