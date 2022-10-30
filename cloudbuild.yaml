@@ -1,19 +1,19 @@
 ---
 steps:
-  - name: 'gcr.io/cloud-builders/bazel'
-    entrypoint: 'bazel'
-    args: ['version']
-  - name: 'gcr.io/cloud-builders/bazel'
-    entrypoint: 'bazel'
-    args: ['build', '//...']
+  # - name: 'gcr.io/cloud-builders/bazel'
+  #   entrypoint: 'bazel'
+  #   args: ['version']
+  # - name: 'gcr.io/cloud-builders/bazel'
+  #   entrypoint: 'bazel'
+  #   args: ['build', '//...']
 
-#   - name: "gcr.io/cloud-builders/docker"
-#     id: "docker build"
-#     args:
-#       - "build"
-#       - "-t"
-#       - "gcr.io/$PROJECT_ID/cocotola-translator-api-2:$SHORT_SHA"
-#       - "./cocotola-translator-api"
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker build"
+    args:
+      - "build"
+      - "-t"
+      - "gcr.io/$PROJECT_ID/cocotola-translator-api-2:$SHORT_SHA"
+      - "./cocotola-translator-api"
 
 #   - name: "gcr.io/cloud-builders/docker"
 #     id: "docker tag"
