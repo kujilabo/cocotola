@@ -23,19 +23,21 @@ def go_repositories():
         version = "v0.3.1",
     )
     go_repository(
+        name = "com_github_felixge_fgprof",
+        build_file_proto_mode = "disable_global",
+        importpath = "github.com/felixge/fgprof",
+        sum = "h1:VvyZxILNuCiUCSXtPtYmmtGvb65nqXh2QFWc0Wpf2/g=",
+        version = "v0.9.3",
+    )
+
+    go_repository(
         name = "com_github_gin_contrib_gzip",
         build_file_proto_mode = "disable_global",
         importpath = "github.com/gin-contrib/gzip",
         sum = "h1:NjcunTcGAj5CO1gn4N8jHOSIeRFHIbn51z6K+xaN4d4=",
         version = "v0.0.6",
     )
-    go_repository(
-        name = "com_github_kujilabo_cocotola_translator_api",
-        build_file_proto_mode = "disable_global",
-        importpath = "github.com/kujilabo/cocotola-translator-api",
-        sum = "h1:R7TeXGGtkkOjUUHHdnSPIS6HBt29cFX9SF0feAFTbjU=",
-        version = "v0.0.0-20221016150244-273c5a815555",
-    )
+
     go_repository(
         name = "com_github_kylebanks_depth",
         build_file_proto_mode = "disable_global",
@@ -78,6 +80,14 @@ def go_repositories():
         sum = "h1:7JgpsBaN0uMkyju4tbYHu0mnM55hNKVYLsXmwr15NQI=",
         version = "v1.3.3",
     )
+    go_repository(
+        name = "com_github_pkg_profile",
+        build_file_proto_mode = "disable_global",
+        importpath = "github.com/pkg/profile",
+        sum = "h1:hnbDkaNWPCLMO9wGLdBFTIZvzDrDfBM2072E1S9gJkA=",
+        version = "v1.7.0",
+    )
+
     go_repository(
         name = "com_github_swaggo_files",
         build_file_proto_mode = "disable_global",

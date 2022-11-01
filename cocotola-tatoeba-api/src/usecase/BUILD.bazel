@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "usecase",
+    srcs = [
+        "admin_usecase.go",
+        "user_usecase.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/usecase",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-tatoeba-api/src/service",
+        "//lib/errors",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

@@ -12,7 +12,6 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/kujilabo/cocotola-translator-api v0.0.0-20221016150244-273c5a815555
 	github.com/kujilabo/cocotola/lib v0.0.0-20221030095144-4797eb0c1923
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/ohler55/ojg v1.14.4

@@ -1815,8 +1815,8 @@ go_repository(
     name = "com_github_google_pprof",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/google/pprof",
-    sum = "h1:K6RDEckDVWvDI9JAJYCmNdQXq6neHJOYx3V6jnqNEec=",
-    version = "v0.0.0-20210720184732-4bb14d4b1be1",
+    sum = "h1:1FjCyPC+syAzJ5/2S8fqdZK1R22vvA0J7JZKcuOIQ7Y=",
+    version = "v0.0.0-20211214055906-6f57359322fd",
 )
 
 go_repository(
@@ -2079,8 +2079,8 @@ go_repository(
     name = "com_github_ianlancetaylor_demangle",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/ianlancetaylor/demangle",
-    sum = "h1:mV02weKRL81bEnm8A0HT1/CAelMQDBuQIfLw8n+d6xI=",
-    version = "v0.0.0-20200824232613-28f6c0f3b639",
+    sum = "h1:uGg2frlt3IcT7kbV6LEp5ONv4vmoO2FW4qSO+my/aoM=",
+    version = "v0.0.0-20210905161508-09a460cdf81d",
 )
 
 go_repository(
@@ -4747,41 +4747,6 @@ go_repository(
     importpath = "go.opentelemetry.io/otel/exporters/stdout/stdouttrace",
     sum = "h1:3Yvzs7lgOw8MmbxmLRsQGwYdCubFmUHSooKaEhQunFQ=",
     version = "v1.11.1",
-)
-
-go_repository(
-    name = "com_github_google_go_github_v35",
-    importpath = "github.com/google/go-github/v35",
-    sum = "h1:s/soW8jauhjUC3rh8JI0FePuocj0DEI9DNBg/bVplE8=",
-    version = "v35.2.0",
-)
-
-go_repository(
-    name = "com_github_googleinterns_cloud_operations_api_mock",
-    importpath = "github.com/googleinterns/cloud-operations-api-mock",
-    sum = "h1:eHv/jVY/JNop1xg2J9cBb4EzyMpWZoNCP1BslSAIkOI=",
-    version = "v0.0.0-20200709193332-a1e58c29bdd3",
-)
-
-go_repository(
-    name = "com_github_kujilabo_cocotola_synthesizer_api",
-    importpath = "github.com/kujilabo/cocotola-synthesizer-api",
-    sum = "h1:uUh42nt/8AfKb1wRFpE2xcOT3My+LONK/QCCWqQK5oc=",
-    version = "v0.0.0-20221016141555-e0d14af1da19",
-)
-
-go_repository(
-    name = "in_gopkg_go_playground_assert_v1",
-    importpath = "gopkg.in/go-playground/assert.v1",
-    sum = "h1:xoYuJVE7KT85PYWrN730RguIQO0ePzVRfFMXadIrXTM=",
-    version = "v1.2.1",
-)
-
-go_repository(
-    name = "in_gopkg_go_playground_validator_v9",
-    importpath = "gopkg.in/go-playground/validator.v9",
-    sum = "h1:SvGtYmN60a5CVKTOzMSyfzWDeZRxRuGvRQyEAKbw1xc=",
-    version = "v9.29.1",
 )
 
 # gazelle:repository_macro go_repositories.bzl%go_repositories

@@ -47,22 +47,24 @@ const readHeaderTimeout = time.Duration(30) * time.Second
 // @securityDefinitions.basic BasicAuth
 func main() {
 	ctx := context.Background()
-	env := flag.String("env", "", "environment")
+	configFile := flag.String("configFile", "", "Config file path")
 	flag.Parse()
-	if len(*env) == 0 {
-		appEnv := os.Getenv("APP_ENV")
-		if len(appEnv) == 0 {
-			*env = "local"
+	if len(*configFile) == 0 {
+		tmpConfigFile := os.Getenv("CONFIG_FILE_PATH")
+		if len(tmpConfigFile) == 0 {
+			*configFile = "./configs/local.yml"
 		} else {
-			*env = appEnv
+			*configFile = tmpConfigFile
 		}
 	}
 
-	logrus.Infof("env: %s", *env)
+	logrus.Info(os.Getwd())
+
+	logrus.Infof("configFile: %s", *configFile)
 
 	liberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp, err := initialize(ctx, *env)
+	cfg, db, sqlDB, tp, err := initialize(ctx, *configFile)
 	if err != nil {
 		panic(err)
 	}
@@ -211,14 +213,14 @@ func grpcServer(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUseca
 	}
 }
 
-func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider, error) {
-	cfg, err := config.LoadConfig(env)
+func initialize(ctx context.Context, configFile string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider, error) {
+	cfg, err := config.LoadConfig(configFile)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to config.LoadConfig in main.initialize. err: %w", err)
 	}
 
 	// init log
-	if err := config.InitLog(env, cfg.Log); err != nil {
+	if err := config.InitLog(cfg.Log); err != nil {
 		return nil, nil, nil, nil, err
 	}
 

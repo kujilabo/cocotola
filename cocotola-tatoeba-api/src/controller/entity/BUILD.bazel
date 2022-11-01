@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "entity",
+    srcs = ["tatoeba_entity.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/controller/entity",
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "entity_test",
+    srcs = ["tatoeba_entity_test.go"],
+    deps = [
+        ":entity",
+        "//lib/domain",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

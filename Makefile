@@ -16,7 +16,7 @@ run-api:
 	bazel run //cocotola-api/src
 
 run-translator-api:
-	bazel run //cocotola-translator-api/src
+	bazel run //cocotola-translator-api/src -- -configFile=cocotola-translator-api/configs/local.yml
 
 test:
 	bazel test //... --test_output=all

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -92,8 +91,8 @@ type Config struct {
 	Swagger  *SwaggerConfig  `yaml:"swagger" validate:"required"`
 }
 
-func LoadConfig(env string) (*Config, error) {
-	confContent, err := ioutil.ReadFile("./configs/" + env + ".yml")
+func LoadConfig(configFile string) (*Config, error) {
+	confContent, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +110,7 @@ func LoadConfig(env string) (*Config, error) {
 	return conf, nil
 }
 
-func InitLog(env string, cfg *LogConfig) error {
+func InitLog(cfg *LogConfig) error {
 	formatter := &logrus.JSONFormatter{
 		FieldMap: logrus.FieldMap{
 			logrus.FieldKeyLevel: "severity",

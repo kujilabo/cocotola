@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "TatoebaLinkAddParameter.go",
+        "TatoebaLinkAddParameterIterator.go",
+        "TatoebaLinkRepository.go",
+        "TatoebaSentence.go",
+        "TatoebaSentenceAddParameter.go",
+        "TatoebaSentenceAddParameterIterator.go",
+        "TatoebaSentencePair.go",
+        "TatoebaSentencePairSearchResult.go",
+        "TatoebaSentenceRepository.go",
+        "TatoebaSentenceSearchCondition.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-tatoeba-api/src/domain",
+        "//cocotola-tatoeba-api/src/service",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

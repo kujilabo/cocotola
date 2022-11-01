@@ -1,0 +1,51 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "init.go",
+        "repository_factory.go",
+        "tatoeba_link_iterator.go",
+        "tatoeba_link_repository.go",
+        "tatoeba_sentence_iterator.go",
+        "tatoeba_sentence_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-tatoeba-api/src/domain",
+        "//cocotola-tatoeba-api/src/service",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/gateway",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "db_mysql_test.go",
+        "db_sqlite_test.go",
+        "db_test.go",
+        "gateway_test.go",
+        "tatoeba_sentence_repository_test.go",
+    ],
+    deps = [
+        "//lib/errors",
+        "@com_github_golang_migrate_migrate_v4//:migrate",
+        "@com_github_golang_migrate_migrate_v4//database",
+        "@com_github_golang_migrate_migrate_v4//database/mysql",
+        "@com_github_golang_migrate_migrate_v4//database/sqlite3",
+        "@com_github_golang_migrate_migrate_v4//source/file",
+        "@com_github_mattn_go_sqlite3//:go-sqlite3",
+        "@com_github_onrik_gorm_logrus//:gorm-logrus",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@io_gorm_driver_mysql//:mysql",
+        "@io_gorm_driver_sqlite//:sqlite",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
