@@ -3,7 +3,9 @@ FROM golang:1.18-alpine as builder
 RUN apk add --no-cache build-base=0.5-r3
 
 WORKDIR /app
-COPY . .
+COPY go.mod go.mod
+COPY go.sum go.sum
+COPY src src
 
 RUN go build -o cocotola ./src/main.go
 
