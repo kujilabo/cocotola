@@ -48,6 +48,8 @@ const readHeaderTimeout = time.Duration(30) * time.Second
 
 // @securityDefinitions.basic BasicAuth
 func main() {
+	logrus.Infof("Starting cocotola-translator-api")
+
 	ctx := context.Background()
 	env := flag.String("env", "", "environment")
 	flag.Parse()

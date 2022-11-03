@@ -15,7 +15,6 @@ go_library(
         "//cocotola-translator-api/src/config",
         "//cocotola-translator-api/src/controller/converter",
         "//cocotola-translator-api/src/controller/entity",
-        "//cocotola-translator-api/src/controller/helper",
         "//cocotola-translator-api/src/domain",
         "//cocotola-translator-api/src/service",
         "//cocotola-translator-api/src/usecase",

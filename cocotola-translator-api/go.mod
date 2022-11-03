@@ -10,8 +10,8 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/kujilabo/cocotola/lib v0.0.0-20221103140759-07a0046ea238
-	github.com/kujilabo/cocotola/proto v0.0.0-20221103140759-07a0046ea238
+	github.com/kujilabo/cocotola/lib v0.0.0-20221103142950-89b0b2508e8c
+	github.com/kujilabo/cocotola/proto v0.0.0-20221103142950-89b0b2508e8c
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221103054343-5644f3a418e7
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.9.0
