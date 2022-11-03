@@ -1,6 +1,19 @@
 SHELL=/bin/bash
 .PHONY: lint
 lint:
+	@pushd ./cocotola-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-synthesizer-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-tatoeba-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-translator-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+
 	@pushd ./cocotola-api/src && \
 		golangci-lint run --config ../../.github/.golangci.yml && \
 	popd
