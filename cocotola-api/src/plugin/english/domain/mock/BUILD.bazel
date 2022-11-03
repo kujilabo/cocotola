@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "EnglishPhraseProblemModel.go",
+        "EnglishSentenceProblemModel.go",
+        "EnglishWordSentenceProblemModel.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

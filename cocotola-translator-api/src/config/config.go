@@ -91,8 +91,8 @@ type Config struct {
 	Swagger  *SwaggerConfig  `yaml:"swagger" validate:"required"`
 }
 
-func LoadConfig(configFile string) (*Config, error) {
-	confContent, err := os.ReadFile(configFile)
+func LoadConfig(env string) (*Config, error) {
+	confContent, err := os.ReadFile("./configs/" + env + ".yml")
 	if err != nil {
 		return nil, err
 	}

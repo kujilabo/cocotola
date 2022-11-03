@@ -49,8 +49,8 @@ def go_repositories():
         name = "com_github_ohler55_ojg",
         build_file_proto_mode = "disable_global",
         importpath = "github.com/ohler55/ojg",
-        sum = "h1:L2ds8AlB5t/QbqSfhRwvagJzQ7pgmdrefMIypQs0Xik=",
-        version = "v1.14.4",
+        sum = "h1:xCX2oyh/ZaoesbLH6fwVHStSJpk4o4eJs8ttXutzdg0=",
+        version = "v1.14.5",
     )
     go_repository(
         name = "com_github_onrik_logrus",

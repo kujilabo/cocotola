@@ -1,0 +1,28 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "config",
+    srcs = [
+        "config_cors.go",
+        "config_db.go",
+        "config_log.go",
+        "config_swagger.go",
+        "config_tracer.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/lib/config",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/gateway",
+        "@com_github_gin_contrib_cors//:cors",
+        "@com_github_googlecloudplatform_opentelemetry_operations_go_exporter_trace//:trace",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//semconv/v1.7.0:v1_7_0",
+        "@io_opentelemetry_go_otel_exporters_jaeger//:jaeger",
+        "@io_opentelemetry_go_otel_exporters_stdout_stdouttrace//:stdouttrace",
+        "@io_opentelemetry_go_otel_sdk//resource",
+        "@io_opentelemetry_go_otel_sdk//trace",
+    ],
+)

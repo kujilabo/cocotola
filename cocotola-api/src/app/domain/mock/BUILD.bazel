@@ -1,0 +1,20 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "AudioModel.go",
+        "ProblemModel.go",
+        "StudentModel.go",
+        "StudyType.go",
+        "SystemStudentModel.go",
+        "WorkbookModel.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/domain/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/user/domain",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

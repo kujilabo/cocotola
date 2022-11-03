@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "entity",
+    srcs = [
+        "problem_entity.go",
+        "recordbook_entity.go",
+        "study_entity.go",
+        "synthesizer_entity.go",
+        "workbook_entity.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/user/domain",
+        "//lib/domain",
+    ],
+)

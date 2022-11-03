@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "english_phrase_problem_model.go",
+        "english_sentence_problem_model.go",
+        "english_word_problem_model.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//lib/domain",
+    ],
+)

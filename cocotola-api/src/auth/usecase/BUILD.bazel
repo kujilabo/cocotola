@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "usecase",
+    srcs = [
+        "google_user_usecase.go",
+        "guest_user_usecase.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/auth/usecase",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/auth/service",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/errors",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

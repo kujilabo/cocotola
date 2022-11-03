@@ -1,0 +1,55 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "service",
+    srcs = [
+        "app_properties.go",
+        "audio.go",
+        "guest_student.go",
+        "problem.go",
+        "problem_iterrator.go",
+        "problem_processor.go",
+        "problem_repository.go",
+        "problem_type_repository.go",
+        "processor_factory.go",
+        "recordbook.go",
+        "recordbook_repository.go",
+        "repository_factory.go",
+        "student.go",
+        "study_type_repository.go",
+        "synthesizer_client.go",
+        "system_student.go",
+        "user_quota_repository.go",
+        "workbook.go",
+        "workbook_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = [
+        "problem_repository_test.go",
+        "student_test.go",
+    ],
+    embed = [":service"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service/mock",
+        "//cocotola-api/src/user/domain/mock",
+        "//cocotola-api/src/user/service/mock",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+    ],
+)

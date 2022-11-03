@@ -32,8 +32,8 @@ func NewRouter(adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecas
 		authConfig.Username: authConfig.Password,
 	})
 
-	v1 := router.Group("v1")
 	{
+		v1 := router.Group("v1")
 		v1.Use(otelgin.Middleware(appConfig.Name))
 		v1.Use(middleware.NewTraceLogMiddleware(appConfig.Name))
 		v1.Use(authMiddleware)

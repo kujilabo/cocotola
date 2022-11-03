@@ -12,6 +12,7 @@ go_library(
         "//cocotola-tatoeba-api/src/gateway",
         "//cocotola-tatoeba-api/src/service",
         "//cocotola-tatoeba-api/src/usecase",
+        "//lib/config",
         "//lib/errors",
         "//lib/gateway",
         "@com_github_gin_gonic_gin//:gin",

@@ -1,0 +1,62 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "app_user_group_repository.go",
+        "app_user_repository.go",
+        "group_user_repository.go",
+        "init.go",
+        "organization_repository.go",
+        "rbac_repository.go",
+        "repository_factory.go",
+        "space_repository.go",
+        "user_space_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/errors",
+        "//lib/gateway",
+        "//lib/passwordhelper",
+        "@com_github_casbin_casbin_v2//:casbin",
+        "@com_github_casbin_casbin_v2//model",
+        "@com_github_casbin_gorm_adapter_v3//:gorm-adapter",
+        "@com_github_pkg_errors//:errors",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "app_user_repository_test.go",
+        "db_mysql_test.go",
+        "db_sqlite_test.go",
+        "db_test.go",
+        "gateway_test.go",
+        "organization_repository_test.go",
+        "space_repository_test.go",
+    ],
+    deps = [
+        ":gateway",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/errors",
+        "@com_github_golang_migrate_migrate_v4//:migrate",
+        "@com_github_golang_migrate_migrate_v4//database",
+        "@com_github_golang_migrate_migrate_v4//database/mysql",
+        "@com_github_golang_migrate_migrate_v4//database/sqlite3",
+        "@com_github_golang_migrate_migrate_v4//source/file",
+        "@com_github_mattn_go_sqlite3//:go-sqlite3",
+        "@com_github_onrik_gorm_logrus//:gorm-logrus",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@io_gorm_driver_mysql//:mysql",
+        "@io_gorm_driver_sqlite//:sqlite",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

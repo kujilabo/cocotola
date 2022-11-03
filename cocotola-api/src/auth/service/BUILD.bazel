@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "auth.go",
+        "auth_token_manager.go",
+        "google_auth_client.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/auth/service",
+    visibility = ["//visibility:public"],
+    deps = ["//cocotola-api/src/user/domain"],
+)

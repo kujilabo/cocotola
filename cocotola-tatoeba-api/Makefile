@@ -1,7 +1,10 @@
+SHELL=/bin/bash
 .PHONY: gen-src unit-test swagger docker-up docker-down test-docker-up test-docker-down docker-clear
 
 gen-src:
+	@pushd ./cocotola-api/
 	@go generate ./src/...
+	@popd
 
 unit-test:
 	@go test -v -short ./src/...

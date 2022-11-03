@@ -1055,8 +1055,8 @@ go_repository(
     name = "com_github_dnaeon_go_vcr",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/dnaeon/go-vcr",
-    sum = "h1:r8L/HqC0Hje5AXMu1ooW8oyQyOFv4GxqpL0nRP7SLLY=",
-    version = "v1.0.1",
+    sum = "h1:zHCHvJYTMh1N7xnV7zf1m1GPBF9Ad0Jk/whtQ1663qI=",
+    version = "v1.2.0",
 )
 
 go_repository(
@@ -1735,8 +1735,8 @@ go_repository(
     name = "com_github_golang_sql_civil",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/golang-sql/civil",
-    sum = "h1:lXe2qZdvpiX5WZkZR4hgp4KJVfY3nMkvmwbVkpv1rVY=",
-    version = "v0.0.0-20190719163853-cb61b32ac6fe",
+    sum = "h1:au07oEsX2xN0ktxqI+Sida1w446QrXBRJ0nee3SNZlA=",
+    version = "v0.0.0-20220223132316-b832511892a9",
 )
 
 go_repository(
@@ -2135,8 +2135,8 @@ go_repository(
     name = "com_github_jackc_pgconn",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgconn",
-    sum = "h1:FmjZ0rOyXTr1wfWs45i4a9vjnjWUAGpMuQLD9OSs+lw=",
-    version = "v1.8.0",
+    sum = "h1:3L1XMNV2Zvca/8BYhzcRFS70Lr0WlDg16Di6SFGAbys=",
+    version = "v1.13.0",
 )
 
 go_repository(
@@ -2159,8 +2159,8 @@ go_repository(
     name = "com_github_jackc_pgmock",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgmock",
-    sum = "h1:JVX6jT/XfzNqIjye4717ITLaNwV9mWbJx0dLCpcRzdA=",
-    version = "v0.0.0-20190831213851-13a1b77aafa2",
+    sum = "h1:DadwsjnMwFjfWc9y5Wi/+Zz7xoE5ALHsRQlOctkOiHc=",
+    version = "v0.0.0-20210724152146-4ad1a8207f65",
 )
 
 go_repository(
@@ -2183,8 +2183,8 @@ go_repository(
     name = "com_github_jackc_pgproto3_v2",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgproto3/v2",
-    sum = "h1:6Pwi1b3QdY65cuv6SyVO0FgPd5J3Bl7wf/nQQjinHMA=",
-    version = "v2.0.7",
+    sum = "h1:nwj7qwf0S+Q7ISFfBndqeLwSwxs+4DPsbRFjECT1Y4Y=",
+    version = "v2.3.1",
 )
 
 go_repository(
@@ -2199,24 +2199,24 @@ go_repository(
     name = "com_github_jackc_pgtype",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgtype",
-    sum = "h1:b3pDeuhbbzBYcg5kwNmNDun4pFUD/0AAr1kLXZLeNt8=",
-    version = "v1.6.2",
+    sum = "h1:Dlq8Qvcch7kiehm8wPGIW0W3KsCCHJnRacKW0UM8n5w=",
+    version = "v1.12.0",
 )
 
 go_repository(
     name = "com_github_jackc_pgx_v4",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgx/v4",
-    sum = "h1:/6Q3ye4myIj6AaplUm+eRcz4OhK9HAvFf4ePsG40LJY=",
-    version = "v4.10.1",
+    sum = "h1:0Ut0rpeKwvIVbMQ1KbMBU4h6wxehBI535LK6Flheh8E=",
+    version = "v4.17.2",
 )
 
 go_repository(
     name = "com_github_jackc_puddle",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/puddle",
-    sum = "h1:JnPg/5Q9xVJGfjsO5CPUOjnJps1JaRUm8I9FXVCFK94=",
-    version = "v1.1.3",
+    sum = "h1:eHK/5clGOatcjX3oWGBO/MpxpbHzSwud5EWTSCI+MX0=",
+    version = "v1.3.0",
 )
 
 go_repository(
@@ -2471,8 +2471,8 @@ go_repository(
     name = "com_github_lib_pq",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/lib/pq",
-    sum = "h1:Zx5DJFEYQXio93kgXnQ09fXNiUKsqv4OUEu2UtGcB1E=",
-    version = "v1.10.0",
+    sum = "h1:AqzbZs4ZoCBp+GtejcpCpcxM3zlSMx29dXbUSeVtJb8=",
+    version = "v1.10.2",
 )
 
 go_repository(
@@ -2775,8 +2775,8 @@ go_repository(
     name = "com_github_montanaflynn_stats",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/montanaflynn/stats",
-    sum = "h1:iruDEfMl2E6fbMZ9s0scYfZQ84/6SPL6zC8ACM2oIL0=",
-    version = "v0.0.0-20171201202039-1bf9dbcd8cbe",
+    sum = "h1:Duep6KMIDpY4Yo11iFsvyqJDyfzLF9+sndUKT+v64GQ=",
+    version = "v0.6.6",
 )
 
 go_repository(
@@ -3887,8 +3887,8 @@ go_repository(
     name = "io_gorm_driver_postgres",
     build_file_proto_mode = "disable_global",
     importpath = "gorm.io/driver/postgres",
-    sum = "h1:PAgM+PaHOSAeroTjHkCHCBIHHoBIf9RgPWGo8dF2DA8=",
-    version = "v1.0.8",
+    sum = "h1:zt1fxJ+C+ajparn0SteEnkoPg0BQ6wOWXEQ99bteAmw=",
+    version = "v1.4.4",
 )
 
 go_repository(
@@ -4047,8 +4047,8 @@ go_repository(
     name = "io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc",
     build_file_proto_mode = "disable_global",
     importpath = "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc",
-    sum = "h1:PNEMW4EvpNQ7SuoPFNkvbZqi1STkTPKq+8vfoMl/6AE=",
-    version = "v0.34.0",
+    sum = "h1:PRXhsszxTt5bbPriTjmaweWUsAnJYeWBhUMLRetUgBU=",
+    version = "v0.36.4",
 )
 
 go_repository(
@@ -4247,8 +4247,8 @@ go_repository(
     name = "org_golang_google_grpc",
     build_file_proto_mode = "disable_global",
     importpath = "google.golang.org/grpc",
-    sum = "h1:WTLtQzmQori5FUH25Pq4WT22oCsv8USpQ+F6rqtsmxw=",
-    version = "v1.49.0",
+    sum = "h1:DS/BukOZWp8s6p4Dt/tOaJaTQyPyOoCcrjroHuCeLzY=",
+    version = "v1.50.1",
 )
 
 go_repository(
@@ -4271,8 +4271,8 @@ go_repository(
     name = "org_golang_x_crypto",
     build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/crypto",
-    sum = "h1:GIAS/yBem/gq2MUqgNIzUHW7cJMmx3TGZOrnyYaNQ6c=",
-    version = "v0.0.0-20220817201139-bc19a97f63c8",
+    sum = "h1:huxqepDufQpLLIRXiVkTvnxrzJlpwmIWAObmcCcUFr0=",
+    version = "v0.0.0-20221005025214-4161e89ecf1b",
 )
 
 go_repository(
@@ -4423,16 +4423,16 @@ go_repository(
     name = "org_modernc_cc_v3",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/cc/v3",
-    sum = "h1:1ScT6MCQRWwvwVdERhGPsPq0f55J1/pFEOCiqM7zc78=",
-    version = "v3.32.4",
+    sum = "h1:Yu2IiiRpustRFUgMDZKwVn2RvyJzpfYSOw7zHeKtSi4=",
+    version = "v3.38.1",
 )
 
 go_repository(
     name = "org_modernc_ccgo_v3",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/ccgo/v3",
-    sum = "h1:mOLFgduk60HFuPmxSix3AluTEh7zhozkby+e1VDo/ro=",
-    version = "v3.9.2",
+    sum = "h1:AXquSwg7GuMk11pIdw7fmO1Y/ybgazVkMhsZWCV0mHM=",
+    version = "v3.16.9",
 )
 
 go_repository(
@@ -4487,8 +4487,8 @@ go_repository(
     name = "org_modernc_libc",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/libc",
-    sum = "h1:zv111ldxmP7DJ5mOIqzRbza7ZDl3kh4ncKfASB2jIYY=",
-    version = "v1.9.5",
+    sum = "h1:bXyVhGQg6KIClTr8FMVIDPl7jtbcs7aS5WP7vLDaxPs=",
+    version = "v1.19.0",
 )
 
 go_repository(
@@ -4503,24 +4503,24 @@ go_repository(
     name = "org_modernc_mathutil",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/mathutil",
-    sum = "h1:+yFk8hBprV+4c0U9GjFtL+dV3N8hOJ8JCituQcMShFY=",
-    version = "v1.2.2",
+    sum = "h1:rV0Ko/6SfM+8G+yKiyI830l3Wuz1zRutdslNoQ0kfiQ=",
+    version = "v1.5.0",
 )
 
 go_repository(
     name = "org_modernc_memory",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/memory",
-    sum = "h1:utMBrFcpnQDdNsmM6asmyH/FM9TqLPS7XF7otpJmrwM=",
-    version = "v1.0.4",
+    sum = "h1:crykUfNSnMAXaOJnnxcSzbUGMqkLWjklJKkBK2nwZwk=",
+    version = "v1.4.0",
 )
 
 go_repository(
     name = "org_modernc_opt",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/opt",
-    sum = "h1:/0RX92k9vwVeDXj+Xn23DKp2VJubL7k8qNffND6qn3A=",
-    version = "v0.1.1",
+    sum = "h1:3XOZf2yznlhC+ibLltsDGzABUGVx8J6pnFMS3E4dcq4=",
+    version = "v0.1.3",
 )
 
 go_repository(
@@ -4543,40 +4543,40 @@ go_repository(
     name = "org_modernc_sqlite",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/sqlite",
-    sum = "h1:iNDTQbULcm0IJAqrzCm2JcCqxaKRS94rJ5/clBMRmc8=",
-    version = "v1.10.6",
+    sum = "h1:8xmS5oLnZtAK//vnd4aTVj8VOeTAccEFOtUnIzfSw+4=",
+    version = "v1.19.1",
 )
 
 go_repository(
     name = "org_modernc_strutil",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/strutil",
-    sum = "h1:+1/yCzZxY2pZwwrsbH+4T7BQMoLQ9QiBshRC9eicYsc=",
-    version = "v1.1.0",
+    sum = "h1:fNMm+oJklMGYfU9Ylcywl0CO5O6nTfaowNsh2wpPjzY=",
+    version = "v1.1.3",
 )
 
 go_repository(
     name = "org_modernc_tcl",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/tcl",
-    sum = "h1:sYNjGr4zK6cDH74USl8wVJRrvDX6UOLpG0j4lFvR0W0=",
-    version = "v1.5.2",
+    sum = "h1:cO7oyRWEXweSJmjdbs1L86P52D9QmBy/CPFKmFvNYTU=",
+    version = "v1.14.0",
 )
 
 go_repository(
     name = "org_modernc_token",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/token",
-    sum = "h1:a0jaWiNMDhDUtqOj09wvjWWAqd3q7WpBulmL9H2egsk=",
-    version = "v1.0.0",
+    sum = "h1:A3qvTqOwexpfZZeyI0FeGPDlSWX5pjZu9hF4lU+EKWg=",
+    version = "v1.0.1",
 )
 
 go_repository(
     name = "org_modernc_z",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/z",
-    sum = "h1:WyIDpEpAIx4Hel6q/Pcgj/VhaQV5XPJ2I6ryIYbjnpc=",
-    version = "v1.0.1",
+    sum = "h1:gLwAw6aS973K/k9EOJGlofauyMk4YOUiPDYzWnq/oXo=",
+    version = "v1.6.0",
 )
 
 go_repository(
@@ -4749,6 +4749,139 @@ go_repository(
     version = "v1.11.1",
 )
 
+go_repository(
+    name = "com_github_azure_azure_sdk_for_go_sdk_azcore",
+    importpath = "github.com/Azure/azure-sdk-for-go/sdk/azcore",
+    sum = "h1:sVPhtT2qjO86rTUaWMr4WoES4TkjGnzcioXcnHV9s5k=",
+    version = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_azure_azure_sdk_for_go_sdk_azidentity",
+    importpath = "github.com/Azure/azure-sdk-for-go/sdk/azidentity",
+    sum = "h1:Yoicul8bnVdQrhDMTHxdEckRGX01XvwXDHUT9zYZ3k0=",
+    version = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_azure_azure_sdk_for_go_sdk_internal",
+    importpath = "github.com/Azure/azure-sdk-for-go/sdk/internal",
+    sum = "h1:jp0dGvZ7ZK0mgqnTSClMxa5xuRL7NZgHameVYF6BurY=",
+    version = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_azuread_microsoft_authentication_library_for_go",
+    importpath = "github.com/AzureAD/microsoft-authentication-library-for-go",
+    sum = "h1:WVsrXCnHlDDX8ls+tootqRE87/hL9S/g4ewig9RsD/c=",
+    version = "v0.4.0",
+)
+
+go_repository(
+    name = "com_github_casbin_casbin_v2",
+    importpath = "github.com/casbin/casbin/v2",
+    sum = "h1:4qM+hDfj+i9M6lBbguafWKE/8tJA+9vRY5+l0ZB5WTo=",
+    version = "v2.56.0",
+)
+
+go_repository(
+    name = "com_github_casbin_gorm_adapter_v3",
+    importpath = "github.com/casbin/gorm-adapter/v3",
+    sum = "h1:YfHkjwna8MR9B9V81/pvu+rVcz8YzATmJbwqD5fvDuI=",
+    version = "v3.12.1",
+)
+
+go_repository(
+    name = "com_github_glebarez_go_sqlite",
+    importpath = "github.com/glebarez/go-sqlite",
+    sum = "h1:o2XhjyR8CQ2m84+bVz10G0cabmG0tY4sIMiCbrcUTrY=",
+    version = "v1.19.1",
+)
+
+go_repository(
+    name = "com_github_glebarez_sqlite",
+    importpath = "github.com/glebarez/sqlite",
+    sum = "h1:+8LAEpmywqresSoGlqjjT+I9m4PseIM3NcerIJ/V7mk=",
+    version = "v1.5.0",
+)
+
+go_repository(
+    name = "com_github_golang_jwt_jwt",
+    importpath = "github.com/golang-jwt/jwt",
+    sum = "h1:IfV12K8xAKAnZqdXVzCZ+TOjboZ2keLg81eXfW3O+oY=",
+    version = "v3.2.2+incompatible",
+)
+
+go_repository(
+    name = "com_github_golang_sql_sqlexp",
+    importpath = "github.com/golang-sql/sqlexp",
+    sum = "h1:ZCD6MBpcuOVfGVqsEmY5/4FtYiKz6tSyUv9LPEDei6A=",
+    version = "v0.1.0",
+)
+
+go_repository(
+    name = "com_github_knetic_govaluate",
+    importpath = "github.com/Knetic/govaluate",
+    sum = "h1:1G1pk05UrOh0NlF1oeaaix1x8XzrfjIDK47TY0Zehcw=",
+    version = "v3.0.1-0.20171022003610-9aa49832a739+incompatible",
+)
+
+go_repository(
+    name = "com_github_kylelemons_godebug",
+    importpath = "github.com/kylelemons/godebug",
+    sum = "h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=",
+    version = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_masterminds_semver_v3",
+    importpath = "github.com/Masterminds/semver/v3",
+    sum = "h1:hLg3sBzpNErnxhQtUy/mmLR2I9foDujNK030IGemrRc=",
+    version = "v3.1.1",
+)
+
+go_repository(
+    name = "com_github_microsoft_go_mssqldb",
+    importpath = "github.com/microsoft/go-mssqldb",
+    sum = "h1:Fto83dMZPnYv1Zwx5vHHxpNraeEaUlQ/hhHLgZiaenE=",
+    version = "v0.17.0",
+)
+
+go_repository(
+    name = "com_github_modocache_gover",
+    importpath = "github.com/modocache/gover",
+    sum = "h1:8Q0qkMVC/MmWkpIdlvZgcv2o2jrlF6zqVOh7W5YHdMA=",
+    version = "v0.0.0-20171022184752-b58185e213c5",
+)
+
+go_repository(
+    name = "com_lukechampine_uint128",
+    importpath = "lukechampine.com/uint128",
+    sum = "h1:pnxCASz787iMf+02ssImqk6OLt+Z5QHMoZyUXR4z6JU=",
+    version = "v1.1.1",
+)
+
+go_repository(
+    name = "io_gorm_driver_sqlserver",
+    importpath = "gorm.io/driver/sqlserver",
+    sum = "h1:t4r4r6Jam5E6ejqP7N82qAJIJAht27EGT41HyPfXRw0=",
+    version = "v1.4.1",
+)
+
+go_repository(
+    name = "io_gorm_plugin_dbresolver",
+    importpath = "gorm.io/plugin/dbresolver",
+    sum = "h1:uFDX3bIuH9Lhj5LY2oyqR/bU6pqWuDgas35NAPF4X3M=",
+    version = "v1.3.0",
+)
+
+go_repository(
+    name = "org_modernc_ccorpus",
+    importpath = "modernc.org/ccorpus",
+    sum = "h1:J16RXiiqiCgua6+ZvQot4yUuUy8zxgqbqEEUuGPlISk=",
+    version = "v1.11.6",
+)
+
 # gazelle:repository_macro go_repositories.bzl%go_repositories
 go_repositories()
 
@@ -4771,3 +4904,7 @@ load(
 )
 
 _go_image_repos()
+
+load("@io_bazel_rules_go//extras:embed_data_deps.bzl", "go_embed_data_dependencies")
+
+go_embed_data_dependencies()

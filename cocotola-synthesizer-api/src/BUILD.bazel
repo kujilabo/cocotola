@@ -12,6 +12,7 @@ go_library(
         "//cocotola-synthesizer-api/src/gateway",
         "//cocotola-synthesizer-api/src/service",
         "//cocotola-synthesizer-api/src/usecase",
+        "//lib/config",
         "//lib/errors",
         "//lib/gateway",
         "@com_github_gin_gonic_gin//:gin",

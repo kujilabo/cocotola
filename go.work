@@ -6,4 +6,5 @@ use (
 	./cocotola-tatoeba-api
 	./cocotola-translator-api
 	./lib
+	./test-lib
 )

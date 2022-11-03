@@ -15,5 +15,4 @@ go_binary(
     name = "cocotola",
     embed = [":cocotola_lib"],
     visibility = ["//visibility:public"],
-    data = ["config.yml"],
 )

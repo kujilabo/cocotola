@@ -1,0 +1,37 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "audio_model.go",
+        "guest_model.go",
+        "init.go",
+        "lang.go",
+        "plugin.go",
+        "problem_model.go",
+        "problem_type.go",
+        "rbac.go",
+        "student_model.go",
+        "study_result.go",
+        "study_type.go",
+        "system_student_model.go",
+        "workbook_model.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/domain",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/user/domain",
+        "//lib/domain",
+        "//lib/errors",
+    ],
+)
+
+go_test(
+    name = "domain_test",
+    srcs = [
+        "audio_model_test.go",
+        "lang_test.go",
+    ],
+    embed = [":domain"],
+    deps = ["@com_github_stretchr_testify//assert"],
+)

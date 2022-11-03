@@ -11,7 +11,7 @@ func Test_a(t *testing.T) {
 // "context"
 // "testing"
 
-// app "github.com/kujilabo/cocotola-api/pkg_app/domain"
+// app "github.com/kujilabo/cocotola/cocotola-api/pkg_app/domain"
 // "github.com/sirupsen/logrus"
 
 // func _Test_azureTranslatorClient_DictionaryLookup(t *testing.T) {

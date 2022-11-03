@@ -2,12 +2,10 @@ package config
 
 import (
 	"os"
-	"strings"
 
-	"github.com/gin-contrib/cors"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 
+	libconfig "github.com/kujilabo/cocotola/lib/config"
 	lib "github.com/kujilabo/cocotola/lib/domain"
 )
 
@@ -15,24 +13,6 @@ type AppConfig struct {
 	Name        string `yaml:"name" validate:"required"`
 	HTTPPort    int    `yaml:"httpPort" validate:"required"`
 	MetricsPort int    `yaml:"metricsPort" validate:"required"`
-}
-
-type SQLite3Config struct {
-	File string `yaml:"file" validate:"required"`
-}
-
-type MySQLConfig struct {
-	Username string `yaml:"username" validate:"required"`
-	Password string `yaml:"password" validate:"required"`
-	Host     string `yaml:"host" validate:"required"`
-	Port     int    `yaml:"port" validate:"required"`
-	Database string `yaml:"database" validate:"required"`
-}
-
-type DBConfig struct {
-	DriverName string         `yaml:"driverName"`
-	SQLite3    *SQLite3Config `yaml:"sqlite3"`
-	MySQL      *MySQLConfig   `yaml:"mysql"`
 }
 
 type AuthConfig struct {
@@ -45,32 +25,9 @@ type SynthesizerConfig struct {
 	TimeoutSec int    `yaml:"timeoutSec" validate:"gte=1"`
 }
 
-type JaegerConfig struct {
-	Endpoint string `yaml:"endpoint" validate:"required"`
-}
-
-type TraceConfog struct {
-	Exporter string        `yaml:"exporter" validate:"required"`
-	Jaeger   *JaegerConfig `yaml:"jaeger"`
-}
-
-type CORSConfig struct {
-	AllowOrigins []string `yaml:"allowOrigins"`
-}
-
 type ShutdownConfig struct {
 	TimeSec1 int `yaml:"timeSec1" validate:"gte=1"`
 	TimeSec2 int `yaml:"timeSec2" validate:"gte=1"`
-}
-
-type LogConfig struct {
-	Level string `yaml:"level"`
-}
-
-type SwaggerConfig struct {
-	Enabled bool   `yaml:"enabled"`
-	Host    string `yaml:"host"`
-	Schema  string `yaml:"schema"`
 }
 
 type DebugConfig struct {
@@ -79,16 +36,16 @@ type DebugConfig struct {
 }
 
 type Config struct {
-	App         *AppConfig         `yaml:"app" validate:"required"`
-	DB          *DBConfig          `yaml:"db" validate:"required"`
-	Auth        *AuthConfig        `yaml:"auth" validate:"required"`
-	Synthesizer *SynthesizerConfig `yaml:"synthesizer" validate:"required"`
-	Trace       *TraceConfog       `yaml:"trace" validate:"required"`
-	CORS        *CORSConfig        `yaml:"cors" validate:"required"`
-	Shutdown    *ShutdownConfig    `yaml:"shutdown" validate:"required"`
-	Log         *LogConfig         `yaml:"log" validate:"required"`
-	Debug       *DebugConfig       `yaml:"debug"`
-	Swagger     *SwaggerConfig     `yaml:"swagger" validate:"required"`
+	App         *AppConfig               `yaml:"app" validate:"required"`
+	DB          *libconfig.DBConfig      `yaml:"db" validate:"required"`
+	Auth        *AuthConfig              `yaml:"auth" validate:"required"`
+	Synthesizer *SynthesizerConfig       `yaml:"synthesizer" validate:"required"`
+	Trace       *libconfig.TraceConfig   `yaml:"trace" validate:"required"`
+	CORS        *libconfig.CORSConfig    `yaml:"cors" validate:"required"`
+	Shutdown    *ShutdownConfig          `yaml:"shutdown" validate:"required"`
+	Log         *libconfig.LogConfig     `yaml:"log" validate:"required"`
+	Debug       *DebugConfig             `yaml:"debug"`
+	Swagger     *libconfig.SwaggerConfig `yaml:"swagger" validate:"required"`
 }
 
 func LoadConfig(env string) (*Config, error) {
@@ -108,52 +65,4 @@ func LoadConfig(env string) (*Config, error) {
 	}
 
 	return conf, nil
-}
-
-func InitLog(env string, cfg *LogConfig) error {
-	formatter := &logrus.JSONFormatter{
-		FieldMap: logrus.FieldMap{
-			logrus.FieldKeyLevel: "severity",
-			logrus.FieldKeyMsg:   "message",
-		},
-	}
-	logrus.SetFormatter(formatter)
-
-	switch strings.ToLower(cfg.Level) {
-	case "trace":
-		logrus.SetLevel(logrus.TraceLevel)
-	case "debug":
-		logrus.SetLevel(logrus.DebugLevel)
-	case "info":
-		logrus.SetLevel(logrus.InfoLevel)
-	case "warn":
-		logrus.SetLevel(logrus.WarnLevel)
-	case "error":
-		logrus.SetLevel(logrus.ErrorLevel)
-	case "fatal":
-		logrus.SetLevel(logrus.FatalLevel)
-	default:
-		logrus.Infof("Unsupported log level: %s", cfg.Level)
-		logrus.SetLevel(logrus.WarnLevel)
-	}
-
-	logrus.SetOutput(os.Stdout)
-
-	return nil
-}
-
-func InitCORS(cfg *CORSConfig) cors.Config {
-	if len(cfg.AllowOrigins) == 1 && cfg.AllowOrigins[0] == "*" {
-		return cors.Config{
-			AllowAllOrigins: true,
-			AllowMethods:    []string{"*"},
-			AllowHeaders:    []string{"*"},
-		}
-	}
-
-	return cors.Config{
-		AllowOrigins: cfg.AllowOrigins,
-		AllowMethods: []string{"*"},
-		AllowHeaders: []string{"*"},
-	}
 }

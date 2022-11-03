@@ -27,6 +27,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/gateway"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/usecase"
+	libconfig "github.com/kujilabo/cocotola/lib/config"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
@@ -97,7 +98,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.Re
 
 func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.RepositoryFactoryFunc) error {
 	// cors
-	corsConfig := config.InitCORS(cfg.CORS)
+	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
 
 	if err := corsConfig.Validate(); err != nil {
@@ -160,12 +161,12 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	}
 
 	// init log
-	if err := config.InitLog(env, cfg.Log); err != nil {
+	if err := libconfig.InitLog(env, cfg.Log); err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	// tracer
-	tp, err := config.InitTracerProvider(cfg)
+	// init tracer
+	tp, err := libconfig.InitTracerProvider(cfg.App.Name, cfg.Trace)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitTracerProvider. err: %w", err)
 	}
@@ -173,7 +174,7 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := config.InitDB(cfg.DB)
+	db, sqlDB, err := libconfig.InitDB(cfg.DB)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
 	}

@@ -1,0 +1,41 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "controller",
+    srcs = [
+        "tatoeba_handler.go",
+        "translator_handler.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/controller",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/plugin/common/controller/converter",
+        "//cocotola-api/src/plugin/common/controller/entity",
+        "//cocotola-api/src/plugin/common/domain",
+        "//cocotola-api/src/plugin/common/service",
+        "//cocotola-api/src/user/controller/helper",
+        "//cocotola-api/src/user/domain",
+        "//lib/controller/helper",
+        "//lib/errors",
+        "//lib/log",
+        "@com_github_gin_gonic_gin//:gin",
+    ],
+)
+
+go_test(
+    name = "controller_test",
+    srcs = ["tatoeba_handler_test.go"],
+    deps = [
+        "//cocotola-api/src/app/controller",
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/plugin/common/service",
+        "//cocotola-api/src/plugin/common/service/mock",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_ohler55_ojg//jp",
+        "@com_github_ohler55_ojg//oj",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+    ],
+)
