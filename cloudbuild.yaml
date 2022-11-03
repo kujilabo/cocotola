@@ -46,7 +46,7 @@ steps:
       - -c
       - |
         diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
-        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api"; fi
+        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api; fi
 
 
   # # synthesizer
