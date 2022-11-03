@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"net/http"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	ginlog "github.com/onrik/logrus/gin"
@@ -32,10 +30,6 @@ func NewRouter(adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecas
 
 	authMiddleware := gin.BasicAuth(gin.Accounts{
 		authConfig.Username: authConfig.Password,
-	})
-
-	router.GET("/healthcheck", func(c *gin.Context) {
-		c.Status(http.StatusOK)
 	})
 
 	v1 := router.Group("v1")

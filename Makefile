@@ -94,7 +94,7 @@ gazelle:
 build:
 	@bazel build //...
 
-run-api:
+run-cocotola:
 	@bazel run //cocotola-api/src
 
 test:

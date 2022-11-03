@@ -141,62 +141,68 @@ steps:
         if [ $diff_synthesizer == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
     env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # # translator
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests/cocotola-translator-api/overlays/production"
-  #   entrypoint: "bash"
-  #   args:
-  #     - -c
-  #     - |
-  #       ls
+  # translator
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-translator-api/overlays/production"
+    args:
+      - -c
+      - |
+        diff_translator=$(cat /workspace/diff_translator.txt)
+        if [ $diff_translator == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-translator-api=gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-translator-api/overlays/production"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-translator-api=gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-translator-api/overlays/development"
+    args:
+      - -c
+      - |
+        diff_translator=$(cat /workspace/diff_translator.txt)
+        if [ $diff_translator == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-translator-api=gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-translator-api/overlays/development"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-translator-api=gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+  # tatoeba
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/production"
+    args:
+      - -c
+      - |
+        diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
+        if [ $diff_tatoeba == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # # tatoeba
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/production"
-  #   entrypoint: "bash"
-  #   args:
-  #     - -c
-  #     - |
-  #       ls
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/development"
+    args:
+      - -c
+      - |
+        diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
+        if [ $diff_tatoeba == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/production"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+  # cocotola
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-api/overlays/production"
+    args:
+      - -c
+      - |
+        diff_cocotola=$(cat /workspace/diff_cocotola.txt)
+        if [ $diff_cocotola == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/development"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
-
-  # # cocotola
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests/cocotola-api/overlays/production"
-  #   entrypoint: "bash"
-  #   args:
-  #     - -c
-  #     - |
-  #       ls
-
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-api/overlays/production"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
-
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-api/overlays/development"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-api/overlays/development"
+    args:
+      - -c
+      - |
+        diff_cocotola=$(cat /workspace/diff_cocotola.txt)
+        if [ $diff_cocotola == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
   # common
   - name: "gcr.io/cloud-builders/git"
