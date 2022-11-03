@@ -33,6 +33,32 @@ steps:
     id: "docker push translator"
     args: ["push", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
 
+  # tatoeba
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker build tatoeba"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "./cocotola-tatoeba-api"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker tag tatoeba"
+    args: ["tag", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker push tatoeba"
+    args: ["push", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
+
+  # cocotola
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker build cocotola"
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "./cocotola-api"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker tag cocotola"
+    args: ["tag", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-api:latest"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    id: "docker push cocotola"
+    args: ["push", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
+
   # common
   - name: "gcr.io/cloud-builders/git"
     secretEnv: ["SSH_KEY"]
@@ -110,6 +136,44 @@ steps:
     args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-translator-api=gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
     env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
 
+  # tatoeba
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/production"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        ls
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/production"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-tatoeba-api/overlays/development"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-tatoeba-api=gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
+  # cocotola
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests/cocotola-api/overlays/production"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        ls
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-api/overlays/production"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    dir: "kujilabo-manifests/cocotola-api/overlays/development"
+    args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+
   # common
   - name: "gcr.io/cloud-builders/git"
     dir: "kujilabo-manifests"
@@ -138,3 +202,5 @@ availableSecrets:
 images:
   - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api"
   - "gcr.io/$PROJECT_ID/cocotola-translator-api"
+  - "gcr.io/$PROJECT_ID/cocotola-tatoeba-api"
+  - "gcr.io/$PROJECT_ID/cocotola-api"

@@ -3,6 +3,10 @@ on: [pull_request]
 name: Hadolint
 jobs:
   hadolint:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
       - uses: hadolint/hadolint-action@v2.0.0

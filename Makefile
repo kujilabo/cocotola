@@ -1,6 +1,19 @@
 SHELL=/bin/bash
 .PHONY: lint
 lint:
+	@pushd ./cocotola-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-synthesizer-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-tatoeba-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+	@pushd ./cocotola-translator-api/ && \
+		docker run --rm -i hadolint/hadolint < Dockerfile && \
+	popd
+
 	@pushd ./cocotola-api/src && \
 		golangci-lint run --config ../../.github/.golangci.yml && \
 	popd
@@ -108,3 +121,18 @@ test-docker-up:
 
 test-docker-down:
 	@docker-compose -f docker/test/docker-compose.yml down
+
+.PHONY: dev-docker-build
+dev-docker-build:
+	@pushd ./cocotola-api/ && \
+		docker build . && \
+	popd
+	@pushd ./cocotola-synthesizer-api/ && \
+		docker build . && \
+	popd
+	@pushd ./cocotola-tatoeba-api/ && \
+		docker build . && \
+	popd
+	@pushd ./cocotola-translator-api/ && \
+		docker build . && \
+	popd
