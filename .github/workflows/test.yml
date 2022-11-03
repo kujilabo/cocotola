@@ -18,7 +18,23 @@ jobs:
       - name: Setup MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
+          host port: 3307
+          mysql version: "5.7"
+          mysql database: "testdb"
+          mysql user: "user"
+          mysql password: "password"
+      - name: Setup MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
           host port: 3317
+          mysql version: "5.7"
+          mysql database: "testdb"
+          mysql user: "user"
+          mysql password: "password"
+      - name: Setup MySQL
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3327
           mysql version: "5.7"
           mysql database: "testdb"
           mysql user: "user"
