@@ -7,10 +7,32 @@ steps:
   #   entrypoint: 'bazel'
   #   args: ['build', '//...']
 
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        git diff --name-only | grep cocotola-api
+        diff_cocotola=$?
+        echo $diff_cocotola
+
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        git diff --name-only | grep cocotola-synthesizer-api
+        diff_cocotola_synthesizer=$?
+        echo synthe=$diff_cocotola_synthesizer
+        echo cocotola=$diff_cocotola
+
   # synthesizer
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
     id: "docker build synthesizer"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "./cocotola-synthesizer-api"]
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest","./cocotola-synthesizer-api"]
 
   - name: "gcr.io/cloud-builders/docker"
     id: "docker tag synthesizer"
@@ -22,8 +44,11 @@ steps:
 
   # translator
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
     id: "docker build translator"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "./cocotola-translator-api"]
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-translator-api:latest","./cocotola-translator-api"]
 
   - name: "gcr.io/cloud-builders/docker"
     id: "docker tag translator"
@@ -35,8 +60,11 @@ steps:
 
   # tatoeba
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
     id: "docker build tatoeba"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "./cocotola-tatoeba-api"]
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest","./cocotola-tatoeba-api"]
 
   - name: "gcr.io/cloud-builders/docker"
     id: "docker tag tatoeba"
@@ -48,8 +76,11 @@ steps:
 
   # cocotola
   - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
     id: "docker build cocotola"
-    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "./cocotola-api"]
+    args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-api:latest","./cocotola-api"]
 
   - name: "gcr.io/cloud-builders/docker"
     id: "docker tag cocotola"

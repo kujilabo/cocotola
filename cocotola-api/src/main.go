@@ -154,24 +154,6 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	// {
-	// 	conn, err := grpc.Dial(cfg.Translator.GRPCAddr, grpc.WithTransportCredentials(insecure.NewCredentials()),
-	// 		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()),
-	// 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor()))
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	defer conn.Close()
-
-	// 	x := pluginCommonGateway.NewTranslatorGRPCClient(conn, "", "", time.Duration(cfg.Translator.TimeoutSec)*time.Second)
-	// 	y, err := x.DictionaryLookup(ctx, appD.Lang2EN, appD.Lang2JA, "book")
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	logrus.Info("-----------------------------")
-	// 	logrus.Info(y)
-	// }
-
 	result := run(context.Background(), cfg, db, pf, rfFunc, userRfFunc, synthesizer, translatorClient, tatoebaClient, newIterator)
 
 	time.Sleep(gracefulShutdownTime2)
