@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"flag"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
@@ -52,6 +50,7 @@ import (
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libconfig "github.com/kujilabo/cocotola/lib/config"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
+	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
@@ -188,10 +187,10 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 		return httpServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
-		return metricsServer(ctx, cfg)
+		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
 	})
 	eg.Go(func() error {
-		return signalNotify(ctx)
+		return libG.SignalWatchProcess(ctx)
 	})
 	eg.Go(func() error {
 		<-ctx.Done()
@@ -203,20 +202,6 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 		return 1
 	}
 	return 0
-}
-
-func signalNotify(ctx context.Context) error {
-	sigs := make(chan os.Signal, 1)
-
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	select {
-	case <-ctx.Done():
-		signal.Reset()
-		return nil
-	case sig := <-sigs:
-		return fmt.Errorf("signal received: %v", sig.String())
-	}
 }
 
 func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
@@ -274,44 +259,6 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 	}
 
 	logrus.Printf("http server listening at %v", httpServer.Addr)
-
-	errCh := make(chan error)
-	go func() {
-		defer close(errCh)
-		if err := httpServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			logrus.Infof("failed to ListenAndServe. err: %v", err)
-			errCh <- err
-		}
-	}()
-
-	select {
-	case <-ctx.Done():
-		gracefulShutdownTime1 := time.Duration(cfg.Shutdown.TimeSec1) * time.Second
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
-		defer shutdownCancel()
-		if err := httpServer.Shutdown(shutdownCtx); err != nil {
-			logrus.Infof("Server forced to shutdown. err: %v", err)
-			return err
-		}
-		return nil
-	case err := <-errCh:
-		return err
-	}
-}
-
-func metricsServer(ctx context.Context, cfg *config.Config) error {
-	router := gin.New()
-	router.Use(gin.Recovery())
-
-	httpServer := http.Server{
-		Addr:    ":" + strconv.Itoa(cfg.App.MetricsPort),
-		Handler: router,
-	}
-
-	router.GET("/healthcheck", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
-	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	errCh := make(chan error)
 	go func() {
