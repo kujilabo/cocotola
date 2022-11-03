@@ -6,6 +6,6 @@ import (
 )
 
 func init() {
-	testlibG.InitMySQL(sqls.SQL)
+	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
 }

@@ -6,19 +6,19 @@ import (
 	"testing"
 	"time"
 
-	// "github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/gateway"
+	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 func Test_customTranslationRepository_FindByText(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
-	for driverName, db := range dbList() {
+	for driverName, db := range testlibG.ListDB() {
 		logrus.Println(driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
@@ -30,7 +30,7 @@ func Test_customTranslationRepository_FindByFirstLetter(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	bg := context.Background()
-	for _, db := range dbList() {
+	for _, db := range testlibG.ListDB() {
 		type args struct {
 			firstLetter string
 			lang2       domain.Lang2

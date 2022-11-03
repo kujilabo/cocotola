@@ -27,8 +27,8 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range testlibeG.ListDB() {
-		log.Printf("%d", i)
+	for driverName, db := range testlibeG.ListDB() {
+		log.Printf("%s", driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()
@@ -87,8 +87,8 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range testlibeG.ListDB() {
-		log.Printf("%d", i)
+	for driverName, db := range testlibeG.ListDB() {
+		log.Printf("%s", driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()

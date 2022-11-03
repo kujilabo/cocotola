@@ -29,11 +29,11 @@ func TestGetOrganization(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range testlibeG.ListDB() {
+	for driverName, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 
-		log.Printf("%d", i)
+		log.Printf("%s", driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()
@@ -83,11 +83,11 @@ func TestFindOrganizationByName(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range testlibeG.ListDB() {
+	for driverName, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 
-		log.Printf("%d", i)
+		log.Printf("%s", driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()
@@ -132,11 +132,11 @@ func TestAddOrganization(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range testlibeG.ListDB() {
+	for driverName, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 
-		log.Printf("%d", i)
+		log.Printf("%s", driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()

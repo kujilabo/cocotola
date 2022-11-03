@@ -43,7 +43,7 @@ func NewRecordbookHandler(studentUsecaseStudy studentU.StudentUsecaseStudy) Reco
 // @Produce     json
 // @Param       workbookID path string true "Workbook ID"
 // @Param       studyType  path string true "Study type"
-// @Success     200 {object} entity.ProblemWithLevelList
+// @Success     200 {object} entity.StudyRecords
 // @Failure     400
 // @Router      /v1/study/workbook/{workbookID}/study_type/{studyType} [get]
 func (h *recordbookHandler) FindRecordbook(c *gin.Context) {
@@ -115,7 +115,7 @@ func (h *recordbookHandler) SetStudyResult(c *gin.Context) {
 // @Produce     json
 // @Param       workbookID path string true "Workbook ID"
 // @Param       studyType  path string true "Study type"
-// @Success     200 {object} entity.ProblemWithLevelList
+// @Success     200 {object} map[string]int
 // @Failure     400
 // @Router      /v1/study/workbook/{workbookID}/study_type/{studyType}/completion_rate [get]
 func (h *recordbookHandler) GetCompletionRate(c *gin.Context) {

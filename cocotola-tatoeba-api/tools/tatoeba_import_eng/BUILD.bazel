@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "tatoeba_import_eng_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/tools/tatoeba_import_eng",
+    visibility = ["//visibility:private"],
+    deps = ["//cocotola-tatoeba-api/src/config"],
+)
+
+go_binary(
+    name = "tatoeba_import_eng",
+    embed = [":tatoeba_import_eng_lib"],
+    visibility = ["//visibility:public"],
+)

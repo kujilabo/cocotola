@@ -19,9 +19,9 @@
 # based on the name of the directory bazel is cloned into.
 /bazel-*
 .vscode
-tools/
 coverage.txt
 *.db
 
 **/mysql-data-*/
 **/mysql-data/
+tmp/

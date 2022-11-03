@@ -15,7 +15,7 @@ go_library(
         "//lib/config",
         "//lib/errors",
         "//lib/gateway",
-        "//lib/proto",
+        "//proto/src/proto",
         "@com_github_grpc_ecosystem_go_grpc_middleware//:go-grpc-middleware",
         "@com_github_grpc_ecosystem_go_grpc_middleware//auth",
         "@com_github_grpc_ecosystem_go_grpc_middleware//recovery",
@@ -42,49 +42,49 @@ go_binary(
     visibility = ["//visibility:public"],
 )
 
-load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+# load("@io_bazel_rules_docker//go:image.bzl", "go_image")
 
-go_image(
-    name = "cocotola-translator-api_image",
-    srcs = ["main.go"],
-    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api",
-    visibility = ["//visibility:private"],
-    deps = [
-        "//cocotola-translator-api/docs",
-        "//cocotola-translator-api/src/config",
-        "//cocotola-translator-api/src/controller",
-        "//cocotola-translator-api/src/gateway",
-        "//cocotola-translator-api/src/usecase",
-        "//lib/errors",
-        "//lib/gateway",
-        "//lib/proto",
-        "@com_github_grpc_ecosystem_go_grpc_middleware//:go-grpc-middleware",
-        "@com_github_grpc_ecosystem_go_grpc_middleware//auth",
-        "@com_github_grpc_ecosystem_go_grpc_middleware//recovery",
-        "@com_github_grpc_ecosystem_go_grpc_prometheus//:go-grpc-prometheus",
-        "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_swaggo_files//:files",
-        "@com_github_swaggo_gin_swagger//:gin-swagger",
-        "@io_gorm_gorm//:gorm",
-        "@io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc//:otelgrpc",
-        "@io_opentelemetry_go_otel//:otel",
-        "@io_opentelemetry_go_otel//propagation",
-        "@io_opentelemetry_go_otel_sdk//trace",
-        "@org_golang_google_grpc//:go_default_library",
-        "@org_golang_google_grpc//codes",
-        "@org_golang_google_grpc//reflection",
-        "@org_golang_google_grpc//status",
-        "@org_golang_x_sync//errgroup",
-    ],
-)
+# go_image(
+#     name = "cocotola-translator-api_image",
+#     srcs = ["main.go"],
+#     importpath = "github.com/kujilabo/cocotola/cocotola-translator-api",
+#     visibility = ["//visibility:private"],
+#     deps = [
+#         "//cocotola-translator-api/docs",
+#         "//cocotola-translator-api/src/config",
+#         "//cocotola-translator-api/src/controller",
+#         "//cocotola-translator-api/src/gateway",
+#         "//cocotola-translator-api/src/usecase",
+#         "//lib/errors",
+#         "//lib/gateway",
+#         "//lib/proto",
+#         "@com_github_grpc_ecosystem_go_grpc_middleware//:go-grpc-middleware",
+#         "@com_github_grpc_ecosystem_go_grpc_middleware//auth",
+#         "@com_github_grpc_ecosystem_go_grpc_middleware//recovery",
+#         "@com_github_grpc_ecosystem_go_grpc_prometheus//:go-grpc-prometheus",
+#         "@com_github_sirupsen_logrus//:logrus",
+#         "@com_github_swaggo_files//:files",
+#         "@com_github_swaggo_gin_swagger//:gin-swagger",
+#         "@io_gorm_gorm//:gorm",
+#         "@io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc_otelgrpc//:otelgrpc",
+#         "@io_opentelemetry_go_otel//:otel",
+#         "@io_opentelemetry_go_otel//propagation",
+#         "@io_opentelemetry_go_otel_sdk//trace",
+#         "@org_golang_google_grpc//:go_default_library",
+#         "@org_golang_google_grpc//codes",
+#         "@org_golang_google_grpc//reflection",
+#         "@org_golang_google_grpc//status",
+#         "@org_golang_x_sync//errgroup",
+#     ],
+# )
 
-load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
+# load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_push")
 
-container_push(
-    name = "cocotola-translator-api_image-push",
-    format = "Docker",
-    image = ":cocotola-translator-api_image",
-    registry = "gcr.io",
-    repository = "cocotola-001/cocotola-translator-api-2",
-    tag = "latest",
-)
+# container_push(
+#     name = "cocotola-translator-api_image-push",
+#     format = "Docker",
+#     image = ":cocotola-translator-api_image",
+#     registry = "gcr.io",
+#     repository = "cocotola-001/cocotola-translator-api-2",
+#     tag = "latest",
+# )

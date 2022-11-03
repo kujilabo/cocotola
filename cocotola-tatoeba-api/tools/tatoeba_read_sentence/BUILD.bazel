@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "tatoeba_read_sentence_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/tools/tatoeba_read_sentence",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//cocotola-tatoeba-api/src/gateway",
+        "@com_github_pkg_profile//:profile",
+    ],
+)
+
+go_binary(
+    name = "tatoeba_read_sentence",
+    embed = [":tatoeba_read_sentence_lib"],
+    visibility = ["//visibility:public"],
+)

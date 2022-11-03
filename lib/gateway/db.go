@@ -41,17 +41,17 @@ func ConvertRelationError(err error, newErr error) error {
 func migrateDB(db *gorm.DB, driverName string, sourceDriver source.Driver, getDatabaseDriver func(sqlDB *sql.DB) (database.Driver, error)) error {
 	sqlDB, err := db.DB()
 	if err != nil {
-		return liberrors.Errorf("failed to db.DB in gateway.migrateDB. err: %w", err)
+		return liberrors.Errorf("db.DB in gateway.migrateDB. err: %w", err)
 	}
 
 	databaseDriver, err := getDatabaseDriver(sqlDB)
 	if err != nil {
-		return liberrors.Errorf("failed to WithInstance. err: %w", err)
+		return liberrors.Errorf("getDatabaseDriver in gateway.migrateDB. err: %w", err)
 	}
 
 	m, err := migrate.NewWithInstance("iofs", sourceDriver, driverName, databaseDriver)
 	if err != nil {
-		return liberrors.Errorf("failed to NewWithDatabaseInstance. err: %w", err)
+		return liberrors.Errorf("NewWithInstance in gateway.migrateDB. err: %w", err)
 	}
 
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {

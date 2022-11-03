@@ -5,7 +5,6 @@ import (
 	"embed"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/golang-migrate/migrate/v4/database"
 	"github.com/golang-migrate/migrate/v4/database/mysql"
@@ -17,7 +16,7 @@ import (
 )
 
 var testDBHost string
-var testDBPort string
+var testDBPort int
 var testDBURL string
 
 func openMySQLForTest() (*gorm.DB, error) {
@@ -26,18 +25,10 @@ func openMySQLForTest() (*gorm.DB, error) {
 	})
 }
 
-func InitMySQL(sqlFS embed.FS) {
-	testDBHost = os.Getenv("TEST_DB_HOST")
-	if testDBHost == "" {
-		testDBHost = "127.0.0.1"
-	}
-
-	testDBPort = os.Getenv("TEST_DB_PORT")
-	if testDBPort == "" {
-		testDBPort = "3307"
-	}
-
-	testDBURL = fmt.Sprintf("user:password@tcp(%s:%s)/testdb?charset=utf8&parseTime=True&loc=Asia%%2FTokyo", testDBHost, testDBPort)
+func InitMySQL(sqlFS embed.FS, dbHost string, dbPort int) {
+	testDBHost = dbHost
+	testDBPort = dbPort
+	testDBURL = fmt.Sprintf("user:password@tcp(%s:%d)/testdb?charset=utf8&parseTime=True&loc=Asia%%2FTokyo", testDBHost, testDBPort)
 
 	setupMySQL(sqlFS)
 }

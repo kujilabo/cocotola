@@ -6,7 +6,6 @@ go_library(
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src",
     visibility = ["//visibility:private"],
     deps = [
-        "//cocotola-api/docs",
         "//cocotola-api/src/app/config",
         "//cocotola-api/src/app/controller",
         "//cocotola-api/src/app/domain",
@@ -17,6 +16,7 @@ go_library(
         "//cocotola-api/src/auth/usecase",
         "//cocotola-api/src/data/english_sentence",
         "//cocotola-api/src/data/english_word",
+        "//cocotola-api/src/docs",
         "//cocotola-api/src/plugin/common/gateway",
         "//cocotola-api/src/plugin/common/service",
         "//cocotola-api/src/plugin/english/domain",

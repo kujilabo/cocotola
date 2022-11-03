@@ -27,25 +27,13 @@ go_library(
 go_test(
     name = "gateway_test",
     srcs = [
-        "db_mysql_test.go",
-        "db_sqlite_test.go",
-        "db_test.go",
         "gateway_test.go",
         "tatoeba_sentence_repository_test.go",
     ],
     deps = [
-        "//lib/errors",
-        "@com_github_golang_migrate_migrate_v4//:migrate",
-        "@com_github_golang_migrate_migrate_v4//database",
-        "@com_github_golang_migrate_migrate_v4//database/mysql",
-        "@com_github_golang_migrate_migrate_v4//database/sqlite3",
-        "@com_github_golang_migrate_migrate_v4//source/file",
-        "@com_github_mattn_go_sqlite3//:go-sqlite3",
-        "@com_github_onrik_gorm_logrus//:gorm-logrus",
+        "//cocotola-tatoeba-api/src/sqls",
+        "//test-lib/gateway",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
-        "@io_gorm_driver_mysql//:mysql",
-        "@io_gorm_driver_sqlite//:sqlite",
-        "@io_gorm_gorm//:gorm",
     ],
 )

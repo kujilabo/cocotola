@@ -21,9 +21,9 @@ import (
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 
-	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/docs"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/config"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/controller"
+	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/docs"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/gateway"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/sqls"

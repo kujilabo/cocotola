@@ -6,9 +6,9 @@ go_library(
     importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src",
     visibility = ["//visibility:private"],
     deps = [
-        "//cocotola-synthesizer-api/docs",
         "//cocotola-synthesizer-api/src/config",
         "//cocotola-synthesizer-api/src/controller",
+        "//cocotola-synthesizer-api/src/docs",
         "//cocotola-synthesizer-api/src/gateway",
         "//cocotola-synthesizer-api/src/service",
         "//cocotola-synthesizer-api/src/sqls",

@@ -8,7 +8,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
-	pb "github.com/kujilabo/cocotola/lib/proto"
+	pb "github.com/kujilabo/cocotola/proto/src/proto"
 )
 
 type userServer struct {

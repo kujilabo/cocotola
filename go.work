@@ -7,5 +7,6 @@ use (
 	./cocotola-tatoeba-api
 	./cocotola-translator-api
 	./lib
+	./proto
 	./test-lib
 )

@@ -41,7 +41,7 @@ import (
 	libconfig "github.com/kujilabo/cocotola/lib/config"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
-	pb "github.com/kujilabo/cocotola/lib/proto"
+	pb "github.com/kujilabo/cocotola/proto/src/proto"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second

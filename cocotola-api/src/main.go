@@ -30,7 +30,6 @@ import (
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 
-	"github.com/kujilabo/cocotola/cocotola-api/docs"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller"
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -41,6 +40,7 @@ import (
 	authU "github.com/kujilabo/cocotola/cocotola-api/src/auth/usecase"
 	english_sentence "github.com/kujilabo/cocotola/cocotola-api/src/data/english_sentence"
 	english_word "github.com/kujilabo/cocotola/cocotola-api/src/data/english_word"
+	"github.com/kujilabo/cocotola/cocotola-api/src/docs"
 	pluginCommonGateway "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/gateway"
 	pluginCommonS "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
 	pluginEnglishDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
@@ -54,6 +54,8 @@ import (
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
+
+const readHeaderTimeout = time.Duration(30) * time.Second
 
 // type newIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error)
 
@@ -266,8 +268,9 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 	}
 
 	httpServer := http.Server{
-		Addr:    ":" + strconv.Itoa(cfg.App.HTTPPort),
-		Handler: router,
+		Addr:              ":" + strconv.Itoa(cfg.App.HTTPPort),
+		Handler:           router,
+		ReadHeaderTimeout: readHeaderTimeout,
 	}
 
 	logrus.Printf("http server listening at %v", httpServer.Addr)

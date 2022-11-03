@@ -21,9 +21,9 @@ import (
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 
-	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/docs"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/config"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/controller"
+	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/docs"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/gateway"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/sqls"

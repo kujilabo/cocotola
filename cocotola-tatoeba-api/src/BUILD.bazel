@@ -6,9 +6,9 @@ go_library(
     importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src",
     visibility = ["//visibility:private"],
     deps = [
-        "//cocotola-tatoeba-api/docs",
         "//cocotola-tatoeba-api/src/config",
         "//cocotola-tatoeba-api/src/controller",
+        "//cocotola-tatoeba-api/src/docs",
         "//cocotola-tatoeba-api/src/gateway",
         "//cocotola-tatoeba-api/src/service",
         "//cocotola-tatoeba-api/src/sqls",
