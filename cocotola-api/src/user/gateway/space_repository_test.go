@@ -15,6 +15,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
@@ -26,7 +27,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range dbList() {
+	for i, db := range testlibeG.ListDB() {
 		log.Printf("%d", i)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
@@ -86,7 +87,7 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range dbList() {
+	for i, db := range testlibeG.ListDB() {
 		log.Printf("%d", i)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)

@@ -2,11 +2,13 @@ package gateway
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 
 	"github.com/golang-migrate/migrate/v4/database"
 	migrate_mysql "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	gorm_logrus "github.com/onrik/gorm-logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -19,8 +21,14 @@ func OpenMySQL(username, password, host string, port int, database string) (*gor
 	})
 }
 
-func MigrateMySQLDB(db *gorm.DB) error {
-	return migrateDB(db, "mysql", func(sqlDB *sql.DB) (database.Driver, error) {
+func MigrateMySQLDB(db *gorm.DB, sqlFS embed.FS) error {
+	driverName := "mysql"
+	sourceDriver, err := iofs.New(sqlFS, driverName)
+	if err != nil {
+		return err
+	}
+
+	return migrateDB(db, driverName, sourceDriver, func(sqlDB *sql.DB) (database.Driver, error) {
 		return migrate_mysql.WithInstance(sqlDB, &migrate_mysql.Config{})
 	})
 }

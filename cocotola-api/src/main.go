@@ -46,6 +46,7 @@ import (
 	pluginEnglishDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
 	pluginEnglishGateway "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/gateway"
 	pluginEnglishS "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/service"
+	"github.com/kujilabo/cocotola/cocotola-api/src/sqls"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -393,7 +394,7 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 		return nil, nil, nil, nil, err
 	}
 
-	// tracer
+	// init tracer
 	tp, err := libconfig.InitTracerProvider(cfg.App.Name, cfg.Trace)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitTracerProvider. err: %w", err)
@@ -402,7 +403,7 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := libconfig.InitDB(cfg.DB)
+	db, sqlDB, err := libconfig.InitDB(cfg.DB, sqls.SQL)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
 	}

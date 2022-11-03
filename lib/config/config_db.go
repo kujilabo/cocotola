@@ -2,6 +2,7 @@ package config
 
 import (
 	"database/sql"
+	"embed"
 
 	"gorm.io/gorm"
 
@@ -28,7 +29,7 @@ type DBConfig struct {
 	MySQL      *MySQLConfig   `yaml:"mysql"`
 }
 
-func InitDB(cfg *DBConfig) (*gorm.DB, *sql.DB, error) {
+func InitDB(cfg *DBConfig, sqlFS embed.FS) (*gorm.DB, *sql.DB, error) {
 	switch cfg.DriverName {
 	case "sqlite3":
 		db, err := libG.OpenSQLite("./" + cfg.SQLite3.File)
@@ -45,7 +46,7 @@ func InitDB(cfg *DBConfig) (*gorm.DB, *sql.DB, error) {
 			return nil, nil, err
 		}
 
-		if err := libG.MigrateSQLiteDB(db); err != nil {
+		if err := libG.MigrateSQLiteDB(db, sqlFS); err != nil {
 			return nil, nil, err
 		}
 
@@ -65,7 +66,7 @@ func InitDB(cfg *DBConfig) (*gorm.DB, *sql.DB, error) {
 			return nil, nil, err
 		}
 
-		if err := libG.MigrateMySQLDB(db); err != nil {
+		if err := libG.MigrateMySQLDB(db, sqlFS); err != nil {
 			return nil, nil, liberrors.Errorf("failed to MigrateMySQLDB. err: %w", err)
 		}
 

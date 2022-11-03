@@ -11,6 +11,7 @@ go_library(
         "//cocotola-tatoeba-api/src/controller",
         "//cocotola-tatoeba-api/src/gateway",
         "//cocotola-tatoeba-api/src/service",
+        "//cocotola-tatoeba-api/src/sqls",
         "//cocotola-tatoeba-api/src/usecase",
         "//lib/config",
         "//lib/errors",

@@ -3903,8 +3903,8 @@ go_repository(
     name = "io_gorm_gorm",
     build_file_proto_mode = "disable_global",
     importpath = "gorm.io/gorm",
-    sum = "h1:j/CoiSm6xpRpmzbFJsQHYj+I8bGYWLXVHeYEyyKlF74=",
-    version = "v1.24.0",
+    sum = "h1:CgvzRniUdG67hBAzsxDGOAuq4Te1osVMYsa1eQbd4fs=",
+    version = "v1.24.1",
 )
 
 go_repository(

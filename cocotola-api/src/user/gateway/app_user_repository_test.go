@@ -12,6 +12,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 // func TestAddUser(t *testing.T) {
@@ -82,8 +83,8 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range dbList() {
-		log.Printf("%d", i)
+	for i, db := range testlibeG.ListDB() {
+		log.Printf("%s", i)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
 		defer sqlDB.Close()

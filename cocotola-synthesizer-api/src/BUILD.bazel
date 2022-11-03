@@ -11,6 +11,7 @@ go_library(
         "//cocotola-synthesizer-api/src/controller",
         "//cocotola-synthesizer-api/src/gateway",
         "//cocotola-synthesizer-api/src/service",
+        "//cocotola-synthesizer-api/src/sqls",
         "//cocotola-synthesizer-api/src/usecase",
         "//lib/config",
         "//lib/errors",

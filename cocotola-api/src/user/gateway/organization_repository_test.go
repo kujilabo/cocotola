@@ -13,6 +13,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 func TestGetOrganization(t *testing.T) {
@@ -28,7 +29,7 @@ func TestGetOrganization(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range dbList() {
+	for i, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 
@@ -82,7 +83,7 @@ func TestFindOrganizationByName(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range dbList() {
+	for i, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 
@@ -131,7 +132,7 @@ func TestAddOrganization(t *testing.T) {
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
 	assert.NoError(t, err)
-	for i, db := range dbList() {
+	for i, db := range testlibeG.ListDB() {
 		sysAd, err := service.NewSystemAdminFromDB(bg, db)
 		assert.NoError(t, err)
 

@@ -35,6 +35,11 @@ docker-run:
 # work-init:
 # 	go work cocotola-api cocotola-translator-api lib
 
+dev-docker-up:
+	@docker-compose -f docker/development/docker-compose.yml up -d
+	sleep 10
+	@chmod -R 777 docker/test
+
 test-docker-up:
 	@docker-compose -f docker/test/docker-compose.yml up -d
 	sleep 10

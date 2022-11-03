@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "sqls",
+    srcs = ["sqls.go"],
+    embedsrcs = [
+        "mysql/2020050204_create_audio.up.sql",
+        "sqlite3/2020050204_create_audio.up.sql",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/sqls",
+    visibility = ["//visibility:public"],
+)

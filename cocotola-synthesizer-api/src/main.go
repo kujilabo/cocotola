@@ -26,6 +26,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/controller"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/gateway"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/service"
+	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/sqls"
 	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/usecase"
 	libconfig "github.com/kujilabo/cocotola/lib/config"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
@@ -176,7 +177,7 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := libconfig.InitDB(cfg.DB)
+	db, sqlDB, err := libconfig.InitDB(cfg.DB, sqls.SQL)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
 	}

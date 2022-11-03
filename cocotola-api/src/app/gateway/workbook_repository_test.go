@@ -15,6 +15,7 @@ import (
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
@@ -25,7 +26,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	}
 
 	userS.InitSystemAdmin(userRfFunc)
-	for driverName, db := range dbList() {
+	for driverName, db := range testlibG.ListDB() {
 		logrus.Println(driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
@@ -189,7 +190,7 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 	}
 
 	userS.InitSystemAdmin(userRfFunc)
-	for driverName, db := range dbList() {
+	for driverName, db := range testlibG.ListDB() {
 		logrus.Println(driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)
@@ -273,7 +274,7 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 	}
 
 	userS.InitSystemAdmin(userRfFunc)
-	for driverName, db := range dbList() {
+	for driverName, db := range testlibG.ListDB() {
 		logrus.Println(driverName)
 		sqlDB, err := db.DB()
 		assert.NoError(t, err)

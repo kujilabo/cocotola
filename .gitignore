@@ -22,3 +22,6 @@
 tools/
 coverage.txt
 *.db
+
+**/mysql-data-*/
+**/mysql-data/

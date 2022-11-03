@@ -2,76 +2,15 @@ package gateway_test
 
 import (
 	"context"
-	"database/sql"
-	"errors"
-	"log"
 	"testing"
 
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database"
-	"github.com/golang-migrate/migrate/v4/source/iofs"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
-	"github.com/kujilabo/cocotola/cocotola-api/src/sqls"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
-
-func dbList() []*gorm.DB {
-	dbList := make([]*gorm.DB, 0)
-	m, err := openMySQLForTest()
-	if err != nil {
-		panic(err)
-	}
-
-	dbList = append(dbList, m)
-
-	s, err := openSQLiteForTest()
-	if err != nil {
-		panic(err)
-	}
-	dbList = append(dbList, s)
-
-	return dbList
-}
-
-func setupDB(db *gorm.DB, driverName string, withInstance func(sqlDB *sql.DB) (database.Driver, error)) {
-	sqlDB, err := db.DB()
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer sqlDB.Close()
-
-	// wd, err := os.Getwd()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// pos := strings.Index(wd, "src/user")
-	// dir := wd[0:pos] + "sqls/" + driverName
-
-	driver, err := withInstance(sqlDB)
-	if err != nil {
-		log.Fatal(liberrors.Errorf("failed to WithInstance. err: %w", err))
-	}
-	d, err := iofs.New(sqls.SQL, driverName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// m, err := migrate.NewWithDatabaseInstance("file://"+dir, driverName, driver)
-	m, err := migrate.NewWithInstance("iofs", d, driverName, driver)
-	if err != nil {
-		log.Fatal(liberrors.Errorf("failed to NewWithDatabaseInstance. err: %w", err))
-	}
-
-	if err := m.Up(); err != nil {
-		if !errors.Is(err, migrate.ErrNoChange) {
-			log.Fatal(liberrors.Errorf("failed to Up. driver:%s, err: %w", driverName, err))
-		}
-	}
-}
 
 func testInitOrganization(t *testing.T, db *gorm.DB) (domain.OrganizationID, service.Owner) {
 	bg := context.Background()

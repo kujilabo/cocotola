@@ -2,7 +2,6 @@ package config
 
 import (
 	"embed"
-	"fmt"
 	"os"
 
 	_ "embed"
@@ -83,8 +82,6 @@ type Config struct {
 var config embed.FS
 
 func LoadConfig(env string) (*Config, error) {
-	fmt.Println(os.Getwd())
-
 	confContent, err := config.ReadFile(env + ".yml")
 	if err != nil {
 		return nil, err
