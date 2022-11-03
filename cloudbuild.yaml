@@ -106,19 +106,19 @@ steps:
       - name: "ssh"
         path: /root/.ssh
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   entrypoint: "bash"
-  #   args:
-  #     - -c
-  #     - |
-  #       git config --global user.email "cloudbuild@kujilabo.com"
-  #       git config --global user.name "cloudbuild"
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        git config --global user.email "cloudbuild@kujilabo.com"
+        git config --global user.name "cloudbuild"
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   args: ["clone", "--recurse-submodules", "git@github.com:kujilabo/kujilabo-manifests.git"]
-  #   volumes:
-  #     - name: "ssh"
-  #       path: /root/.ssh
+  - name: "gcr.io/cloud-builders/git"
+    args: ["clone", "--recurse-submodules", "git@github.com:kujilabo/kujilabo-manifests.git"]
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
 
   # - name: "gcr.io/cloud-builders/git"
   #   dir: "kujilabo-manifests"
