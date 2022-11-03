@@ -1,9 +1,9 @@
-FROM golang:1.16-alpine as builder
+FROM golang:1.18-alpine as builder
 
 RUN apk add --no-cache build-base
 
-WORKDIR /go/src/app
-ADD . .
+WORKDIR /app
+COPY . .
 
 RUN go build -o cocotola ./src/main.go
 
@@ -14,16 +14,14 @@ RUN apk --no-cache add tzdata
 
 WORKDIR /app
 
-COPY --from=builder /go/src/cocotola .
-COPY --from=builder /go/src/configs ./configs
-COPY --from=builder /go/src/sqls ./sqls
+COPY --from=builder /app/cocotola .
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-
-RUN chown -R appuser /app
+RUN addgroup -S appgroup && \
+    adduser -S appuser -G appgroup && \
+    chown -R appuser /app
 
 USER appuser
 
-EXPOSE 8080
+EXPOSE 8080 8081
 
 CMD ["./cocotola"]

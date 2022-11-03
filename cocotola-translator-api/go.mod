@@ -11,6 +11,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/kujilabo/cocotola/lib v0.0.0-20221103054343-5644f3a418e7
+	github.com/kujilabo/cocotola/proto v0.0.0-20221103084244-bc68f1120fbf
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221103054343-5644f3a418e7
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.9.0
