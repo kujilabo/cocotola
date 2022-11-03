@@ -1,0 +1,38 @@
+---
+app:
+  name: cocotola-tatoeba-api
+  httpPort: 8280
+  metricsPort: 8281
+db:
+  # driverName: sqlite3
+  # sqlite3:
+  #   file: app.db
+  driverName: mysql
+  mysql:
+    username: user
+    password: password
+    host: 127.0.0.1
+    port: 3326
+    database: development
+auth:
+  username: user
+  password: password
+trace:
+  exporter: jaeger
+  jaeger:
+    endpoint: http://localhost:14268/api/traces
+cors:
+  allowOrigins:
+    - "*"
+shutdown:
+  timeSec1: 1
+  timeSec2: 1
+log:
+  level: info
+swagger:
+  enabled: true
+  host: localhost:8280
+  schema: http
+debug:
+  ginMode: true
+  wait: false

@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "student",
+    srcs = [
+        "student_usecase_audio.go",
+        "student_usecase_problem.go",
+        "student_usecase_study.go",
+        "student_usecase_workbook.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/app/usecase",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

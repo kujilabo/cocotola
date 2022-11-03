@@ -23,7 +23,7 @@ go_library(
         "//lib/controller/middleware",
         "//lib/errors",
         "//lib/log",
-        "//lib/proto",
+        "//proto/src/proto",
         "@com_github_gin_contrib_cors//:cors",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_onrik_logrus//gin",

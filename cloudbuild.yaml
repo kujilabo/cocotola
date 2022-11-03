@@ -9,28 +9,28 @@ steps:
 
   # synthesizer
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker build"
+    id: "docker build synthesizer"
     args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "./cocotola-synthesizer-api"]
 
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker tag"
+    id: "docker tag synthesizer"
     args: ["tag", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest"]
 
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker push"
+    id: "docker push synthesizer"
     args: ["push", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
 
   # translator
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker build"
+    id: "docker build translator"
     args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "./cocotola-translator-api"]
 
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker tag"
+    id: "docker tag translator"
     args: ["tag", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-translator-api:latest"]
 
   - name: "gcr.io/cloud-builders/docker"
-    id: "docker push"
+    id: "docker push translator"
     args: ["push", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
 
   # common

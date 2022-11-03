@@ -36,10 +36,12 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/config"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/gateway"
+	"github.com/kujilabo/cocotola/cocotola-translator-api/src/sqls"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
+	libconfig "github.com/kujilabo/cocotola/lib/config"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
-	pb "github.com/kujilabo/cocotola/lib/proto"
+	pb "github.com/kujilabo/cocotola/proto/src/proto"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
@@ -116,7 +118,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usec
 
 func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) error {
 	// cors
-	corsConfig := config.InitCORS(cfg.CORS)
+	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
 
 	if err := corsConfig.Validate(); err != nil {
@@ -218,12 +220,12 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	}
 
 	// init log
-	if err := config.InitLog(env, cfg.Log); err != nil {
+	if err := libconfig.InitLog(env, cfg.Log); err != nil {
 		return nil, nil, nil, nil, err
 	}
 
-	// tracer
-	tp, err := config.InitTracerProvider(cfg)
+	// init tracer
+	tp, err := libconfig.InitTracerProvider(cfg.App.Name, cfg.Trace)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to config.InitTracerProvider in main.initialize. err: %w", err)
 	}
@@ -231,7 +233,7 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 
 	// init db
-	db, sqlDB, err := config.InitDB(cfg.DB)
+	db, sqlDB, err := libconfig.InitDB(cfg.DB, sqls.SQL)
 	if err != nil {
 		return nil, nil, nil, nil, liberrors.Errorf("failed to configInitDB in main.initialize. err: %w", err)
 	}

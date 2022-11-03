@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "english_sentence",
+    srcs = ["flush.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/data/english_sentence",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/plugin/english/domain",
+        "//lib/errors",
+        "//lib/log",
+    ],
+)

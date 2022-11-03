@@ -1,0 +1,20 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "proto",
+    srcs = [
+        "translator_admin.pb.go",
+        "translator_admin_grpc.pb.go",
+        "translator_user.pb.go",
+        "translator_user_grpc.pb.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_grpc//status",
+        "@org_golang_google_protobuf//reflect/protoreflect",
+        "@org_golang_google_protobuf//runtime/protoimpl",
+    ],
+)

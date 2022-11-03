@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "import2_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/tools/import2",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "import2",
+    embed = [":import2_lib"],
+    visibility = ["//visibility:public"],
+)

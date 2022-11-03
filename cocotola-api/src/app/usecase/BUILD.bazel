@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "usecase",
+    srcs = ["usecase_helper.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "//lib/errors",
+    ],
+)

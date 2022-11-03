@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "casbinquery",
+    srcs = ["casbin_query.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/gateway/casbinquery",
+    visibility = ["//visibility:public"],
+    deps = ["@io_gorm_gorm//:gorm"],
+)

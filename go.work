@@ -1,8 +1,12 @@
 go 1.18
 
 use (
+	.
 	./cocotola-api
 	./cocotola-synthesizer-api
+	./cocotola-tatoeba-api
 	./cocotola-translator-api
 	./lib
+	./proto
+	./test-lib
 )

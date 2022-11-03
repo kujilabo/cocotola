@@ -1,0 +1,206 @@
+definitions:
+  entity.StudyRecord:
+    properties:
+      lastAnsweredAt:
+        type: string
+      level:
+        type: integer
+      memorized:
+        type: boolean
+      problemId:
+        type: integer
+      resultPrev1:
+        type: boolean
+    type: object
+  entity.StudyRecords:
+    properties:
+      records:
+        items:
+          $ref: '#/definitions/entity.StudyRecord'
+        type: array
+    type: object
+  entity.WorkbookAddParameter:
+    properties:
+      name:
+        type: string
+      problemType:
+        type: string
+      questionText:
+        type: string
+    required:
+    - name
+    - problemType
+    type: object
+  entity.WorkbookResponseHTTPEntity:
+    properties:
+      createdAt:
+        type: string
+      createdBy:
+        minimum: 0
+        type: integer
+      id:
+        minimum: 0
+        type: integer
+      lang2:
+        type: string
+      name:
+        type: string
+      problemType:
+        type: string
+      questionText:
+        type: string
+      updatedAt:
+        type: string
+      updatedBy:
+        minimum: 0
+        type: integer
+      version:
+        minimum: 1
+        type: integer
+    required:
+    - lang2
+    - name
+    - problemType
+    - version
+    type: object
+  entity.WorkbookSearchResponse:
+    properties:
+      results:
+        items:
+          $ref: '#/definitions/entity.WorkbookResponseHTTPEntity'
+        type: array
+      totalCount:
+        minimum: 0
+        type: integer
+    type: object
+  entity.WorkbookUpdateParameter:
+    properties:
+      name:
+        type: string
+      questionText:
+        type: string
+    required:
+    - name
+    type: object
+  handlerhelper.IDResponse:
+    properties:
+      id:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /v1/private/workbook:
+    post:
+      parameters:
+      - description: parameter to create new workbook
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/entity.WorkbookAddParameter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlerhelper.IDResponse'
+        "400":
+          description: Bad Request
+      summary: Create new workbook
+  /v1/private/workbook/{workbookID}:
+    put:
+      consumes:
+      - application/json
+      description: update the workbook
+      parameters:
+      - description: Workbook ID
+        in: path
+        name: workbookID
+        required: true
+        type: integer
+      - description: parameter to update the workbook
+        in: body
+        name: param
+        required: true
+        schema:
+          $ref: '#/definitions/entity.WorkbookUpdateParameter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlerhelper.IDResponse'
+        "400":
+          description: Bad Request
+      summary: Update the workbook
+      tags:
+      - private workbook
+  /v1/private/workbook/search:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.WorkbookSearchResponse'
+        "400":
+          description: Bad Request
+      summary: Find workbooks
+  /v1/study/workbook/{workbookID}/study_type/{studyType}:
+    get:
+      description: find results of workbook
+      parameters:
+      - description: Workbook ID
+        in: path
+        name: workbookID
+        required: true
+        type: string
+      - description: Study type
+        in: path
+        name: studyType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.StudyRecords'
+        "400":
+          description: Bad Request
+      summary: Find the recordbook
+      tags:
+      - study
+  /v1/study/workbook/{workbookID}/study_type/{studyType}/completion_rate:
+    get:
+      parameters:
+      - description: Workbook ID
+        in: path
+        name: workbookID
+        required: true
+        type: string
+      - description: Study type
+        in: path
+        name: studyType
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+      summary: Get the completion rate of the workbook
+      tags:
+      - study
+swagger: "2.0"

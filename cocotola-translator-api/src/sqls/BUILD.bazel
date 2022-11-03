@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "sqls",
+    srcs = ["sqls.go"],
+    embedsrcs = [
+        "mysql/2020080108_create_azure_translation.up.sql",
+        "mysql/2020080114_create_custom_translation.up.sql",
+        "sqlite3/2020080108_create_azure_translation.up.sql",
+        "sqlite3/2020080114_create_custom_translation.up.sql",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/sqls",
+    visibility = ["//visibility:public"],
+)

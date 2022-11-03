@@ -1,0 +1,39 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "init.go",
+        "repository_factory.go",
+        "tatoeba_link_iterator.go",
+        "tatoeba_link_repository.go",
+        "tatoeba_sentence_iterator.go",
+        "tatoeba_sentence_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-tatoeba-api/src/domain",
+        "//cocotola-tatoeba-api/src/service",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/gateway",
+        "//lib/log",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "gateway_test.go",
+        "tatoeba_sentence_repository_test.go",
+    ],
+    deps = [
+        "//cocotola-tatoeba-api/src/sqls",
+        "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

@@ -1,16 +1,7 @@
 {
   "folders": [
-	{
-		"path": "cocotola-api"
-	},
-	{
-		"path": "cocotola-translator-api"
-	},
-	{
-		"path": "lib"
-	},
-	{
-		"path": "."
-	}
-]
+    {
+      "path": "."
+    }
+  ]
 }

@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "init.go",
+        "repository_factory.go",
+        "tatoeba_itrerator.go",
+        "tatoeba_link_repository.go",
+        "tatoeba_sentence_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-tatoeba-api/src/domain",
+        "//lib/domain",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

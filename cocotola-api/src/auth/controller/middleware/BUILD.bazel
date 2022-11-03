@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "middleware",
+    srcs = ["auth_middleware.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/auth/controller/middleware",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/auth/gateway",
+        "//lib/log",
+        "@com_github_gin_gonic_gin//:gin",
+        "@com_github_golang_jwt_jwt//:jwt",
+    ],
+)

@@ -5,10 +5,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/domain"
-	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/service"
 	"gorm.io/gorm"
 
+	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/domain"
+	"github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 

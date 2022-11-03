@@ -1,0 +1,33 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "app_properties.go",
+        "app_user.go",
+        "app_user_group.go",
+        "app_user_group_repository.go",
+        "app_user_repository.go",
+        "group_user_repository.go",
+        "organization.go",
+        "organization_repository.go",
+        "owner.go",
+        "rbac_repository.go",
+        "repository_factory.go",
+        "space.go",
+        "space_repository.go",
+        "system_admin.go",
+        "system_owner.go",
+        "user_space_repository.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/user/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/user/domain",
+        "//lib/domain",
+        "//lib/errors",
+        "//lib/log",
+        "@com_github_casbin_casbin_v2//:casbin",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
