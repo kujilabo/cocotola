@@ -28,14 +28,7 @@ steps:
     env:
       - diff_cocotola=$diff_cocotola
 
-  - name: "gcr.io/cloud-builders/git"
-    entrypoint: "bash"
-    args:
-      - -c
-      - |
-        diff_cocotola=$(cat /workspace/diff_cocotola.txt)
-        echo "dif=$diff_cocotola"
-
+  # synthesizer
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
@@ -47,71 +40,53 @@ steps:
       - |
         diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
         if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api; fi
+        if [ $diff_synthesizer == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest; fi
+        if [ $diff_synthesizer == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
 
+  # translator
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
 
-  # # synthesizer
-  # - name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "bash"
-  #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker build synthesizer"
-  #   args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest", "./cocotola-synthesizer-api"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_translator=$(cat /workspace/diff_translator.txt)
+        if [ $diff_translator == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-translator-api:latest ./cocotola-translator-api; fi
+        if [ $diff_translator == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-translator-api:latest; fi
+        if [ $diff_translator == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA; fi
 
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker tag synthesizer"
-  #   args: ["tag", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest"]
+  # tatoeba
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
 
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker push synthesizer"
-  #   args: ["push", "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
+        if [ $diff_tatoeba == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest ./cocotola-tatoeba-api; fi
+        if [ $diff_tatoeba == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
+        if [ $diff_tatoeba == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA; fi
 
-  # # translator
-  # - name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "bash"
-  #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker build translator"
-  #   args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-translator-api:latest","./cocotola-translator-api"]
+  # cocotola
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
 
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker tag translator"
-  #   args: ["tag", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-translator-api:latest"]
-
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker push translator"
-  #   args: ["push", "gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA"]
-
-  # # tatoeba
-  # - name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "bash"
-  #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker build tatoeba"
-  #   args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest","./cocotola-tatoeba-api"]
-
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker tag tatoeba"
-  #   args: ["tag", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest"]
-
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker push tatoeba"
-  #   args: ["push", "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA"]
-
-  # # cocotola
-  # - name: "gcr.io/cloud-builders/docker"
-  #   entrypoint: "bash"
-  #   args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker build cocotola"
-  #   args: ["build", "-t", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "--cache-from", "gcr.io/$PROJECT_ID/cocotola-api:latest","./cocotola-api"]
-
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker tag cocotola"
-  #   args: ["tag", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA", "gcr.io/$PROJECT_ID/cocotola-api:latest"]
-
-  # - name: "gcr.io/cloud-builders/docker"
-  #   id: "docker push cocotola"
-  #   args: ["push", "gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_cocotola=$(cat /workspace/diff_cocotola.txt)
+        if [ $diff_cocotola == '0' ]; then docker build -t gcr.io/$PROJECT_ID/api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-api:latest ./cocotola-api; fi
+        if [ $diff_cocotola == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-api:latest; fi
+        if [ $diff_cocotola == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA; fi
 
   # common
   - name: "gcr.io/cloud-builders/git"
@@ -141,35 +116,30 @@ steps:
       - name: "ssh"
         path: /root/.ssh
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests"
-  #   args: ["checkout", "master"]
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests"
+    args: ["checkout", "master"]
 
-  # # - name: "gcr.io/cloud-builders/git"
-  # #   entrypoint: "bash"
-  # #   args:
-  # #     - -c
-  # #     - |
-  # #       ls
+  # synthesizer
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/production"
+    args:
+      - -c
+      - |
+        diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
+        if [ $diff_synthesizer == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
-  # # synthesizer
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/production"
-  #   entrypoint: "bash"
-  #   args:
-  #     - -c
-  #     - |
-  #       ls
-
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/production"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
-
-  # - name: "gcr.io/$PROJECT_ID/kustomize"
-  #   dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/development"
-  #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA"]
-  #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
+  - name: "gcr.io/$PROJECT_ID/kustomize"
+    entrypoint: "bash"
+    dir: "kujilabo-manifests/cocotola-synthesizer-api/overlays/development"
+    args:
+      - -c
+      - |
+        diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
+        if [ $diff_synthesizer == '0' ]; then kustomize edit set image gcr.io/cocotola/cocotola-synthesizer-api=gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
+    env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=$PROJECT_ID", "GCLOUD_PROJECT=$PROJECT_ID"]
 
   # # translator
   # - name: "gcr.io/cloud-builders/git"
@@ -228,25 +198,25 @@ steps:
   #   args: ["edit", "set", "image", "gcr.io/cocotola/cocotola-api=gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA"]
   #   env: ["APPLY=false", "CLOUDSDK_COMPUTE_ZONE=asia-northeast1-c", "CLOUDSDK_CONTAINER_CLUSTER=cocotola-001", "GCLOUD_PROJECT=cocotola-001"]
 
-  # # common
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests"
-  #   args: ["diff"]
+  # common
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests"
+    args: ["diff"]
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests"
-  #   args: ["add", "."]
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests"
+    args: ["add", "."]
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests"
-  #   args: ["commit", "-m", "Update $SHORT_SHA"]
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests"
+    args: ["commit", "-m", "Update $SHORT_SHA"]
 
-  # - name: "gcr.io/cloud-builders/git"
-  #   dir: "kujilabo-manifests"
-  #   args: ["push", "origin", "master"]
-  #   volumes:
-  #     - name: "ssh"
-  #       path: /root/.ssh
+  - name: "gcr.io/cloud-builders/git"
+    dir: "kujilabo-manifests"
+    args: ["push", "origin", "master"]
+    volumes:
+      - name: "ssh"
+        path: /root/.ssh
 
 availableSecrets:
   secretManager:
