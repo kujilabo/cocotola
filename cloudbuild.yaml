@@ -12,7 +12,14 @@ steps:
     args:
       - -c
       - |
-        git diff --name-only HEAD~1 | grep cocotola-api
+        git diff --name-only HEAD^
+
+  - name: "gcr.io/cloud-builders/git"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        git diff --name-only HEAD^ | grep cocotola-api
         diff_cocotola=$?
         echo $diff_cocotola
     env:
