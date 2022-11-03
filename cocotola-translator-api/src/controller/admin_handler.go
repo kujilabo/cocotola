@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/converter"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/entity"
-	handlerhelper "github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/helper"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
@@ -52,7 +51,7 @@ func (h *adminHandler) FindTranslationsByFirstLetter(c *gin.Context) {
 	logger := log.FromContext(ctx)
 	logger.Infof("FindTranslations")
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		param := entity.TranslationFindParameterHTTPEntity{}
 		if err := c.ShouldBindJSON(&param); err != nil {
 			c.Status(http.StatusBadRequest)
@@ -97,7 +96,7 @@ func (h *adminHandler) FindTranslationByTextAndPos(c *gin.Context) {
 	logger := log.FromContext(ctx)
 	logger.Infof("FindTranslationByTextAndPos")
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		text := helper.GetStringFromPath(c, "text")
 
 		pos, err := helper.GetIntFromPath(c, "pos")
@@ -139,7 +138,7 @@ func (h *adminHandler) FindTranslationByTextAndPos(c *gin.Context) {
 func (h *adminHandler) FindTranslationsByText(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		text := helper.GetStringFromPath(c, "text")
 		results, err := h.adminUsecase.FindTranslationByText(ctx, domain.Lang2JA, text)
 		if err != nil {
@@ -159,7 +158,7 @@ func (h *adminHandler) FindTranslationsByText(c *gin.Context) {
 func (h *adminHandler) AddTranslation(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		param := entity.TranslationAddParameterHTTPEntity{}
 		if err := c.ShouldBindJSON(&param); err != nil {
 			c.Status(http.StatusBadRequest)
@@ -182,7 +181,7 @@ func (h *adminHandler) AddTranslation(c *gin.Context) {
 func (h *adminHandler) UpdateTranslation(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		text := helper.GetStringFromPath(c, "text")
 
 		pos, err := helper.GetIntFromPath(c, "pos")
@@ -216,7 +215,7 @@ func (h *adminHandler) UpdateTranslation(c *gin.Context) {
 func (h *adminHandler) RemoveTranslation(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		text := helper.GetStringFromPath(c, "text")
 
 		pos, err := helper.GetIntFromPath(c, "pos")
@@ -238,7 +237,7 @@ func (h *adminHandler) RemoveTranslation(c *gin.Context) {
 }
 
 func (h *adminHandler) ExportTranslations(c *gin.Context) {
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		csvStruct := [][]string{
 			{"name", "address", "phone"},
 			{"Ram", "Tokyo", "1236524"},

@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/converter"
-	handlerhelper "github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/helper"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
@@ -44,7 +43,7 @@ func NewUserHandler(userUsecase usecase.UserUsecase) UserHandler {
 // @Security    BasicAuth
 func (h *userHandler) DictionaryLookup(c *gin.Context) {
 	ctx := c.Request.Context()
-	handlerhelper.HandleFunction(c, func() error {
+	helper.HandleFunction(c, func() error {
 		text := helper.GetStringFromQuery(c, "text")
 		if len(text) <= 1 {
 			c.Status(http.StatusBadRequest)
