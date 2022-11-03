@@ -13,18 +13,18 @@ steps:
       - -c
       - |
         git fetch --depth=2
-        git diff --name-only HEAD^ HEAD
-
-  - name: "gcr.io/cloud-builders/git"
-    entrypoint: "bash"
-    args:
-      - -c
-      - |
-        git fetch --depth=2
         git diff --name-only HEAD^ HEAD | grep cocotola-api
         diff_cocotola=$?
-        echo $diff_cocotola
         echo "$diff_cocotola" > /workspace/diff_cocotola.txt
+        git diff --name-only HEAD^ HEAD | grep cocotola-translator-api
+        diff_translator=$?
+        echo "$diff_translator" > /workspace/diff_translator.txt
+        git diff --name-only HEAD^ HEAD | grep cocotola-synthesizer-api
+        diff_synthesizer=$?
+        echo "$diff_synthesizer" > /workspace/diff_synthesizer.txt
+        git diff --name-only HEAD^ HEAD | grep cocotola-tatoeba-api
+        diff_tatoeba=$?
+        echo "$diff_tatoeba" > /workspace/diff_tatoeba.txt
     env:
       - diff_cocotola=$diff_cocotola
 
@@ -35,6 +35,19 @@ steps:
       - |
         diff_cocotola=$(cat /workspace/diff_cocotola.txt)
         echo "dif=$diff_cocotola"
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
+        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api"; fi
+
 
   # # synthesizer
   # - name: "gcr.io/cloud-builders/docker"
