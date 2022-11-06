@@ -156,7 +156,7 @@ func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator
 	for i, e := range workbooks {
 		w, err := e.toWorkbookModel(r.rf, r.pf, operator, r.toProblemType(e.ProblemTypeID), priv)
 		if err != nil {
-			return nil, liberrors.Errorf("failed to toWorkbook. err: %w", err)
+			return nil, liberrors.Errorf("toWorkbookModel. err: %w", err)
 		}
 		results[i] = w
 	}
@@ -240,7 +240,7 @@ func (r *workbookRepository) FindWorkbookByID(ctx context.Context, operator doma
 
 	priv, err := r.getPrivileges(ctx, operator, domain.WorkbookID(workbookEntity.ID))
 	if err != nil {
-		return nil, liberrors.Errorf("failed to checkPrivileges. err: %w", err)
+		return nil, liberrors.Errorf("getPrivileges. err: %w", err)
 	}
 	if !priv.HasPrivilege(domain.PrivilegeRead) {
 		return nil, service.ErrWorkbookPermissionDenied
