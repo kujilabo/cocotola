@@ -58,10 +58,19 @@ jobs:
       - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
-            "${{ matrix.go-version }}/**.md"
+            "**/**.md"
       - name: Test
         # if: (env.GIT_DIFF | grep ${{ matrix.workdir }}) 0
-        run: echo "$(${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})"
+        run: |
+          echo ${{env.GIT_DIFF}}
+          echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }}
+          diff=(echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})
+          echo ${diff}
+          echo ${{diff}}
+          diff=$(echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})
+          echo ${diff}
+          echo ${{diff}}
+
         working-directory: ${{ matrix.workdir }}
       # - name: Test
       #   working-directory: ${{ matrix.workdir }}
