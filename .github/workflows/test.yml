@@ -68,6 +68,9 @@ jobs:
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
+      - name: Check diff
+        if: contains(steps.changed-files.outputs.all_changed_files, 'cocotola-api/*')
+        run: echo DIFF
       # - uses: technote-space/get-diff-action@v6
       #   with:
       #     PATTERNS: |
