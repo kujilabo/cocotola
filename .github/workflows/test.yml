@@ -57,7 +57,8 @@ jobs:
         uses: bazelbuild/setup-bazelisk@v2.0.0
       - uses: technote-space/get-diff-action@v6
         with:
-          PATTERNS: ${{ matrix.workdir }}
+          PATTERNS: |
+            "${{ matrix.workdir }}/*"
       - name: Test
         if: steps.diff.outputs.diff
         run: echo "Do Test ${{ matrix.workdir }}"
