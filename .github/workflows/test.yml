@@ -56,14 +56,10 @@ jobs:
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v2.0.0
       - id: check_diff
-        run: echo "dif_${{ renamed_workdir }}=$(git diff --name-only HEAD^ HEAD | grep ${{ matrix.workdir }})" >> $GITHUB_OUTPUT
-        with:
-          renamed_workdir: ${{ matrix.workdir//-/_ }}
+        run: echo "dif_${{  matrix.workdir//-/_ }}=$(git diff --name-only HEAD^ HEAD | grep ${{ matrix.workdir }})" >> $GITHUB_OUTPUT
       - name: Test
-        if: ${{ steps.check_diff_${{ renamed_workdir }}.outputs.changed != '0' }}
+        if: ${{ steps.check_diff_${{  matrix.workdir//-/_ }}.outputs.changed != '0' }}
         run: echo "Do Test ${{ matrix.workdir }}"
-        with:
-          renamed_workdir: ${{ matrix.workdir//-/_ }}
       # - name: Test
       #   working-directory: ${{ matrix.workdir }}
       #   run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
