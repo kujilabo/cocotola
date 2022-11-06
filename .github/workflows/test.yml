@@ -59,6 +59,7 @@ jobs:
         with:
           PATTERNS: |
             "${{ matrix.workdir }}/*"
+            "${{ matrix.workdir }}/go.mod"
       - name: Test
         if: steps.diff.outputs.diff
         run: echo "Do Test ${{ matrix.workdir }}"
