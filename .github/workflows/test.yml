@@ -58,10 +58,10 @@ jobs:
       - uses: technote-space/get-diff-action@v6
         with:
           PATTERNS: |
-            "**/**"
+            **/**.md
       - name: Test
         # if: (env.GIT_DIFF | grep ${{ matrix.workdir }}) 0
-        run: echo "$(env.GIT_DIFF | grep ${{ matrix.workdir }})"
+        run: echo "$(${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})"
         working-directory: ${{ matrix.workdir }}
       # - name: Test
       #   working-directory: ${{ matrix.workdir }}
