@@ -1,6 +1,5 @@
 ---
-# on: [pull_request]
-on: [abc]
+on: [pull_request]
 name: Reviewdog
 jobs:
   staticcheck:
