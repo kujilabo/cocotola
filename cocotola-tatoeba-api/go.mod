@@ -6,7 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang-migrate/migrate/v4 v4.15.2
-	github.com/kujilabo/cocotola/lib v0.0.0-20221103140759-07a0046ea238
+	github.com/kujilabo/cocotola/lib v0.0.0-20221103142950-89b0b2508e8c
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/onrik/gorm-logrus v0.4.0
 	github.com/onrik/logrus v0.9.0
