@@ -61,7 +61,7 @@ jobs:
       - name: Test
         if: steps.diff.outputs.diff
         run: echo "Do Test ${{ matrix.workdir }}"
-        working-directory: ${{ matrix.dir }}
+        working-directory: ${{ matrix.workdir }}
       # - name: Test
       #   working-directory: ${{ matrix.workdir }}
       #   run: go test -coverprofile="coverage.txt" -covermode=atomic ./...

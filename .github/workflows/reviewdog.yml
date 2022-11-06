@@ -1,11 +1,17 @@
 ---
-on: [pull_request]
+# on: [pull_request]
+on: [push]
 name: Reviewdog
 jobs:
   staticcheck:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
     name: runner / staticcheck
     runs-on: ubuntu-latest
     steps:
