@@ -53,8 +53,10 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v2.0.0
+        with:
+          fetch-depth: 0
+      # - name: Setup Bazelisk
+      #   uses: bazelbuild/setup-bazelisk@v2.0.0
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v34
