@@ -56,14 +56,14 @@ jobs:
         with:
           fetch-depth: 0
       - name: Get changed files
-        id: changed-files
+        id: changed-files-specific
         uses: tj-actions/changed-files@v34
         with:
           files: |
             ${{ matrix.workdir }}/**
       - name: List all changed files
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
             echo "$file was changed"
           done
       - name: Test
