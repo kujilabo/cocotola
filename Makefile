@@ -1,4 +1,17 @@
 SHELL=/bin/bash
+
+.PHONY: all
+all:
+	$(MAKE) lint
+	$(MAKE) gen-swagger
+	$(MAKE) gen-src
+	$(MAKE) gen-proto
+	$(MAKE) update-mod
+	$(MAKE) gazelle
+	$(MAKE) build
+	$(MAKE) test
+	$(MAKE) dev-docker-build
+
 .PHONY: lint
 lint:
 	@pushd ./cocotola-api/ && \
@@ -125,14 +138,14 @@ test-docker-down:
 .PHONY: dev-docker-build
 dev-docker-build:
 	@pushd ./cocotola-api/ && \
-		docker build . && \
+		docker build -t cocotola-api . && \
 	popd
 	@pushd ./cocotola-synthesizer-api/ && \
-		docker build . && \
+		docker build -t cocotola-synthesizer-api . && \
 	popd
 	@pushd ./cocotola-tatoeba-api/ && \
-		docker build . && \
+		docker build -t cocotola-tatoeba-api . && \
 	popd
 	@pushd ./cocotola-translator-api/ && \
-		docker build . && \
+		docker build -t cocotola-translator-api . && \
 	popd

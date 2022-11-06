@@ -5,12 +5,26 @@ jobs:
   staticcheck:
     strategy:
       matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
     name: runner / staticcheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
       - name: staticcheck
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -21,15 +35,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  golangci-lint:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / golangci-lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: golangci-lint
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -38,15 +45,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  errcheck:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / errcheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: errcheck
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -57,15 +57,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  gosec:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / gosec
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: gosec
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -75,30 +68,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  # dupl:
-  #   name: runner / dupl
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: dupl
-  #       uses: reviewdog/action-golangci-lint@v2
-  #       with:
-  #         github_token: ${{ secrets.REVIEWDOG_TOKEN }}
-  #         reporter: github-pr-review
-  #         golangci_lint_flags: "--disable-all -E dupl --timeout=10m"
-  #         tool_name: dupl
-  #         filter_mode: nofilter
-  #         fail_on_error: true
-
-  gofmt:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / gofmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: gofmt
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -109,15 +80,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  unconvert:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / unconvert
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: unconvert
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -128,15 +92,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  gomnd:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / gomnd
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: gomnd
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -147,15 +104,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  errorlint:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / errorlint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: errorlint
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -166,16 +116,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-
-  gocyclo:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / gocyclo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: gocyclo
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -186,15 +128,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  goimports:
-    strategy:
-      matrix:
-        workdir: [lib, cocotola-api, cocotola-synthesizer-api, cocotola-translator-api]
-    name: runner / goimports
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: goimports
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -204,12 +139,8 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-  misspell:
-    name: runner / misspell
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: misspell
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-misspell@v1
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
@@ -217,12 +148,8 @@ jobs:
           locale: "US"
           fail_on_error: true
 
-  yamllint:
-    name: runner / yamllint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
       - name: yamllint
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-yamllint@v1
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}

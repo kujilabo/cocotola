@@ -911,6 +911,10 @@ github.com/kujilabo/cocotola/lib v0.0.0-20221103022908-251fac8c039e h1:YWO5aCxGb
 github.com/kujilabo/cocotola/lib v0.0.0-20221103022908-251fac8c039e/go.mod h1:lHVk4bEenqON8lczKiccuYi44KKM/k1hA2dfoYMQXO4=
 github.com/kujilabo/cocotola/lib v0.0.0-20221103054343-5644f3a418e7 h1:RUPauOFWyNR1l4iH1sk5qKa7Vnd/RBP5gfCVZUWq+hM=
 github.com/kujilabo/cocotola/lib v0.0.0-20221103054343-5644f3a418e7/go.mod h1:lHVk4bEenqON8lczKiccuYi44KKM/k1hA2dfoYMQXO4=
+github.com/kujilabo/cocotola/lib v0.0.0-20221103140759-07a0046ea238 h1:Z7PfRWBstqhnulFGZJkCUwFww41Ja2nU0xSGRL4nGMM=
+github.com/kujilabo/cocotola/lib v0.0.0-20221103140759-07a0046ea238/go.mod h1:lHVk4bEenqON8lczKiccuYi44KKM/k1hA2dfoYMQXO4=
+github.com/kujilabo/cocotola/lib v0.0.0-20221103142950-89b0b2508e8c h1:8dTKN8nUxvSlP8eb6s9HWj8ZdfRRec7iW2y/XRFaIaU=
+github.com/kujilabo/cocotola/lib v0.0.0-20221103142950-89b0b2508e8c/go.mod h1:lHVk4bEenqON8lczKiccuYi44KKM/k1hA2dfoYMQXO4=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221103022908-251fac8c039e h1:LXlyp5u2/+KuudKOUZ+iODNFkHSA7tDspAUjPsvbsY4=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221103022908-251fac8c039e/go.mod h1:D85ntDoB2eF+2akN6aYNU0QezHv2ecCM13aldvBwlM4=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=

@@ -2,7 +2,7 @@
 on: [pull_request]
 name: Test
 jobs:
-  test:
+  test_go:
     strategy:
       matrix:
         go-version: [1.18.x]
@@ -53,9 +53,21 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v2.0.0
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files-specific.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
       - name: Test
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         working-directory: ${{ matrix.workdir }}
         run: go test -coverprofile="coverage.txt" -covermode=atomic ./...
       - name: Coverage
