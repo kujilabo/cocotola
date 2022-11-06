@@ -20,7 +20,7 @@ auth:
   signingKey: ah5T9Y9V2JPU74fhCtHQfDqLp3Zg8ZNc
   accessTokenTtlMin: 5
   refreshTokenTtlHour: 720
-  googleCallbackUrl: http://localhost:3000/app/callback
+  googleCallbackUrl: http://localhost:5173/app/callback
   googleClientId: 830416463276-3ts1rsinahi0hdnsfc10m6mabpttrd5i.apps.googleusercontent.com
   googleClientSecret: $GOOGLE_CLIENT_SECRET
   apiTimeoutSec: 5

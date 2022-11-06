@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/go-cmp v0.5.9
-	github.com/kujilabo/cocotola/lib v0.0.0-20221103054343-5644f3a418e7
+	github.com/kujilabo/cocotola/lib v0.0.0-20221103142950-89b0b2508e8c
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221103022908-251fac8c039e
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.9.0
