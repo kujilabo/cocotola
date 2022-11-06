@@ -65,10 +65,8 @@ jobs:
           echo ${{env.GIT_DIFF}}
           echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }}
           diff=(echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})
-          echo ${diff}
           echo ${{diff}}
           diff=$(echo ${{env.GIT_DIFF}} | grep ${{ matrix.workdir }})
-          echo ${diff}
           echo ${{diff}}
 
         working-directory: ${{ matrix.workdir }}
