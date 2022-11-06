@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v2.0.0
-      - id: check_diff_${{ matrix.workdir//-/_ }}
+      - id: check_diff
         run: echo "dif_${{ renamed_workdir }}=$(git diff --name-only HEAD^ HEAD | grep ${{ matrix.workdir }})" >> $GITHUB_OUTPUT
         with:
           renamed_workdir: ${{ matrix.workdir//-/_ }}
