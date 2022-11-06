@@ -5,8 +5,8 @@ RUN apk add --no-cache build-base=0.5-r3
 WORKDIR /app
 COPY go.mod go.mod ./
 RUN go mod download
-COPY . .
 
+COPY . .
 RUN go build -o cocotola ./src/main.go
 
 # Application image.
