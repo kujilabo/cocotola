@@ -6,7 +6,7 @@ import { Form as NativeForm } from 'semantic-ui-react';
 import * as Yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { UpdateButton } from '@/components';
+import { AppDimmer, UpdateButton } from '@/components';
 import {
   updateProblemProperty,
   selectProblemUpdateLoading,
@@ -24,35 +24,31 @@ export const problemPropertyEditFormikForm = <
   problemId: number,
   problemVersion: number,
   problemType: string,
+  toField: (values: V) => ReactElement,
   validationSchema: Yup.ObjectSchema<any>,
-  setErrorMessage: Dispatch<SetStateAction<string>>,
-  setProblem: (t: V) => void,
   propsToValues: (props: P) => V,
   valuesToProperites: (values: V) => { [key: string]: string },
-  form: ReactElement
+  setValues: (v: V) => void,
+  setErrorMessage: Dispatch<SetStateAction<string>>
 ): ComponentType<P> => {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectProblemUpdateLoading);
 
-  const EditForm = <V extends FormValues & { loading: boolean }>(
-    props: FormikProps<V>
-  ): ReactElement => {
+  const EditForm = (props: FormikProps<V>): ReactElement => {
     const { values, isValid, submitForm } = props;
+    const onClick = () => {
+      if (isValid) {
+        submitForm();
+      }
+    };
 
     return (
       <Form>
+        {loading ? <AppDimmer /> : <div />}
         <NativeForm.Group inline>
-          <NativeForm.Field>{form}</NativeForm.Field>
+          <NativeForm.Field>{toField(values)}</NativeForm.Field>
           <NativeForm.Field>
-            <UpdateButton
-              type="button"
-              disabled={values.loading}
-              onClick={() => {
-                if (isValid) {
-                  submitForm();
-                }
-              }}
-            />
+            <UpdateButton type="button" disabled={loading} onClick={onClick} />
           </NativeForm.Field>
         </NativeForm.Group>
       </Form>
@@ -80,7 +76,7 @@ export const problemPropertyEditFormikForm = <
           postFailureProcess: (error: string) => setErrorMessage(error),
         })
       );
-      setProblem(values);
+      setValues(values);
     },
   })(EditForm);
 };

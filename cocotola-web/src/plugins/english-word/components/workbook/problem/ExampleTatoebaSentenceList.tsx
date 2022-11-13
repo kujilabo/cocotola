@@ -1,14 +1,13 @@
 import React from 'react';
+
 import { Form, Checkbox, CheckboxProps, Table } from 'semantic-ui-react';
 
-import { TatoebaSentencePairModel } from 'plugins/tatoeba/models/tatoeba';
 import {
   makeAuthorLink,
   makeLicenseLink,
   makeSentenceLink,
-} from 'plugins/tatoeba/components/util';
-
-import 'App.css';
+} from '@/plugins/tatoeba/components/util';
+import { TatoebaSentencePairModel } from '@/plugins/tatoeba/models/tatoeba';
 
 type ExampleTatoebaSentenceListProps = {
   sentences: TatoebaSentencePairModel[];

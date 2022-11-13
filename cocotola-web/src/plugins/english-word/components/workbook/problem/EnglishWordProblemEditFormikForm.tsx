@@ -1,18 +1,20 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+
 import { withFormik, FormikBag } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
-import { useAppDispatch } from 'app/hooks';
-import { updateProblem } from 'features/problem_update';
-import { EnglishWordProblemTypeId } from 'models/problem';
+import { useAppDispatch } from '@/app/hooks';
+import { updateProblem } from '@/features/problem_update';
+import { EnglishWordProblemTypeId } from '@/models/problem';
+import { TatoebaSentencePairModel } from '@/plugins/tatoeba/models/tatoeba';
+
+import { EnglishWordProblemModel } from '../../../models/english-word-problem';
+
 import {
   EnglishWordProblemEditForm,
   EnglishWordProblemEditFormValues,
 } from './EnglishWordProblemEditForm';
-import { TatoebaSentencePairModel } from 'plugins/tatoeba/models/tatoeba';
-import { EnglishWordProblemModel } from '../../../models/english-word-problem';
-import 'App.css';
 
 export interface EnglishWordProblemEditFormikFormProps {
   number: number;
@@ -35,7 +37,7 @@ export const englishWordProblemEditFormikForm = (
   setProblem: (t: EnglishWordProblemEditFormValues) => void,
   selectSentence: (index: number, checked: boolean) => void
 ): React.ComponentType<EnglishWordProblemEditFormikFormProps> => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   return withFormik<
@@ -74,7 +76,6 @@ export const englishWordProblemEditFormikForm = (
             workbookId: workbookId,
             problemId: problem.id,
             version: problem.version,
-            number: 1,
             problemType: EnglishWordProblemTypeId,
             properties: {
               text: values.text,
@@ -86,7 +87,7 @@ export const englishWordProblemEditFormikForm = (
             },
           },
           postSuccessProcess: () =>
-            history.push(`/app/private/workbook/${workbookId}`),
+            navigate(`/app/private/workbook/${workbookId}`),
           postFailureProcess: (error: string) => setErrorMessage(error),
         })
       );

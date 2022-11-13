@@ -6,14 +6,13 @@ import { Button, Container, Divider, Form, Message } from 'semantic-ui-react';
 import * as Yup from 'yup';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, ErrorMessage, AppDimmer } from '@/components';
+import { AppBreadcrumbLink, ErrorMessage } from '@/components';
 import {
   FormValues,
   FormikFormProps,
   problemPropertyEditFormikForm,
 } from '@/components/problem/ProblemPropertyEditFormikForm';
 import { selectProblemMap } from '@/features/problem_find';
-import { selectProblemUpdateLoading } from '@/features/problem_update';
 import { addRecord } from '@/features/record_add';
 import { selectWorkbook } from '@/features/workbook_get';
 import { EnglishSentenceProblemTypeId } from '@/models/problem';
@@ -57,7 +56,6 @@ export const EnglishSentenceMemorizationAnswer: FC<
   const englishSentenceRecordbook = useAppSelector(
     selectEnglishSentenceRecordbook
   );
-  const loading = useAppSelector(selectProblemUpdateLoading);
   const [memorized, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const breadcrumb = (
@@ -147,14 +145,16 @@ export const EnglishSentenceMemorizationAnswer: FC<
     problem.id,
     problem.version,
     EnglishSentenceProblemTypeId,
+    (values: formValuesTranslated) => (
+      <Input name="translated" placeholder="translated sentence" errorPrompt />
+    ),
     Yup.object().shape({
-      translated: Yup.string().required('Sentence is required'),
+      translated: Yup.string().required('Translated is required'),
     }),
-    setErrorMessage,
-    (values: FormValues) => {},
     (props: formikFormPropsTranslated) => ({ ...props }),
     (values: formValuesTranslated) => ({ translated: values.translated }),
-    <Input name="translated" placeholder="translated sentence" errorPrompt />
+    (values: formValuesTranslated) => {},
+    setErrorMessage
   );
 
   return (
@@ -169,7 +169,6 @@ export const EnglishSentenceMemorizationAnswer: FC<
         headerText={problem.text}
         contentList={[
           <div>
-            {loading ? <AppDimmer /> : <div />}
             <EnglishSentenceProblemEditFormikForm
               translated={problem.translated}
             />

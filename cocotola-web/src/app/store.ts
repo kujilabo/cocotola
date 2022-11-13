@@ -29,29 +29,30 @@ import workbookGetReducer from '@/features/workbook_get';
 import workbookRemoveReducer from '@/features/workbook_remove';
 import workbookUpdateReducer from '@/features/workbook_update';
 import { EnglishSentenceProblem } from '@/plugins/english-sentence/containers/workbook/problem/EnglishSentenceProblem';
-// import { EnglishWordProblem } from '@/plugins/english-word/containers/workbook/problem/EnglishWordProblem';
+import { EnglishWordProblem } from '@/plugins/english-word/containers/workbook/problem/EnglishWordProblem';
+import tatoebaSentenceFindReducer from '@/plugins/tatoeba/features/tatoeba_find';
+import tatoebaImportReducer from '@/plugins/tatoeba/features/tatoeba_import';
+import translationAddReducer from '@/plugins/translation/features/translation_add';
+import translationExportReducer from '@/plugins/translation/features/translation_export';
+import translationFindReducer from '@/plugins/translation/features/translation_find';
+import translationGetReducer from '@/plugins/translation/features/translation_get';
+import translationGetListReducer from '@/plugins/translation/features/translation_get_list';
+import translationImportReducer from '@/plugins/translation/features/translation_import';
+import translationRemoveReducer from '@/plugins/translation/features/translation_remove';
+import translationUpdateReducer from '@/plugins/translation/features/translation_update';
+
 // import routerReducer from 'features/router';
 
-// // plugin
-// import translationFindReducer from 'plugins/translation/features/translation_find';
-// import translationGetReducer from 'plugins/translation/features/translation_get';
-// import translationGetListReducer from 'plugins/translation/features/translation_get_list';
-// import translationAddReducer from 'plugins/translation/features/translation_add';
-// import translationUpdateReducer from 'plugins/translation/features/translation_update';
-// import translationRemoveReducer from 'plugins/translation/features/translation_remove';
-// import translationImportReducer from 'plugins/translation/features/translation_import';
-// import translationExportReducer from 'plugins/translation/features/translation_export';
-// import tatoebaImportReducer from 'plugins/tatoeba/features/tatoeba_import';
-// import tatoebaSentenceFindReducer from 'plugins/tatoeba/features/tatoeba_find';
+// plugin
 
-// const englishWordProblem = new EnglishWordProblem();
+const englishWordProblem = new EnglishWordProblem();
 const englishSentenceProblem = new EnglishSentenceProblem();
 export const problemFactory = new ProblemFactory({
-  // english_word: englishWordProblem,
+  english_word: englishWordProblem,
   english_sentence: englishSentenceProblem,
 });
 const reducers = {
-  //   englishWord: englishWordProblem.getReducer(),
+  englishWord: englishWordProblem.getReducer(),
   englishSentence: englishSentenceProblem.getReducer(),
 };
 
@@ -74,17 +75,17 @@ export const rootReducer = combineReducers({
   recordbookGet: recordbookGetReducer,
   recordAdd: recordAddReducer,
   audio: audioReducer,
-  // // plugin
-  // translationFind: translationFindReducer,
-  // translationGet: translationGetReducer,
-  // translationGetList: translationGetListReducer,
-  // translationAdd: translationAddReducer,
-  // translationUpdate: translationUpdateReducer,
-  // translationRemove: translationRemoveReducer,
-  // translationImport: translationImportReducer,
-  // translationExport: translationExportReducer,
-  // tatoebaImport: tatoebaImportReducer,
-  // tatoebaSentenceFindSlice: tatoebaSentenceFindReducer,
+  // plugin
+  translationFind: translationFindReducer,
+  translationGet: translationGetReducer,
+  translationGetList: translationGetListReducer,
+  translationAdd: translationAddReducer,
+  translationUpdate: translationUpdateReducer,
+  translationRemove: translationRemoveReducer,
+  translationImport: translationImportReducer,
+  translationExport: translationExportReducer,
+  tatoebaImport: tatoebaImportReducer,
+  tatoebaSentenceFindSlice: tatoebaSentenceFindReducer,
 });
 
 const persistConfig = {

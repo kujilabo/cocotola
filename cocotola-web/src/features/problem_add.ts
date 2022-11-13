@@ -10,7 +10,7 @@ const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/workbook`;
 
 // Add problem
 export type ProblemAddParameter = {
-  number: number;
+  // number: number;
   problemType: string;
   properties: { [key: string]: string };
 };

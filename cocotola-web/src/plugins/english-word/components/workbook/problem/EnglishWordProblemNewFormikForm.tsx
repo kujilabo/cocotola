@@ -1,16 +1,17 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+
 import { withFormik, FormikBag } from 'formik';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
-import { useAppDispatch } from 'app/hooks';
-import { addProblem } from 'features/problem_add';
-import { EnglishWordProblemTypeId } from 'models/problem';
+import { useAppDispatch } from '@/app/hooks';
+import { addProblem } from '@/features/problem_add';
+import { EnglishWordProblemTypeId } from '@/models/problem';
+
 import {
   EnglishWordProblemNewForm,
   EnglishWordProblemNewFormValues,
 } from './EnglishWordProblemNewForm';
-import 'App.css';
 
 export interface EnglishWordProblemNewFormikFormProps {
   text: string;
@@ -23,7 +24,7 @@ export const englishWordProblemNewFormikForm = (
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
   setProblem: (t: EnglishWordProblemNewFormValues) => void
 ): React.ComponentType<EnglishWordProblemNewFormikFormProps> => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   return withFormik<
@@ -51,7 +52,6 @@ export const englishWordProblemNewFormikForm = (
         addProblem({
           workbookId: workbookId,
           param: {
-            number: 1,
             problemType: EnglishWordProblemTypeId,
             properties: {
               text: values.text,
@@ -60,7 +60,7 @@ export const englishWordProblemNewFormikForm = (
             },
           },
           postSuccessProcess: () =>
-            history.push(`/app/private/workbook/${workbookId}`),
+            navigate(`/app/private/workbook/${workbookId}`),
           postFailureProcess: setErrorMessage,
         })
       );

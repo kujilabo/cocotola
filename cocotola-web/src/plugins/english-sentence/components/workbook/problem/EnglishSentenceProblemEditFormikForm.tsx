@@ -62,7 +62,6 @@ export const englishSentenceProblemEditFormikForm = (
             workbookId: workbookId,
             problemId: problem.id,
             version: problem.version,
-            number: 1,
             problemType: EnglishSentenceProblemTypeId,
             properties: {
               text: values.text,

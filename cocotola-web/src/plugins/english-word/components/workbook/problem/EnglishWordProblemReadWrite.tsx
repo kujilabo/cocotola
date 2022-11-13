@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+
 import { useTranslation } from 'react-i18next';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button, Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
 
-import { useAppSelector, useAppDispatch } from 'app/hooks';
-import { removeProblem } from 'features/problem_remove';
-import { ProblemModel } from 'models/problem';
-import { AudioButton, DangerModal, ErrorMessage } from 'components';
-import { getAudio, selectAudioViewLoading } from 'features/audio';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { AudioButton, DangerModal, ErrorMessage } from '@/components';
+import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { removeProblem } from '@/features/problem_remove';
+import { ProblemModel } from '@/models/problem';
+import { emptyFunction } from '@/utils/util';
+
 import { toDsiplayText } from '../../../utils/util';
-import { emptyFunction } from 'utils/util';
-import 'App.css';
 
 export const EnglishWordProblemReadWrite: React.FC<
   EnglishWordProblemReadWriteProps
@@ -20,7 +21,7 @@ export const EnglishWordProblemReadWrite: React.FC<
   const problemVersion = props.problem.version;
   const dispatch = useAppDispatch();
   const [t] = useTranslation();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const baseUrl = `/app/private/workbook/${workbookId}/problem/${problemId}`;
   const audioViewLoading = useAppSelector(selectAudioViewLoading);
@@ -47,7 +48,7 @@ export const EnglishWordProblemReadWrite: React.FC<
           problemId: problemId,
           version: problemVersion,
         },
-        postSuccessProcess: () => history.push(props.baseWorkbookPath),
+        postSuccessProcess: () => navigate(props.baseWorkbookPath),
         postFailureProcess: setErrorMessage,
       })
     );

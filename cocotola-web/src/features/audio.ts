@@ -1,4 +1,3 @@
-import { extractErrorMessage } from './base';
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
@@ -7,6 +6,8 @@ import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
 import { AudioModel } from '@/models/audio';
 import { jsonHeaders } from '@/utils/util';
+
+import { extractErrorMessage } from './base';
 
 const baseUrl = import.meta.env.VITE_APP_BACKEND + '/v1/workbook';
 

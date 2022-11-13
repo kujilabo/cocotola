@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import {
@@ -10,25 +11,24 @@ import {
   Header,
 } from 'semantic-ui-react';
 
-import { useAppSelector, useAppDispatch } from 'app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from 'components';
-import { LinkButton } from 'components/buttons';
-import { selectWorkbook } from 'features/workbook_get';
-import { selectProblemMap } from 'features/problem_find';
-import { addRecord } from 'features/record_add';
-import { getAudio, selectAudioViewLoading } from 'features/audio';
-import { getProblem } from 'features/problem_get';
-import { ProblemModel } from 'models/problem';
-import { emptyFunction } from 'utils/util';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
+import { LinkButton } from '@/components/buttons';
+import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { selectProblemMap, getProblem } from '@/features/problem_find';
+import { addRecord } from '@/features/record_add';
+import { selectWorkbook } from '@/features/workbook_get';
+import { ProblemModel } from '@/models/problem';
+import { emptyFunction } from '@/utils/util';
+
 import {
   selectEnglishWordRecordbook,
   nextEnglishWordProblem,
 } from '../../../../features/english_word_study';
-import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
 import { EnglishWordProblemModel } from '../../../../models/english-word-problem';
 import { toDsiplayText } from '../../../../utils/util';
 
-import 'App.css';
+import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
 
 type ParamTypes = {
   _workbookId: string;
@@ -38,6 +38,8 @@ export const EnglishWordMemorizationAnswer: React.FC<
   EnglishWordMemorizationAnswerProps
 > = (props: EnglishWordMemorizationAnswerProps) => {
   const { _workbookId, _studyType } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
+  const studyType = _studyType || '';
   const dispatch = useAppDispatch();
   const [t] = useTranslation();
   const workbook = useAppSelector(selectWorkbook);
@@ -78,7 +80,7 @@ export const EnglishWordMemorizationAnswer: React.FC<
   useEffect(() => {
     dispatch(
       getProblem({
-        param: { workbookId: +_workbookId, problemId: problemId },
+        param: { workbookId: workbookId, problemId: problemId },
         postSuccessProcess: (p: ProblemModel) => {
           const e = EnglishWordProblemModel.of(p);
           console.log(e);
@@ -92,7 +94,7 @@ export const EnglishWordMemorizationAnswer: React.FC<
     dispatch(
       getAudio({
         param: {
-          workbookId: +_workbookId,
+          workbookId: workbookId,
           problemId: problemId,
           audioId: +problem.audioId,
           updatedAt: problem.updatedAt,
@@ -108,8 +110,8 @@ export const EnglishWordMemorizationAnswer: React.FC<
       dispatch(
         addRecord({
           param: {
-            workbookId: +_workbookId,
-            studyType: _studyType,
+            workbookId: workbookId,
+            studyType: studyType,
             problemId: problemId,
             result: true,
             memorized: true,
@@ -129,7 +131,7 @@ export const EnglishWordMemorizationAnswer: React.FC<
         breadcrumbLinks={props.breadcrumbLinks}
         workbookUrl={props.workbookUrl}
         name={workbook.name}
-        id={+_workbookId}
+        id={workbookId}
       />
       <Divider hidden />
       <Card>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button, Card, Header } from 'semantic-ui-react';
+
 import { FormikProps } from 'formik';
 import { Form, Input, Select } from 'formik-semantic-ui-react';
-import { posOptions } from 'plugins/translation/components';
-import { langOptions } from 'components';
-import { AppDimmer } from 'components';
-import 'App.css';
+import { Button, Card, Header } from 'semantic-ui-react';
+
+import { langOptions, AppDimmer } from '@/components';
+import { posOptions } from '@/plugins/translation/components';
 
 export interface EnglishWordProblemNewFormValues {
   text: string;
