@@ -164,7 +164,7 @@ jobs:
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
-          eslint_flags: 'src/'
+          eslint_flags: 'src/**/*.{ts,tsx}'
   others:
     strategy:
       matrix:
