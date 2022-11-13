@@ -2,7 +2,7 @@
 on: [pull_request]
 name: Reviewdog
 jobs:
-  staticcheck:
+  golang:
     strategy:
       matrix:
         workdir:
@@ -11,7 +11,7 @@ jobs:
           - cocotola-synthesizer-api
           - cocotola-translator-api
           - cocotola-tatoeba-api
-    name: runner / staticcheck
+    name: golang
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -138,7 +138,55 @@ jobs:
           tool_name: goimports
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
-
+  typescript:
+    strategy:
+      matrix:
+        workdir:
+          - cocotola-web
+    name: typescript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
+      - name: eslint
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-eslint@v1
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          filter_mode: nofilter
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+          eslint_flags: 'src/**/*.{ts,tsx}'
+  others:
+    strategy:
+      matrix:
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
+          - cocotola-web
+    name: others
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
       - name: misspell
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-misspell@v1
@@ -147,7 +195,6 @@ jobs:
           reporter: github-pr-review
           locale: "US"
           fail_on_error: true
-
       - name: yamllint
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-yamllint@v1

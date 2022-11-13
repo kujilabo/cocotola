@@ -1,7 +1,14 @@
 {
   "folders": [
-    {
-      "path": "."
-    }
-  ]
+	{
+		"path": "."
+	},
+	{
+		"path": "cocotola-web"
+	}
+],
+  "settings": {
+    "go.coverOnSingleTest": true,
+    "go.coverOnSingleTestFile": true
+  }
 }
