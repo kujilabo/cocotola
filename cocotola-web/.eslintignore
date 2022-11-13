@@ -6,3 +6,4 @@ dist
 coverage
 **/*.test.tsx
 **/*.test.ts
+jest.config.jest
