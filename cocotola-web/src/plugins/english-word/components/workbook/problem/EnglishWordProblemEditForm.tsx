@@ -1,14 +1,18 @@
 import React from 'react';
-import { Button, Card, Header } from 'semantic-ui-react';
+
 import { FormikProps } from 'formik';
 import { Form, Input, Select } from 'formik-semantic-ui-react';
-import { TatoebaSentencePairModel } from 'plugins/tatoeba/models/tatoeba';
+import { Button, Card, Header } from 'semantic-ui-react';
+
+import { langOptions } from '@/components';
+import {
+  TatoebaSentencePairModel,
+  TatoebaSentenceModel,
+} from '@/plugins/tatoeba/models/tatoeba';
+import { posOptions } from '@/plugins/translation/components';
+
 import { ExampleTatoebaSentence } from './ExampleTatoebaSentence';
 import { ExampleTatoebaSentenceList } from './ExampleTatoebaSentenceList';
-import { TatoebaSentenceModel } from 'plugins/tatoeba/models/tatoeba';
-import { posOptions } from 'plugins/translation/components';
-import { langOptions } from 'components';
-import 'App.css';
 
 export interface EnglishWordProblemEditFormValues {
   number: number;

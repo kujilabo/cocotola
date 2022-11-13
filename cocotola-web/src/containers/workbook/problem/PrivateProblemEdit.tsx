@@ -5,16 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { problemFactory } from '@/app/store';
 import { AppDimmer } from '@/components';
-// import {
-//   getProblem,
-//   selectProblem,
-//   selectProblemGetLoading,
-// } from '@/features/problem_get';import {
-import {
-  getProblem,
-  selectProblemMap,
-  // selectProblemLoadingMap,
-} from '@/features/problem_find';
+import { getProblem, selectProblemMap } from '@/features/problem_find';
 import { getWorkbook, selectWorkbook } from '@/features/workbook_get';
 import { emptyFunction } from '@/utils/util';
 
@@ -34,8 +25,7 @@ export const PrivateProblemEdit = (): ReactElement => {
   // TODO
   const problemLoading = false;
   const [errorMessage, setErrorMessage] = useState('');
-
-  console.log('problem.version', problem.version);
+  const problemVersion = problem ? problem.version : 0;
   useEffect(() => {
     dispatch(
       getWorkbook({
@@ -44,30 +34,23 @@ export const PrivateProblemEdit = (): ReactElement => {
         postFailureProcess: setErrorMessage,
       })
     );
-  }, [dispatch, workbookId]);
+  }, [workbookId]);
 
   useEffect(() => {
-    console.log(
-      'getProblem1',
-      workbookId + ',' + problemId + ',' + ',' + problem.version
-    );
     if (problemLoading) {
       return;
     }
 
-    console.log(
-      'getProblem2',
-      workbookId + ',' + problemId + ',' + ',' + problem.version
-    );
-    dispatch(
-      getProblem({
-        param: { workbookId: workbookId, problemId: problemId },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-    // }, [dispatch, workbookId, problemId]);
-  }, [dispatch, workbookId, problemId, problem.version]);
+    if (problem && problemId !== problem.id) {
+      dispatch(
+        getProblem({
+          param: { workbookId: workbookId, problemId: problemId },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    }
+  }, [workbookId, problemId, problem, problemVersion]);
 
   if (errorMessage !== '') {
     return <div>{errorMessage}</div>;

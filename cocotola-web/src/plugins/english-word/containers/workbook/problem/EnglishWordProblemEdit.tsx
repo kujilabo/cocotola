@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from 'react';
+
 import { useParams } from 'react-router-dom';
 import { Container, Divider } from 'semantic-ui-react';
 
-import { useAppDispatch, useAppSelector } from 'app/hooks';
-import { ErrorMessage, PrivateProblemBreadcrumb } from 'components';
-import { selectProblem } from 'features/problem_get';
-import { WorkbookModel } from 'models/workbook';
-import { ProblemModel } from 'models/problem';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { ErrorMessage, PrivateProblemBreadcrumb } from '@/components';
+import { selectProblemMap } from '@/features/problem_find';
+import { ProblemModel } from '@/models/problem';
+import { WorkbookModel } from '@/models/workbook';
 import {
   findTatoebaSentences,
   selectTatoebaSentences,
   selectTatoebaFindLoading,
-} from 'plugins/tatoeba/features/tatoeba_find';
-import { emptyFunction } from 'utils/util';
+} from '@/plugins/tatoeba/features/tatoeba_find';
+import { emptyFunction } from '@/utils/util';
 
 import { englishWordProblemEditFormikForm } from '../../../components/workbook/problem/EnglishWordProblemEditFormikForm';
 import { EnglishWordProblemModel } from '../../../models/english-word-problem';
-
-import 'App.css';
 
 type ParamTypes = {
   _workbookId: string;
@@ -27,10 +26,12 @@ type ParamTypes = {
 export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
   props: EnglishWordProblemEditProps
 ) => {
-  const { _workbookId } = useParams<ParamTypes>();
-  const workbookId = +_workbookId;
+  const { _workbookId, _problemId } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
+  const problemId = +(_problemId || '');
   const dispatch = useAppDispatch();
-  const problem = EnglishWordProblemModel.of(useAppSelector(selectProblem));
+  const problemMap = useAppSelector(selectProblemMap);
+  const problem = EnglishWordProblemModel.of(problemMap[problemId]);
   const tatoebaSentences = useAppSelector(selectTatoebaSentences);
   const tatoebaSentenceFindLoading = useAppSelector(selectTatoebaFindLoading);
   const [values, setValues] = useState({
@@ -99,7 +100,7 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
     <Container fluid>
       <PrivateProblemBreadcrumb
         name={props.workbook.name}
-        id={+_workbookId}
+        id={workbookId}
         text={'' + props.problem.number}
       />
       <Divider hidden />

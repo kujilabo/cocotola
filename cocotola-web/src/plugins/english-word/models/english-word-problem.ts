@@ -1,4 +1,4 @@
-import { ProblemModel } from 'models/problem';
+import { ProblemModel } from '@/models/problem';
 
 export const POS_ADJ = 1; // 形容詞
 export const POS_ADV = 2; // 副詞

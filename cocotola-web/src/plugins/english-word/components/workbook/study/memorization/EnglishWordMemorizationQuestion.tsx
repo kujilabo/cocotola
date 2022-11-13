@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { useParams } from 'react-router-dom';
 import {
   Accordion,
@@ -11,21 +12,22 @@ import {
   Message,
 } from 'semantic-ui-react';
 
-import { useAppSelector, useAppDispatch } from 'app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from 'components';
-import { selectWorkbook } from 'features/workbook_get';
-import { addRecord } from 'features/record_add';
-import { selectProblemMap } from 'features/problem_find';
-import { getAudio, selectAudioViewLoading } from 'features/audio';
-import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
-import { emptyFunction } from 'utils/util';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
+import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { selectProblemMap } from '@/features/problem_find';
+import { addRecord } from '@/features/record_add';
+import { selectWorkbook } from '@/features/workbook_get';
+import { emptyFunction } from '@/utils/util';
+
 import {
   selectEnglishWordRecordbook,
   setEnglishWordStatus,
   setEnglishWordRecord,
   ENGLISH_WORD_STATUS_ANSWER,
 } from '../../../../features/english_word_study';
-import 'App.css';
+
+import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
 
 type ParamTypes = {
   _workbookId: string;
@@ -36,6 +38,8 @@ export const EnglishWordMemorizationQuestion: React.FC<
 > = (props: EnglishWordMemorizationQuestionProps) => {
   //onsole.log('EnglishWordMemorizationQuestion');
   const { _workbookId, _studyType } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
+  const studyType = _studyType || '';
   const dispatch = useAppDispatch();
   const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
@@ -48,7 +52,7 @@ export const EnglishWordMemorizationQuestion: React.FC<
       breadcrumbLinks={props.breadcrumbLinks}
       workbookUrl={props.workbookUrl}
       name={workbook.name}
-      id={+_workbookId}
+      id={workbookId}
     />
   );
   if (englishWordRecordbook.records.length === 0) {
@@ -73,7 +77,7 @@ export const EnglishWordMemorizationQuestion: React.FC<
     dispatch(
       getAudio({
         param: {
-          workbookId: +_workbookId,
+          workbookId: workbookId,
           problemId: problemId,
           audioId: problem.properties['audioId'],
           updatedAt: problem.updatedAt,
@@ -89,8 +93,8 @@ export const EnglishWordMemorizationQuestion: React.FC<
     dispatch(
       addRecord({
         param: {
-          workbookId: +_workbookId,
-          studyType: _studyType,
+          workbookId: workbookId,
+          studyType: studyType,
           problemId: problemId,
           result: result,
           memorized: false,

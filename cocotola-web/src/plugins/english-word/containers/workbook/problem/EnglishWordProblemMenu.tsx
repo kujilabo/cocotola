@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+
+import { useNavigate } from 'react-router-dom';
 import { Label, Menu, Input } from 'semantic-ui-react';
 
-import { useAppSelector, useAppDispatch } from 'app/hooks';
-import { WorkbookModel } from 'models/workbook';
-import { emptyFunction } from 'utils/util';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import {
   getCompletionRate,
   selectRecordbookCompletionRateMap,
-} from 'features/recordbook_get';
-import 'App.css';
+} from '@/features/recordbook_get';
+import { WorkbookModel } from '@/models/workbook';
+import { emptyFunction } from '@/utils/util';
 
 export const EnglishWordProblemMenu: React.FC<EnglishWordProblemMenuProps> = (
   props: EnglishWordProblemMenuProps
@@ -19,13 +19,13 @@ export const EnglishWordProblemMenu: React.FC<EnglishWordProblemMenuProps> = (
     selectRecordbookCompletionRateMap
   );
   const [errorMessage, setErrorMessage] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
   const studyButtonClicked = (studyType: string) => {
     props.initStudy('');
-    history.push(`/app/workbook/${props.workbook.id}/study/${studyType}`);
+    navigate(`/app/workbook/${props.workbook.id}/study/${studyType}`);
   };
   const onImportButtonClick = () => {
-    history.push(`/app/private/workbook/${props.workbook.id}/import`);
+    navigate(`/app/private/workbook/${props.workbook.id}/import`);
   };
   // when workbookId is changed
   useEffect(() => {
@@ -83,7 +83,7 @@ export const EnglishWordProblemMenu: React.FC<EnglishWordProblemMenuProps> = (
             </Menu.Item>
             <Menu.Item
               onClick={() => {
-                history.push(
+                navigate(
                   `/app/private/workbook/${props.workbook.id}/problem/new`
                 );
               }}
@@ -98,7 +98,7 @@ export const EnglishWordProblemMenu: React.FC<EnglishWordProblemMenuProps> = (
           <Menu.Menu>
             <Menu.Item
               onClick={() =>
-                history.push(`/app/private/workbook/${props.workbook.id}/edit`)
+                navigate(`/app/private/workbook/${props.workbook.id}/edit`)
               }
             >
               Edit workbook

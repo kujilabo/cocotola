@@ -81,7 +81,7 @@ export const PrivateProblemImport = (): ReactElement => {
     <Container fluid>
       <PrivateProblemBreadcrumb
         name={workbook.name}
-        id={+_workbookId}
+        id={workbookId}
         text={'Import'}
       />
       <Divider hidden />

@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
+
 import { useParams } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 
-import { useAppSelector, useAppDispatch } from 'app/hooks';
-import { AppBreadcrumbLink } from 'components';
-import { selectWorkbook } from 'features/workbook_get';
-import { selectRecordbook } from 'features/recordbook_get';
-import { selectProblemMap } from 'features/problem_find';
-import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
+import { useAppSelector, useAppDispatch } from '@/app/hooks';
+import { AppBreadcrumbLink } from '@/components';
+import { selectProblemMap } from '@/features/problem_find';
+import { selectRecordbook } from '@/features/recordbook_get';
+import { selectWorkbook } from '@/features/workbook_get';
+
 import {
   setEnglishWordRecordbook,
   selectTs,
   selectEnglishWordRecordbook,
 } from '../../../../features/english_word_study';
-import 'App.css';
+
+import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
 
 type ParamTypes = {
   _workbookId: string;
@@ -23,6 +25,7 @@ export const EnglishWordMemorizationInit: React.FC<
   EnglishWordMemorizationInitProps
 > = (props: EnglishWordMemorizationInitProps) => {
   const { _workbookId } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
   const dispatch = useAppDispatch();
   const workbook = useAppSelector(selectWorkbook);
   const recordbook = useAppSelector(selectRecordbook);
@@ -54,7 +57,7 @@ export const EnglishWordMemorizationInit: React.FC<
         breadcrumbLinks={props.breadcrumbLinks}
         workbookUrl={props.workbookUrl}
         name={workbook.name}
-        id={+_workbookId}
+        id={workbookId}
       />
     </Container>
   );

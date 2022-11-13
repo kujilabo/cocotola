@@ -14,7 +14,6 @@ export type ProblemUpdateParameter = {
   workbookId: number;
   problemId: number;
   version: number;
-  number: number;
   problemType: string;
   properties: { [key: string]: string };
 };

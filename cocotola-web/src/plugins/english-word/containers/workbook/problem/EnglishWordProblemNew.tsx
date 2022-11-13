@@ -1,21 +1,19 @@
 import React, { useState } from 'react';
+
 import { useParams } from 'react-router-dom';
 import { Container, Divider } from 'semantic-ui-react';
 
-import { useAppSelector } from 'app/hooks';
+import { useAppSelector } from '@/app/hooks';
+import { ErrorMessage } from '@/components';
+import { PrivateProblemBreadcrumb } from '@/components/PrivateProblemBreadcrumb';
+import { selectProblemAddLoading } from '@/features/problem_add';
 import {
   selectWorkbook,
   selectWorkbookGetLoading,
-} from 'features/workbook_get';
-import { selectProblemAddLoading } from 'features/problem_add';
-
-import { ErrorMessage } from 'components';
-import { PrivateProblemBreadcrumb } from 'components/PrivateProblemBreadcrumb';
-import { WorkbookModel } from 'models/workbook';
+} from '@/features/workbook_get';
+import { WorkbookModel } from '@/models/workbook';
 
 import { englishWordProblemNewFormikForm } from '../../../components/workbook/problem/EnglishWordProblemNewFormikForm';
-
-import 'App.css';
 
 type ParamTypes = {
   _workbookId: string;
@@ -25,7 +23,7 @@ export const EnglishWordProblemNew: React.FC<EnglishWordProblemNewProps> = (
   props: EnglishWordProblemNewProps
 ) => {
   const { _workbookId } = useParams<ParamTypes>();
-  const workbookId = +_workbookId;
+  const workbookId = +(_workbookId || '');
   const workbook = useAppSelector(selectWorkbook);
   const workbookGetLoading = useAppSelector(selectWorkbookGetLoading);
   const problemAddLoading = useAppSelector(selectProblemAddLoading);

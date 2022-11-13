@@ -1,16 +1,16 @@
 import { ComponentType, SetStateAction, Dispatch } from 'react';
 
-import {
-  PrivateWorkbookNewForm,
-  PrivateWorkbookNewFormValues,
-} from './PrivateWorkbookNewForm';
-
 import { withFormik, FormikBag } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import { useAppDispatch } from '@/app/hooks';
 import { addWorkbook } from '@/features/workbook_add';
+
+import {
+  PrivateWorkbookNewForm,
+  PrivateWorkbookNewFormValues,
+} from './PrivateWorkbookNewForm';
 
 export interface PrivateWorkbookNewFormikFormProps {
   name: string;

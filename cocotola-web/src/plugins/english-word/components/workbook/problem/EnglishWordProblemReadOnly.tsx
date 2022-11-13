@@ -1,9 +1,10 @@
 import React from 'react';
 
 import { Button, Card, Grid, Header } from 'semantic-ui-react';
-import { ProblemModel } from 'models/problem';
+
+import { ProblemModel } from '@/models/problem';
+
 import { toDsiplayText } from '../../../utils/util';
-import 'App.css';
 
 export const EnglishWordProblemReadOnly: React.FC<
   EnglishWordProblemReadOnlyProps

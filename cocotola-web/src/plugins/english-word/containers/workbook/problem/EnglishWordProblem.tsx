@@ -1,12 +1,10 @@
 import React from 'react';
+
 import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
 
-import { CustomProblem } from 'containers/workbook/problem/CustomProblem';
-import { ProblemModel } from 'models/problem';
-import { WorkbookModel } from 'models/workbook';
-import { EnglishWordProblemNew } from './EnglishWordProblemNew';
-import { EnglishWordProblemEdit } from './EnglishWordProblemEdit';
-import { EnglishWordProblemMenu } from './EnglishWordProblemMenu';
+import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';
+import { ProblemModel } from '@/models/problem';
+import { WorkbookModel } from '@/models/workbook';
 
 import { EnglishWordProblemReadOnly } from '../../../components/workbook/problem/EnglishWordProblemReadOnly';
 import { EnglishWordProblemReadWrite } from '../../../components/workbook/problem/EnglishWordProblemReadWrite';
@@ -16,6 +14,10 @@ import {
   englishWordSlice,
   initEnglishWordStatus,
 } from '../../../features/english_word_study';
+
+import { EnglishWordProblemEdit } from './EnglishWordProblemEdit';
+import { EnglishWordProblemMenu } from './EnglishWordProblemMenu';
+import { EnglishWordProblemNew } from './EnglishWordProblemNew';
 
 export class EnglishWordProblem extends CustomProblem {
   getName(): string {
