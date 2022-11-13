@@ -3,11 +3,11 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { WorkbookModel } from '@/models/workbook';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = import.meta.env.VITE_APP_BACKEND + '/v1/private/workbook';
+const baseUrl = `${backendUrl}/v1/private/workbook`;
 
 // Find my workbooks
 export type MyWorkbookFindParameter = {

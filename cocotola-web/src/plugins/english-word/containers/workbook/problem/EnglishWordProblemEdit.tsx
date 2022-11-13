@@ -15,7 +15,7 @@ import {
 } from '@/plugins/tatoeba/features/tatoeba_find';
 import { emptyFunction } from '@/utils/util';
 
-import { englishWordProblemEditFormikForm } from '../../../components/workbook/problem/EnglishWordProblemEditFormikForm';
+import { EnglishWordProblemEditFormikForm } from '../../../components/workbook/problem/EnglishWordProblemEditFormikForm';
 import { EnglishWordProblemModel } from '../../../models/english-word-problem';
 
 type ParamTypes = {
@@ -69,24 +69,28 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
     if (tatoebaSentenceFindLoading) {
       return;
     }
-    dispatch(
-      findTatoebaSentences({
-        param: {
-          pageNo: 1,
-          pageSize: 10,
-          keyword: values.text,
-          random: true,
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  }, [dispatch, values.text]);
+    const f = async () => {
+      await dispatch(
+        findTatoebaSentences({
+          param: {
+            pageNo: 1,
+            pageSize: 10,
+            keyword: values.text,
+            random: true,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
+  }, [dispatch, values.text, tatoebaSentenceFindLoading]);
+
   const selectSentence = (index: number, checked: boolean): void => {
     // dispatch(selectTatoebaSentence);
   };
 
-  const EnglishWordProblemEditFormikForm = englishWordProblemEditFormikForm(
+  const EditFormikForm = EnglishWordProblemEditFormikForm(
     workbookId,
     problem,
     setErrorMessage,
@@ -101,10 +105,10 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
       <PrivateProblemBreadcrumb
         name={props.workbook.name}
         id={workbookId}
-        text={'' + props.problem.number}
+        text={String(props.problem.number)}
       />
       <Divider hidden />
-      <EnglishWordProblemEditFormikForm
+      <EditFormikForm
         number={values.number}
         text={values.text}
         pos={values.pos}

@@ -3,12 +3,12 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonHeaders } from '@/utils/util';
 
 import { TranslationModel } from '../models/translation';
 
-const baseUrl = process.env.REACT_APP_BACKEND + '/plugin/translation';
+const baseUrl = `${backendUrl}/plugin/translation`;
 
 // Get translations
 export type TranslationGetListParameter = {

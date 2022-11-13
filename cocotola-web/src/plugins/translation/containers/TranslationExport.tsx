@@ -38,13 +38,16 @@ export const TranslationEx = (): React.ReactElement => {
     const formData = new FormData();
     formData.append('file', file as Blob);
 
-    dispatch(
-      importTranslation({
-        param: formData,
-        postSuccessProcess: () => setErrorMessage(''),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        importTranslation({
+          param: formData,
+          postSuccessProcess: () => setErrorMessage(''),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   return (

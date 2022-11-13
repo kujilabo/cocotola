@@ -30,33 +30,39 @@ export const TatoebaList = (): React.ReactElement => {
   const [keyword, setKeyword] = useState('');
   console.log('keyword', keyword);
   const onSearch = (value: string) => {
-    dispatch(
-      findTatoebaSentences({
-        param: {
-          pageNo: 1,
-          pageSize: 10,
-          keyword: value,
-          random: true,
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        findTatoebaSentences({
+          param: {
+            pageNo: 1,
+            pageSize: 10,
+            keyword: value,
+            random: true,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
     setKeyword(value);
   };
   useEffect(() => {
-    dispatch(
-      findTatoebaSentences({
-        param: {
-          pageNo: 1,
-          pageSize: 10,
-          keyword: '',
-          random: true,
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        findTatoebaSentences({
+          param: {
+            pageNo: 1,
+            pageSize: 10,
+            keyword: '',
+            random: true,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch]);
 
   if (loading) {

@@ -45,11 +45,11 @@ export class EnglishSentenceProblemModel {
       updatedAt: p.updatedAt,
       number: p.number,
       problemType: p.problemType,
-      provider: p.properties['provider'],
-      audioId: '' + p.properties['audioId'],
-      text: '' + p.properties['text'],
-      lang2: '' + p.properties['lang2'],
-      translated: '' + p.properties['translated'],
+      provider: String(p.properties['provider']),
+      audioId: String(p.properties['audioId']),
+      text: String(p.properties['text']),
+      lang2: String(p.properties['lang2']),
+      translated: String(p.properties['translated']),
       // note: '' + p.properties['note'],
     };
   }

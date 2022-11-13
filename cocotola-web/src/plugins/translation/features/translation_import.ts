@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = `${process.env.REACT_APP_BACKEND}`;
+const baseUrl = `${backendUrl}`;
 
 // Import translation
 export type TranslationImportArg = {
@@ -14,7 +14,7 @@ export type TranslationImportArg = {
   postSuccessProcess: () => void;
   postFailureProcess: (error: string) => void;
 };
-type TranslationImportResult = {};
+type TranslationImportResult = Record<string, never>;
 
 export const importTranslation = createAsyncThunk<
   TranslationImportResult,
@@ -25,11 +25,11 @@ export const importTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .post(url, arg.param, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return {} as TranslationImportResult;
         })
@@ -60,11 +60,11 @@ export const translationImportSlice = createSlice({
       .addCase(importTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(importTranslation.fulfilled, (state, action) => {
+      .addCase(importTranslation.fulfilled, (state) => {
         state.loading = false;
         state.failed = false;
       })
-      .addCase(importTranslation.rejected, (state, action) => {
+      .addCase(importTranslation.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       });

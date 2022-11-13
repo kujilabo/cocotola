@@ -18,7 +18,7 @@ export interface TranslationNewFormikFormProps {
   translated: string;
   refreshTranslations: () => void;
 }
-export const translationNewFormikForm = (
+export const TranslationNewFormikForm = (
   setSuccessMessage: React.Dispatch<React.SetStateAction<string>>,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
   setValues: (v: TranslationNewFormValues) => void
@@ -45,25 +45,28 @@ export const translationNewFormikForm = (
       setValues(formValues);
       setErrorMessage('');
       setSuccessMessage('');
-      dispatch(
-        addTranslation({
-          param: {
-            text: formValues.text,
-            pos: +formValues.pos,
-            translated: formValues.translated,
-            lang2: 'ja',
-          },
-          postSuccessProcess: () => {
-            formikBag.props.refreshTranslations();
-            setErrorMessage('');
-            setSuccessMessage('Word has been updated successfully');
-          },
-          postFailureProcess: (err: string) => {
-            setErrorMessage(err);
-            setSuccessMessage('');
-          },
-        })
-      );
+      const f = async () => {
+        await dispatch(
+          addTranslation({
+            param: {
+              text: formValues.text,
+              pos: +formValues.pos,
+              translated: formValues.translated,
+              lang2: 'ja',
+            },
+            postSuccessProcess: () => {
+              formikBag.props.refreshTranslations();
+              setErrorMessage('');
+              setSuccessMessage('Word has been updated successfully');
+            },
+            postFailureProcess: (err: string) => {
+              setErrorMessage(err);
+              setSuccessMessage('');
+            },
+          })
+        );
+      };
+      f().catch(console.error);
     },
   })(TranslationNewForm);
 };

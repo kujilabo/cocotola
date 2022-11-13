@@ -1,6 +1,6 @@
 import { ComponentType, SetStateAction, Dispatch } from 'react';
 
-import { withFormik, FormikBag } from 'formik';
+import { withFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
@@ -19,7 +19,7 @@ export interface PrivateWorkbookNewFormikFormProps {
   problemType: string;
   loading: boolean;
 }
-export const privateWorkbookNewFormikForm = (
+export const PrivateWorkbookNewFormikForm = (
   setErrorMessage: Dispatch<SetStateAction<string>>,
   setWorkbook: (t: PrivateWorkbookNewFormValues) => void
 ): ComponentType<PrivateWorkbookNewFormikFormProps> => {
@@ -41,21 +41,19 @@ export const privateWorkbookNewFormikForm = (
       name: Yup.string().required('Name is required'),
       problemType: Yup.string().required('Problem type is required'),
     }),
-    handleSubmit: (
-      values: PrivateWorkbookNewFormValues,
-      formikBag: FormikBag<
-        PrivateWorkbookNewFormikFormProps,
-        PrivateWorkbookNewFormValues
-      >
-    ) => {
+    handleSubmit: (values: PrivateWorkbookNewFormValues) => {
       // onsole.log('handleSubmit');
-      dispatch(
-        addWorkbook({
-          param: { ...values, spaceKey: 'personal' },
-          postSuccessProcess: (id: number) => navigate('/app/private/workbook'),
-          postFailureProcess: setErrorMessage,
-        })
-      );
+      const f = async () => {
+        await dispatch(
+          addWorkbook({
+            param: { ...values, spaceKey: 'personal' },
+            postSuccessProcess: (id: number) =>
+              navigate('/app/private/workbook'),
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
       setWorkbook(values);
     },
   })(PrivateWorkbookNewForm);

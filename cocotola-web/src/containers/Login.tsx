@@ -4,6 +4,8 @@ import { Button, Container, Menu } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { selectRedirectUrl, redirectTo } from '@/features/auth';
+import { clientId, frontendUrl } from '@/features/base';
+import { emptyFunction } from '@/utils/util';
 
 export const Login = (): ReactElement => {
   const dispatch = useAppDispatch();
@@ -11,9 +13,9 @@ export const Login = (): ReactElement => {
   const googleAuth = () => {
     let url = 'https://accounts.google.com/o/oauth2/auth';
     url += '?client_id=';
-    url += import.meta.env.VITE_APP_CLIENT_ID;
+    url += clientId;
     url += '&redirect_uri=';
-    url += import.meta.env.VITE_APP_FRONTEND;
+    url += frontendUrl;
     url += '/app/callback';
     url += '&scope=profile email';
     url += '&response_type=';
@@ -23,7 +25,7 @@ export const Login = (): ReactElement => {
     console.log(url);
     dispatch(redirectTo({ url: url }));
   };
-  const guestAuth = () => {};
+  const guestAuth = () => emptyFunction;
 
   if (redirectUrl && redirectUrl !== '') {
     console.log('redirect');

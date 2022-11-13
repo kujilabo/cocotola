@@ -33,29 +33,36 @@ export const TatoebaImport = (): React.ReactElement => {
     }
     setFile(file);
   };
+
   const onUploadSentenceButtonClick = () => {
     const formData = new FormData();
     formData.append('file', file as Blob);
-
-    dispatch(
-      importTatoebaSentence({
-        param: formData,
-        postSuccessProcess: () => setErrorMessage(''),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        importTatoebaSentence({
+          param: formData,
+          postSuccessProcess: () => setErrorMessage(''),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
+
   const onUploadLinkButtonClick = () => {
     const formData = new FormData();
     formData.append('file', file as Blob);
 
-    dispatch(
-      importTatoebaLink({
-        param: formData,
-        postSuccessProcess: () => setErrorMessage(''),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        importTatoebaLink({
+          param: formData,
+          postSuccessProcess: () => setErrorMessage(''),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   return (

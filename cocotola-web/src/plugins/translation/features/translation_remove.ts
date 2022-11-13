@@ -3,11 +3,11 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 // import { TranslationModel } from '../models/translation';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = process.env.REACT_APP_BACKEND + '/plugin/translation';
+const baseUrl = `${backendUrl}/plugin/translation`;
 
 // Remove translation
 export type TranslationRemoveParameter = {
@@ -31,11 +31,11 @@ export const removeTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .delete(url, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return {
             param: arg.param,
@@ -67,12 +67,12 @@ export const translationRemoveSlice = createSlice({
       .addCase(removeTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(removeTranslation.fulfilled, (state, action) => {
+      .addCase(removeTranslation.fulfilled, (state) => {
         // onsole.log('workbook', action.payload.response);
         state.loading = false;
         state.failed = false;
       })
-      .addCase(removeTranslation.rejected, (state, action) => {
+      .addCase(removeTranslation.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

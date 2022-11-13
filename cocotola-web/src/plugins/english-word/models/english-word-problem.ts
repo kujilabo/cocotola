@@ -59,7 +59,7 @@ export class EnglishWordProblemModel {
   }
 
   static of(p: ProblemModel): EnglishWordProblemModel {
-    let sentence1: EnglishWordProblemSentenceModel = {
+    const sentence1: EnglishWordProblemSentenceModel = {
       text: '',
       translated: '',
       note: '',
@@ -83,11 +83,11 @@ export class EnglishWordProblemModel {
       updatedAt: p.updatedAt,
       number: p.number,
       problemType: p.problemType,
-      audioId: '' + p.properties['audioId'],
-      text: '' + p.properties['text'],
-      pos: '' + p.properties['pos'],
-      lang2: '' + p.properties['lang2'],
-      translated: '' + p.properties['translated'],
+      audioId: String(p.properties['audioId']),
+      text: String(p.properties['text']),
+      pos: String(p.properties['pos']),
+      lang2: String(p.properties['lang2']),
+      translated: String(p.properties['translated']),
       sentence1,
     };
   }

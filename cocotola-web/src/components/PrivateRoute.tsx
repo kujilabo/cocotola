@@ -44,11 +44,14 @@ export const PrivateRoute: FC<PrivateRouteProps> = (
   useEffect(() => {
     if (!failed && !loading && isAccessTokenExpired && !isRefreshTokenExpired) {
       // onsole.log('xxx refreshAccessToken');
-      dispatch(
-        refreshAccessToken({
-          refreshToken: refreshToken,
-        })
-      );
+      const f = async () => {
+        await dispatch(
+          refreshAccessToken({
+            refreshToken: refreshToken,
+          })
+        );
+      };
+      f().catch(console.error);
     }
   }, [loading, refreshToken, isAccessTokenExpired, isRefreshTokenExpired]);
 

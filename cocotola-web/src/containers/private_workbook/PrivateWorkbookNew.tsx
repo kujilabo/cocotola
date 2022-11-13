@@ -4,7 +4,7 @@ import { Container, Divider } from 'semantic-ui-react';
 
 import { useAppSelector } from '@/app/hooks';
 import { AppBreadcrumb, ErrorMessage } from '@/components';
-import { privateWorkbookNewFormikForm } from '@/components/workbook/PrivateWorkbookNewFormikForm';
+import { PrivateWorkbookNewFormikForm } from '@/components/workbook/PrivateWorkbookNewFormikForm';
 import { selectWorkbookAddLoading } from '@/features/workbook_add';
 
 export const PrivateWorkbookNew = (): ReactElement => {
@@ -17,7 +17,7 @@ export const PrivateWorkbookNew = (): ReactElement => {
   });
   const [errorMessage, setErrorMessage] = useState('');
 
-  const PrivateWorkbookNewFormikForm = privateWorkbookNewFormikForm(
+  const NewFormikForm = PrivateWorkbookNewFormikForm(
     setErrorMessage,
     setValues
   );
@@ -29,7 +29,7 @@ export const PrivateWorkbookNew = (): ReactElement => {
         text={'New workbook'}
       />
       <Divider hidden />
-      <PrivateWorkbookNewFormikForm
+      <NewFormikForm
         loading={workbookAddLoading}
         name={values.name}
         lang2={values.lang2}

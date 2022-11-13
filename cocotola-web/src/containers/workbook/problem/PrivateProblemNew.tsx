@@ -18,13 +18,16 @@ export const PrivateProblemNew = (): ReactElement => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    dispatch(
-      getWorkbook({
-        param: { id: workbookId },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getWorkbook({
+          param: { id: workbookId },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, workbookId]);
 
   if (errorMessage !== '') {

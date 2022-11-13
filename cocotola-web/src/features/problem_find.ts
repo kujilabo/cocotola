@@ -3,13 +3,13 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { removeProblem } from '@/features/problem_remove';
 import { updateProblemProperty } from '@/features/problem_update';
 import { ProblemModel } from '@/models/problem';
 import { jsonRequestConfig, jsonHeaders } from '@/utils/util';
 
-const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/workbook`;
+const baseUrl = `${backendUrl}/v1/workbook`;
 
 // Find problems
 export type ProblemFindParameter = {
@@ -243,7 +243,7 @@ export const problemFindSlice = createSlice({
         state.failed = false;
         state.problemMap[action.payload.response.id] = action.payload.response;
       })
-      .addCase(getProblem.rejected, (state, action) => {
+      .addCase(getProblem.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

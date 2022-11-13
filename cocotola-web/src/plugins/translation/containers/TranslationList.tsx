@@ -41,13 +41,16 @@ export const TranslationList = (): React.ReactElement => {
   const onAlphabetClick = (letter: string) => setLetter(letter);
 
   useEffect(() => {
-    dispatch(
-      findTranslations({
-        param: { letter: letter },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        findTranslations({
+          param: { letter: letter },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, letter]);
 
   if (loading) {

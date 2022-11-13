@@ -1,6 +1,6 @@
 import { ReactElement, ReactNode, useState, useEffect } from 'react';
 
-import { withFormik, FormikBag, FormikProps } from 'formik';
+import { withFormik, FormikProps } from 'formik';
 import { Form, Input } from 'formik-semantic-ui-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Container, Divider, Header } from 'semantic-ui-react';
@@ -107,32 +107,38 @@ export const PrivateWorkbookEdit = (): ReactElement => {
   });
   const [errorMessage, setErrorMessage] = useState('');
   const onRemoveButtonClick = () => {
-    dispatch(
-      removeWorkbook({
-        param: {
-          id: workbookId,
-          version: values.version,
-        },
-        postSuccessProcess: () => navigate('/app/private/workbook'),
-        postFailureProcess: (error: string) => setErrorMessage(error),
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        removeWorkbook({
+          param: {
+            id: workbookId,
+            version: values.version,
+          },
+          postSuccessProcess: () => navigate('/app/private/workbook'),
+          postFailureProcess: (error: string) => setErrorMessage(error),
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   useEffect(() => {
-    dispatch(
-      getWorkbook({
-        param: { id: workbookId },
-        postSuccessProcess: (workbook: WorkbookModel) => {
-          setValues({
-            version: workbook.version,
-            name: workbook.name,
-            questionText: workbook.questionText,
-          });
-        },
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getWorkbook({
+          param: { id: workbookId },
+          postSuccessProcess: (workbook: WorkbookModel) => {
+            setValues({
+              version: workbook.version,
+              name: workbook.name,
+              questionText: workbook.questionText,
+            });
+          },
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, workbookId]);
 
   const loading =
@@ -159,18 +165,18 @@ export const PrivateWorkbookEdit = (): ReactElement => {
     validationSchema: Yup.object().shape({
       name: Yup.string().required('Name is required'),
     }),
-    handleSubmit: (
-      formValues: FormValues,
-      formikBag: FormikBag<FormProps, FormValues>
-    ) => {
-      dispatch(
-        updateWorkbook({
-          param: { ...formValues },
-          postSuccessProcess: (id: number) =>
-            navigate(`/app/private/workbook/${workbookId}`),
-          postFailureProcess: setErrorMessage,
-        })
-      );
+    handleSubmit: (formValues: FormValues) => {
+      const f = async () => {
+        await dispatch(
+          updateWorkbook({
+            param: { ...formValues },
+            postSuccessProcess: (id: number) =>
+              navigate(`/app/private/workbook/${workbookId}`),
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
       setValues(formValues);
     },
   })(InnerForm);

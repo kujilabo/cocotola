@@ -1,6 +1,6 @@
 import { ReactElement, Dispatch, SetStateAction, ComponentType } from 'react';
 
-import { withFormik, FormikBag, FormikProps } from 'formik';
+import { withFormik, FormikProps } from 'formik';
 import { Form } from 'formik-semantic-ui-react';
 import { Form as NativeForm } from 'semantic-ui-react';
 import * as Yup from 'yup';
@@ -11,34 +11,54 @@ import {
   updateProblemProperty,
   selectProblemUpdateLoading,
 } from '@/features/problem_update';
+import { emptyFunction } from '@/utils/util';
 
-export interface FormValues {}
+export interface problemPropertyEditFormikFormArgs<
+  V extends object,
+  P extends object
+> {
+  workbookId: number;
+  problemId: number;
+  problemVersion: number;
+  problemType: string;
+  toField: (v: V) => ReactElement;
+  validationSchema: Yup.ObjectSchema<any>;
+  propsToValues: (props: P) => V;
+  valuesToProperties: (values: V) => { [key: string]: string };
+  resetValues: (v: V) => void;
+  setErrorMessage: Dispatch<SetStateAction<string>>;
+}
 
-export interface FormikFormProps {}
-
-export const problemPropertyEditFormikForm = <
-  V extends FormValues,
-  P extends FormikFormProps
+export const ProblemPropertyEditFormikForm = <
+  V extends object,
+  P extends object
 >(
-  workbookId: number,
-  problemId: number,
-  problemVersion: number,
-  problemType: string,
-  toField: (values: V) => ReactElement,
-  validationSchema: Yup.ObjectSchema<any>,
-  propsToValues: (props: P) => V,
-  valuesToProperites: (values: V) => { [key: string]: string },
-  setValues: (v: V) => void,
-  setErrorMessage: Dispatch<SetStateAction<string>>
+  args: problemPropertyEditFormikFormArgs<V, P>
 ): ComponentType<P> => {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectProblemUpdateLoading);
+
+  const {
+    workbookId,
+    problemId,
+    problemVersion,
+    problemType,
+    toField,
+    validationSchema,
+    propsToValues,
+    valuesToProperties,
+    resetValues,
+    setErrorMessage,
+  } = args;
 
   const EditForm = (props: FormikProps<V>): ReactElement => {
     const { values, isValid, submitForm } = props;
     const onClick = () => {
       if (isValid) {
-        submitForm();
+        const f = async () => {
+          await submitForm();
+        };
+        f().catch(console.error);
       }
     };
 
@@ -61,22 +81,25 @@ export const problemPropertyEditFormikForm = <
       loading,
     }),
     validationSchema: validationSchema,
-    handleSubmit: (values: V, formikBag: FormikBag<P, V>) => {
+    handleSubmit: (values: V) => {
       console.log('handleSubmit');
-      dispatch(
-        updateProblemProperty({
-          param: {
-            workbookId: workbookId,
-            problemId: problemId,
-            version: problemVersion,
-            problemType: problemType,
-            properties: valuesToProperites(values),
-          },
-          postSuccessProcess: () => {},
-          postFailureProcess: (error: string) => setErrorMessage(error),
-        })
-      );
-      setValues(values);
+      const f = async () => {
+        await dispatch(
+          updateProblemProperty({
+            param: {
+              workbookId: workbookId,
+              problemId: problemId,
+              version: problemVersion,
+              problemType: problemType,
+              properties: valuesToProperties(values),
+            },
+            postSuccessProcess: () => emptyFunction,
+            postFailureProcess: (error: string) => setErrorMessage(error),
+          })
+        );
+      };
+      f().catch(console.error);
+      resetValues(values);
     },
   })(EditForm);
 };

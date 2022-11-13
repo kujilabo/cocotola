@@ -34,21 +34,25 @@ export const LoginCallback = (): ReactElement => {
     return <div>Failed</div>;
   } else if (authLoading === false && isAccessTokenExpired) {
     const parsed = parse(location);
-    const code = '' + parsed.code || '';
+    // const code: string '' || parsed.code || '';
+    const code = parsed ? String(parsed.code) : '';
 
-    dispatch(
-      googleAuthorize({
-        param: {
-          organizationName: 'cocotola',
-          code: code,
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: (error: string) => {
-          console.log('callback error', error);
-          return;
-        },
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        googleAuthorize({
+          param: {
+            organizationName: 'cocotola',
+            code: code,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: (error: string) => {
+            console.log('callback error', error);
+            return;
+          },
+        })
+      );
+    };
+    f().catch(console.error);
     return <AppDimmer />;
   } else if (!isAccessTokenExpired) {
     return <Navigate replace to="/" />;

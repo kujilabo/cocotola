@@ -1,7 +1,5 @@
 import { ReactElement } from 'react';
 
-// import EnglishSentenceDictation from '../../../components/workbook/study/dictation/EnglishSentenceDictation';
-
 import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
 
 import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';

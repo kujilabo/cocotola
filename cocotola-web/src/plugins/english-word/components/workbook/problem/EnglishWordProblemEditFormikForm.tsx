@@ -30,7 +30,7 @@ export interface EnglishWordProblemEditFormikFormProps {
   tatoebaSentenceNumber2: string;
   tatoebaSentences: TatoebaSentencePairModel[];
 }
-export const englishWordProblemEditFormikForm = (
+export const EnglishWordProblemEditFormikForm = (
   workbookId: number,
   problem: EnglishWordProblemModel,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
@@ -70,27 +70,30 @@ export const englishWordProblemEditFormikForm = (
       >
     ) => {
       // onsole.log('handleSubmit');
-      dispatch(
-        updateProblem({
-          param: {
-            workbookId: workbookId,
-            problemId: problem.id,
-            version: problem.version,
-            problemType: EnglishWordProblemTypeId,
-            properties: {
-              text: values.text,
-              pos: values.pos,
-              lang2: values.lang2,
-              sentenceProvider: values.sentenceProvider,
-              tatoebaSentenceNumber1: values.tatoebaSentenceNumber1,
-              tatoebaSentenceNumber2: values.tatoebaSentenceNumber2,
+      const f = async () => {
+        await dispatch(
+          updateProblem({
+            param: {
+              workbookId: workbookId,
+              problemId: problem.id,
+              version: problem.version,
+              problemType: EnglishWordProblemTypeId,
+              properties: {
+                text: values.text,
+                pos: values.pos,
+                lang2: values.lang2,
+                sentenceProvider: values.sentenceProvider,
+                tatoebaSentenceNumber1: values.tatoebaSentenceNumber1,
+                tatoebaSentenceNumber2: values.tatoebaSentenceNumber2,
+              },
             },
-          },
-          postSuccessProcess: () =>
-            navigate(`/app/private/workbook/${workbookId}`),
-          postFailureProcess: (error: string) => setErrorMessage(error),
-        })
-      );
+            postSuccessProcess: () =>
+              navigate(`/app/private/workbook/${workbookId}`),
+            postFailureProcess: (error: string) => setErrorMessage(error),
+          })
+        );
+      };
+      f().catch(console.error);
       setProblem(values);
     },
   })(EnglishWordProblemEditForm);

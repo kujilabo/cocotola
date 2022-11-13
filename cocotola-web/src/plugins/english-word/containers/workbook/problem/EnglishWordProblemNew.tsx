@@ -13,7 +13,7 @@ import {
 } from '@/features/workbook_get';
 import { WorkbookModel } from '@/models/workbook';
 
-import { englishWordProblemNewFormikForm } from '../../../components/workbook/problem/EnglishWordProblemNewFormikForm';
+import { EnglishWordProblemNewFormikForm } from '../../../components/workbook/problem/EnglishWordProblemNewFormikForm';
 
 type ParamTypes = {
   _workbookId: string;
@@ -35,7 +35,7 @@ export const EnglishWordProblemNew: React.FC<EnglishWordProblemNewProps> = (
   const [errorMessage, setErrorMessage] = useState('');
   const loading = workbookGetLoading || problemAddLoading;
 
-  const EnglishWordProblemNewFormikForm = englishWordProblemNewFormikForm(
+  const NewFormikForm = EnglishWordProblemNewFormikForm(
     workbookId,
     setErrorMessage,
     setValues
@@ -49,7 +49,7 @@ export const EnglishWordProblemNew: React.FC<EnglishWordProblemNewProps> = (
         text={'New problem'}
       />
       <Divider hidden />
-      <EnglishWordProblemNewFormikForm
+      <NewFormikForm
         text={values.text}
         pos={values.pos}
         lang2={values.lang2}

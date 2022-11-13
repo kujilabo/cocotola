@@ -9,7 +9,7 @@ export const PrivateProblemBreadcrumb: FC<PrivateProblemBreadcrumbProps> = (
     <AppBreadcrumb
       links={[
         { text: 'My Workbooks', url: '/app/private/workbook' },
-        { text: props.name, url: '/app/private/workbook/' + props.id },
+        { text: props.name, url: `/app/private/workbook/${props.id}` },
       ]}
       text={props.text}
     />

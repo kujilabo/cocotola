@@ -26,6 +26,8 @@ type ParamTypes = {
 };
 export const WorkbookStudy = () => {
   const { _workbookId, _studyType } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
+  const studyType = _studyType || '';
   const dispatch = useAppDispatch();
   const workbook = useAppSelector(selectWorkbook);
   const workbookGetLoading = useAppSelector(selectWorkbookGetLoading);
@@ -35,41 +37,50 @@ export const WorkbookStudy = () => {
 
   // find workbook and all problems
   useEffect(() => {
-    dispatch(
-      getWorkbook({
-        param: { id: +(_workbookId || '') },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-    dispatch(
-      findAllProblems({
-        param: {
-          workbookId: +(_workbookId || ''),
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  }, [dispatch, _workbookId]);
+    const f1 = async () => {
+      await dispatch(
+        getWorkbook({
+          param: { id: workbookId },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f1().catch(console.error);
+    const f2 = async () => {
+      await dispatch(
+        findAllProblems({
+          param: {
+            workbookId: workbookId,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f2().catch(console.error);
+  }, [dispatch, workbookId]);
 
   // find recordbook
   useEffect(() => {
-    dispatch(
-      getRecordbook({
-        param: {
-          workbookId: +(_workbookId || ''),
-          studyType: _studyType || '',
-        },
-        postSuccessProcess: () => {
-          const now = new Date();
-          const ts = now.toISOString();
-          dispatch(problemFactory.initProblemStudy(workbook.problemType)(ts));
-        },
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  }, [dispatch, _workbookId, workbook.problemType]);
+    const f = async () => {
+      await dispatch(
+        getRecordbook({
+          param: {
+            workbookId: workbookId,
+            studyType: studyType,
+          },
+          postSuccessProcess: () => {
+            const now = new Date();
+            const ts = now.toISOString();
+            dispatch(problemFactory.initProblemStudy(workbook.problemType)(ts));
+          },
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
+  }, [dispatch, workbookId, studyType, workbook.problemType]);
 
   if (workbookGetLoading || problemListLoading || recordbookViewLoading) {
     return <AppDimmer />;
@@ -77,8 +88,5 @@ export const WorkbookStudy = () => {
     return <div>{errorMessage}</div>;
   }
 
-  return problemFactory.createProblemStudy(
-    workbook.problemType,
-    _studyType || ''
-  );
+  return problemFactory.createProblemStudy(workbook.problemType, studyType);
 };

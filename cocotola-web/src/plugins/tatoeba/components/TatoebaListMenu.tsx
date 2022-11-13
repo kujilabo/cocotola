@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { ReactElement, FC, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import { Icon, Menu, Input } from 'semantic-ui-react';
@@ -10,9 +10,9 @@ type TatoebaListMenuProps = {
   onSearch: (keyword: string) => void;
 };
 
-export const TatoebaListMenu: React.FC<TatoebaListMenuProps> = (
+export const TatoebaListMenu: FC<TatoebaListMenuProps> = (
   props: TatoebaListMenuProps
-) => {
+): ReactElement => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState(props.keyword);
   const onImportButtonClick = () => {
