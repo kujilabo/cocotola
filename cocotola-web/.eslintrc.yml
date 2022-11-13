@@ -1,0 +1,72 @@
+---
+root: true
+env:
+  browser: true
+  es2021: true
+extends:
+  - eslint:recommended
+  - prettier
+  - plugin:import/recommended
+  - plugin:import/typescript
+  - plugin:import/errors
+  - plugin:import/warnings
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: 12
+  sourceType: module
+  project:
+    - ./tsconfig.eslint.json
+plugins:
+  - react-hooks
+  - react
+  - "@typescript-eslint"
+  - import
+globals:
+  JSX: true
+  process: true
+rules:
+  no-unused-vars:
+    - error
+    - vars: "all"
+      args: "none"
+      ignoreRestSiblings: false
+  import/order:
+    - error
+    - groups:
+      - builtin
+      - external
+      - internal
+      - parent
+      - sibling
+      - index
+      - object
+      - type
+      pathGroups:
+        - pattern: react
+          group: builtin
+          position: before
+        - pattern: "@/**"
+          group: internal
+          position: after
+      newlines-between: always
+      pathGroupsExcludedImportTypes:
+      - builtin
+      alphabetize:
+        order: asc
+        caseInsensitive: true
+  # "import/no-anonymous-default-export":
+  #   - "error"
+  #   - "allowArray": false
+  #     "allowArrowFunction": false
+  #     "allowAnonymousClass": false
+  #     "allowAnonymousFunction": false
+  #     "allowCallExpression": true
+  #     "allowNew": false
+  #     "allowLiteral": false
+  #     "allowObject": false
+settings:
+  import/resolver:
+    typescript: true
+    node: true

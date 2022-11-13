@@ -1,0 +1,14 @@
+{
+  "folders": [
+	{
+		"path": "../../../../.."
+	},
+	{
+		"path": "../../../.."
+	}
+],
+  "settings": {
+    "go.coverOnSingleTest": true,
+    "go.coverOnSingleTestFile": true
+  }
+}
