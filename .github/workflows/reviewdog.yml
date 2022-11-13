@@ -11,7 +11,7 @@ jobs:
           - cocotola-synthesizer-api
           - cocotola-translator-api
           - cocotola-tatoeba-api
-    name: runner / staticcheck
+    name: golang
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -143,7 +143,7 @@ jobs:
       matrix:
         workdir:
           - cocotola-web
-    name: runner / staticcheck
+    name: typescript
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -164,6 +164,7 @@ jobs:
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
+          eslint_flags: 'src/'
   others:
     strategy:
       matrix:
@@ -174,7 +175,7 @@ jobs:
           - cocotola-translator-api
           - cocotola-tatoeba-api
           - cocotola-web
-    name: runner / staticcheck
+    name: others
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
