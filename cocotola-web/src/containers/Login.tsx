@@ -5,8 +5,7 @@ import { Button, Container, Menu } from 'semantic-ui-react';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { selectRedirectUrl, redirectTo } from '@/features/auth';
 import { clientId, frontendUrl } from '@/features/base';
-
-import { emptyFunction } from '../../../bazel-cocotola/cocotola-web/src/utils/util';
+import { emptyFunction } from '@/utils/util';
 
 export const Login = (): ReactElement => {
   const dispatch = useAppDispatch();
