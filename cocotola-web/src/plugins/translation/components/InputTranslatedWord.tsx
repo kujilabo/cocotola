@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactElement } from 'react';
 
 import { Input } from 'formik-semantic-ui-react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ export type InputTrasnslatedWordProps = {
 };
 export const InputTrasnslatedWord = (
   props: InputTrasnslatedWordProps
-): React.ReactElement => {
+): ReactElement => {
   const [t] = useTranslation();
   return (
     <Input

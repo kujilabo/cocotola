@@ -164,8 +164,6 @@ jobs:
         with:
           github_token: ${{ secrets.REVIEWDOG_TOKEN }}
           reporter: github-pr-review
-          golangci_lint_flags: "--config=../.github/.golangci.yml --disable-all -E staticcheck --timeout=10m"
-          tool_name: staticcheck
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
