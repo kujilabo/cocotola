@@ -11,8 +11,8 @@ import {
   SuccessMessage,
 } from '@/components';
 
-import { translationEditFormikForm } from '../components/TranslationEditFormikForm';
-import { translationNewFormikForm } from '../components/TranslationNewFormikForm';
+import { TranslationEditFormikForm } from '../components/TranslationEditFormikForm';
+import { TranslationNewFormikForm } from '../components/TranslationNewFormikForm';
 import { selectTranslationAddLoading } from '../features/translation_add';
 import {
   getTranslations,
@@ -85,7 +85,7 @@ export const TranslationEdit = (): React.ReactElement => {
     translated: '',
     provider: '',
   });
-  const localGetTranslations = () => {
+  const localGetTranslations = (text: string, pos: number) => {
     return getTranslations({
       param: {
         text: text,
@@ -106,15 +106,18 @@ export const TranslationEdit = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    dispatch(localGetTranslations());
-  }, [dispatch, _text, _pos]);
+    const f = async () => {
+      await dispatch(localGetTranslations(text, pos));
+    };
+    f().catch(console.error);
+  }, [dispatch, text, pos]);
 
-  const TranslationEditFormikForm = translationEditFormikForm(
+  const EditFormikForm = TranslationEditFormikForm(
     setSuccessMessage,
     setErrorMessage,
     setEditValues
   );
-  const TranslationNewFormikForm = translationNewFormikForm(
+  const NewFormikForm = TranslationNewFormikForm(
     setSuccessMessage,
     setErrorMessage,
     setNewValues
@@ -132,7 +135,7 @@ export const TranslationEdit = (): React.ReactElement => {
         <Grid.Row>
           <Grid doubling columns={3}>
             <Grid.Column>
-              <TranslationEditFormikForm
+              <EditFormikForm
                 index={0}
                 selectedLang2={'ja'}
                 lang2={editValues.lang2}
@@ -140,15 +143,29 @@ export const TranslationEdit = (): React.ReactElement => {
                 pos={editValues.pos}
                 translated={editValues.translated}
                 provider={editValues.provider}
-                refreshTranslations={() => dispatch(localGetTranslations())}
+                refreshTranslations={() => {
+                  const f = async () => {
+                    await dispatch(
+                      localGetTranslations(editValues.text, +editValues.pos)
+                    );
+                  };
+                  f().catch(console.error);
+                }}
               />
             </Grid.Column>
             <Grid.Column>
-              <TranslationNewFormikForm
+              <NewFormikForm
                 text={newValues.text}
                 pos={newValues.pos}
                 translated={newValues.translated}
-                refreshTranslations={() => dispatch(localGetTranslations())}
+                refreshTranslations={() => {
+                  const f = async () => {
+                    await dispatch(
+                      localGetTranslations(editValues.text, +editValues.pos)
+                    );
+                  };
+                  f().catch(console.error);
+                }}
               />
             </Grid.Column>
           </Grid>
@@ -158,7 +175,7 @@ export const TranslationEdit = (): React.ReactElement => {
             {translations.map((t: TranslationModel, i: number) => {
               return (
                 <Grid.Column key={t.pos}>
-                  <TranslationEditFormikForm
+                  <EditFormikForm
                     index={i}
                     selectedLang2={'ja'}
                     text={t.text}
@@ -166,7 +183,14 @@ export const TranslationEdit = (): React.ReactElement => {
                     translated={t.translated}
                     lang2={t.lang2}
                     provider={t.provider}
-                    refreshTranslations={() => dispatch(localGetTranslations())}
+                    refreshTranslations={() => {
+                      const f = async () => {
+                        await dispatch(
+                          localGetTranslations(editValues.text, +editValues.pos)
+                        );
+                      };
+                      f().catch(console.error);
+                    }}
                   />
                 </Grid.Column>
               );

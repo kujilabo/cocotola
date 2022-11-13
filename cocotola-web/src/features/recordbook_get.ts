@@ -3,11 +3,11 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { RecordbookModel } from '@/models/recordbook';
 import { jsonHeaders } from '@/utils/util';
 
-const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/study/workbook`;
+const baseUrl = `${backendUrl}/v1/study/workbook`;
 
 // Get recordbook
 export type RecordbookGetParameter = {

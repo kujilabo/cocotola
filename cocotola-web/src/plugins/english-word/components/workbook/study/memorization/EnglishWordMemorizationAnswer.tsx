@@ -34,6 +34,12 @@ type ParamTypes = {
   _workbookId: string;
   _studyType: string;
 };
+
+type EnglishWordMemorizationAnswerProps = {
+  breadcrumbLinks: AppBreadcrumbLink[];
+  workbookUrl: string;
+};
+
 export const EnglishWordMemorizationAnswer: React.FC<
   EnglishWordMemorizationAnswerProps
 > = (props: EnglishWordMemorizationAnswerProps) => {
@@ -48,12 +54,9 @@ export const EnglishWordMemorizationAnswer: React.FC<
   const englishWordRecordbook = useAppSelector(selectEnglishWordRecordbook);
   const [memorized, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  if (englishWordRecordbook.records.length === 0) {
-    return <div></div>;
-  }
   const problemId = englishWordRecordbook.records[0].problemId;
   const problem = EnglishWordProblemModel.of(problemMap[problemId]);
-  const baseUrl = `/app/private/workbook/${_workbookId}/problem/${problemId}`;
+  const baseUrl = `/app/private/workbook/${workbookId}/problem/${problemId}`;
   console.log('problem', problem);
   // let sentence1 = emptyTatoebaSentence;
   // let sentence2 = emptyTatoebaSentence;
@@ -78,48 +81,60 @@ export const EnglishWordMemorizationAnswer: React.FC<
   //   }
   // }
   useEffect(() => {
-    dispatch(
-      getProblem({
-        param: { workbookId: workbookId, problemId: problemId },
-        postSuccessProcess: (p: ProblemModel) => {
-          const e = EnglishWordProblemModel.of(p);
-          console.log(e);
-        },
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getProblem({
+          param: { workbookId: workbookId, problemId: problemId },
+          postSuccessProcess: (p: ProblemModel) => {
+            const e = EnglishWordProblemModel.of(p);
+            console.log(e);
+          },
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, _workbookId, problemId, problem.version]);
 
+  if (englishWordRecordbook.records.length === 0) {
+    return <div></div>;
+  }
   const loadAndPlay = (postFunc: (value: string) => void) => {
-    dispatch(
-      getAudio({
-        param: {
-          workbookId: workbookId,
-          problemId: problemId,
-          audioId: +problem.audioId,
-          updatedAt: problem.updatedAt,
-        },
-        postFunc: postFunc,
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  };
-  const onNextButtonClick = () => {
-    if (memorized) {
-      dispatch(
-        addRecord({
+    const f = async () => {
+      await dispatch(
+        getAudio({
           param: {
             workbookId: workbookId,
-            studyType: studyType,
             problemId: problemId,
-            result: true,
-            memorized: true,
+            audioId: +problem.audioId,
+            updatedAt: problem.updatedAt,
           },
+          postFunc: postFunc,
           postSuccessProcess: emptyFunction,
           postFailureProcess: setErrorMessage,
         })
       );
+    };
+    f().catch(console.error);
+  };
+  const onNextButtonClick = () => {
+    if (memorized) {
+      const f = async () => {
+        await dispatch(
+          addRecord({
+            param: {
+              workbookId: workbookId,
+              studyType: studyType,
+              problemId: problemId,
+              result: true,
+              memorized: true,
+            },
+            postSuccessProcess: emptyFunction,
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
     }
     dispatch(nextEnglishWordProblem());
   };
@@ -181,9 +196,4 @@ export const EnglishWordMemorizationAnswer: React.FC<
       })}
     </Container>
   );
-};
-
-type EnglishWordMemorizationAnswerProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
 };

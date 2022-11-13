@@ -19,7 +19,7 @@ export interface EnglishWordProblemNewFormikFormProps {
   lang2: string;
   loading: boolean;
 }
-export const englishWordProblemNewFormikForm = (
+export const EnglishWordProblemNewFormikForm = (
   workbookId: number,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
   setProblem: (t: EnglishWordProblemNewFormValues) => void
@@ -48,22 +48,25 @@ export const englishWordProblemNewFormikForm = (
       >
     ) => {
       // onsole.log('handleSubmit');
-      dispatch(
-        addProblem({
-          workbookId: workbookId,
-          param: {
-            problemType: EnglishWordProblemTypeId,
-            properties: {
-              text: values.text,
-              pos: values.pos,
-              lang2: values.lang2,
+      const f = async () => {
+        await dispatch(
+          addProblem({
+            workbookId: workbookId,
+            param: {
+              problemType: EnglishWordProblemTypeId,
+              properties: {
+                text: values.text,
+                pos: values.pos,
+                lang2: values.lang2,
+              },
             },
-          },
-          postSuccessProcess: () =>
-            navigate(`/app/private/workbook/${workbookId}`),
-          postFailureProcess: setErrorMessage,
-        })
-      );
+            postSuccessProcess: () =>
+              navigate(`/app/private/workbook/${workbookId}`),
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
       setProblem(values);
     },
   })(EnglishWordProblemNewForm);

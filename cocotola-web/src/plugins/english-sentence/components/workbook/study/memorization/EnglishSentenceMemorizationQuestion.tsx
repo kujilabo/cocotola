@@ -82,22 +82,25 @@ export const EnglishSentenceMemorizationQuestion: FC<
   // onsole.log('problem', problem);
 
   const setRecord = (result: boolean) => {
-    dispatch(
-      addRecord({
-        param: {
-          workbookId: workbookId,
-          studyType: studyType,
-          problemId: problemId,
-          result: result,
-          memorized: false,
-        },
-        postSuccessProcess: () => {
-          dispatch(setEnglishSentenceRecord(result));
-          dispatch(setEnglishSentenceStatus(ENGLISH_SENTENCE_STATUS_ANSWER));
-        },
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        addRecord({
+          param: {
+            workbookId: workbookId,
+            studyType: studyType,
+            problemId: problemId,
+            result: result,
+            memorized: false,
+          },
+          postSuccessProcess: () => {
+            dispatch(setEnglishSentenceRecord(result));
+            dispatch(setEnglishSentenceStatus(ENGLISH_SENTENCE_STATUS_ANSWER));
+          },
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
   const onYesButtonClick = () => setRecord(true);
   const onNoButtonClick = () => setRecord(false);
@@ -113,9 +116,9 @@ export const EnglishSentenceMemorizationQuestion: FC<
       <EnglishSentenceMemorizationCard
         workbookId={workbookId}
         problemId={problemId}
-        audioId={problem.properties['audioId']}
+        audioId={+problem.properties['audioId']}
         updatedAt={problem.updatedAt}
-        headerText={problem.properties['text']}
+        headerText={String(problem.properties['text'])}
         contentList={[
           <div className="ui fluid buttons">
             <Button onClick={onNoButtonClick}>わからない</Button>

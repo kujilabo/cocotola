@@ -1,32 +1,22 @@
 import { FC, useState, Dispatch, SetStateAction } from 'react';
 
 import { Input, Select } from 'formik-semantic-ui-react';
-import { useParams } from 'react-router-dom';
 import { Container, Divider } from 'semantic-ui-react';
 import * as Yup from 'yup';
 
-import { useAppSelector } from '@/app/hooks';
-import { ErrorMessage, langOptions, AppDimmer } from '@/components';
+import { ErrorMessage, langOptions } from '@/components';
 import { PrivateProblemBreadcrumb } from '@/components/PrivateProblemBreadcrumb';
-import {
-  FormValues,
-  FormikFormProps,
-  problemNewFormikForm,
-} from '@/components/problem/ProblemNewFormikForm';
-import {
-  selectWorkbook,
-  selectWorkbookGetLoading,
-} from '@/features/workbook_get';
+import { ProblemNewFormikForm } from '@/components/problem/ProblemNewFormikForm';
 import { EnglishSentenceProblemTypeId } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
 
-interface formikFormProps extends FormikFormProps {
+interface formikFormProps {
   text: string;
   translated: string;
   lang2: string;
 }
 
-interface formValues extends FormValues {
+interface formValues {
   text: string;
   translated: string;
   lang2: string;
@@ -37,7 +27,7 @@ const newFormikForm = (
   setValues: (v: formValues) => void,
   setErrorMessage: Dispatch<SetStateAction<string>>
 ) => {
-  return problemNewFormikForm({
+  return ProblemNewFormikForm({
     workbookId: workbookId,
     problemType: EnglishSentenceProblemTypeId,
     toContent: (values: formValues) => {
@@ -79,10 +69,6 @@ const newFormikForm = (
   });
 };
 
-type ParamTypes = {
-  _workbookId: string;
-};
-
 type EnglishSentenceProblemNewProps = {
   workbook: WorkbookModel;
 };
@@ -90,19 +76,15 @@ type EnglishSentenceProblemNewProps = {
 export const EnglishSentenceProblemNew: FC<EnglishSentenceProblemNewProps> = (
   props: EnglishSentenceProblemNewProps
 ) => {
-  const { _workbookId } = useParams<ParamTypes>();
-  const workbookId = +(_workbookId || '');
-  const workbook = useAppSelector(selectWorkbook);
-  const workbookGetLoading = useAppSelector(selectWorkbookGetLoading);
+  const workbook = props.workbook;
   const [values, setValues] = useState({
     text: 'pen',
     lang2: 'ja',
     translated: '',
   });
   const [errorMessage, setErrorMessage] = useState('');
-  const loading = workbookGetLoading;
   const EnglishSentenceProblemNewFormikForm = newFormikForm(
-    workbookId,
+    workbook.id,
     (values: formValues) => setValues(values),
     setErrorMessage
   );
@@ -111,11 +93,10 @@ export const EnglishSentenceProblemNew: FC<EnglishSentenceProblemNewProps> = (
     <Container fluid>
       <PrivateProblemBreadcrumb
         name={workbook.name}
-        id={workbookId}
+        id={workbook.id}
         text={'New problem'}
       />
       <Divider hidden />
-      {loading ? <AppDimmer /> : <div />}
       <EnglishSentenceProblemNewFormikForm
         text={values.text}
         lang2={values.lang2}

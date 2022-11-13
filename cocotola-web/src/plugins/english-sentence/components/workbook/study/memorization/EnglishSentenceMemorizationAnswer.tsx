@@ -7,11 +7,7 @@ import * as Yup from 'yup';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { AppBreadcrumbLink, ErrorMessage } from '@/components';
-import {
-  FormValues,
-  FormikFormProps,
-  problemPropertyEditFormikForm,
-} from '@/components/problem/ProblemPropertyEditFormikForm';
+import { ProblemPropertyEditFormikForm } from '@/components/problem/ProblemPropertyEditFormikForm';
 import { selectProblemMap } from '@/features/problem_find';
 import { addRecord } from '@/features/record_add';
 import { selectWorkbook } from '@/features/workbook_get';
@@ -37,11 +33,11 @@ type EnglishSentenceMemorizationAnswerProps = {
   workbookUrl: string;
 };
 
-interface formikFormPropsTranslated extends FormikFormProps {
+interface formikFormPropsTranslated extends Object {
   translated: string;
 }
 
-interface formValuesTranslated extends FormValues {
+interface formValuesTranslated extends Object {
   translated: string;
 }
 
@@ -119,43 +115,48 @@ export const EnglishSentenceMemorizationAnswer: FC<
 
   const onNextButtonClick = () => {
     if (memorized) {
-      dispatch(
-        addRecord({
-          param: {
-            workbookId: workbookId,
-            studyType: _studyType || '',
-            problemId: problemId,
-            result: true,
-            memorized: true,
-          },
-          postSuccessProcess: emptyFunction,
-          postFailureProcess: setErrorMessage,
-        })
-      );
+      const f = async () => {
+        await dispatch(
+          addRecord({
+            param: {
+              workbookId: workbookId,
+              studyType: _studyType || '',
+              problemId: problemId,
+              result: true,
+              memorized: true,
+            },
+            postSuccessProcess: emptyFunction,
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
     }
     dispatch(nextEnglishSentenceProblem());
   };
   const onMemorizeButtonClick = () => setMemorized(!memorized);
 
-  const EnglishSentenceProblemEditFormikForm = problemPropertyEditFormikForm<
+  const EnglishSentenceProblemEditFormikForm = ProblemPropertyEditFormikForm<
     formValuesTranslated,
     formikFormPropsTranslated
-  >(
-    workbookId,
-    problem.id,
-    problem.version,
-    EnglishSentenceProblemTypeId,
-    (values: formValuesTranslated) => (
+  >({
+    workbookId: workbookId,
+    problemId: problem.id,
+    problemVersion: problem.version,
+    problemType: EnglishSentenceProblemTypeId,
+    toField: () => (
       <Input name="translated" placeholder="translated sentence" errorPrompt />
     ),
-    Yup.object().shape({
+    validationSchema: Yup.object().shape({
       translated: Yup.string().required('Translated is required'),
     }),
-    (props: formikFormPropsTranslated) => ({ ...props }),
-    (values: formValuesTranslated) => ({ translated: values.translated }),
-    (values: formValuesTranslated) => {},
-    setErrorMessage
-  );
+    propsToValues: (props: formikFormPropsTranslated) => ({ ...props }),
+    valuesToProperties: (values: formValuesTranslated) => ({
+      translated: values.translated,
+    }),
+    resetValues: () => emptyFunction,
+    setErrorMessage: setErrorMessage,
+  });
 
   return (
     <Container fluid>

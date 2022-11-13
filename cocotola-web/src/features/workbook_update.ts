@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = import.meta.env.VITE_APP_BACKEND + '/v1/private/workbook';
+const baseUrl = `${backendUrl}/v1/private/workbook`;
 
 // Update workbook
 export type WorkbookUpdateParameter = {

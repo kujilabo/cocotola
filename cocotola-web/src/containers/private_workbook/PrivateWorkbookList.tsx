@@ -31,17 +31,20 @@ export const PrivateWorkbookList = (): ReactElement => {
   // onsole.log('workbooksLoaded', workbooksLoadedMap);
 
   useDidMount(() => {
-    dispatch(
-      findMyWorkbooks({
-        param: {
-          pageNo: 1,
-          pageSize: 10,
-          spaceKey: spaceKey,
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        findMyWorkbooks({
+          param: {
+            pageNo: 1,
+            pageSize: 10,
+            spaceKey: spaceKey,
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   });
 
   if (!workbookFindFailed && !workbookFindLoading && !workbooksLoaded) {

@@ -3,12 +3,12 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
 import { TatoebaSentencePairModel } from '../models/tatoeba';
 
-const baseUrl = process.env.REACT_APP_BACKEND + '/plugin/tatoeba';
+const baseUrl = `${backendUrl}/plugin/tatoeba`;
 
 // Find tatoeba sentence
 export type TatoebaFindParameter = {

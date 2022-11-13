@@ -75,7 +75,7 @@ export const englishWordSlice = createSlice({
           const lastAnsweredAt = new Date(record.lastAnsweredAt);
 
           const daysToAdd = 1;
-          var nextDateToAnwswer = new Date(
+          const nextDateToAnwswer = new Date(
             lastAnsweredAt.getTime() + daysToAdd * 24 * 60 * 60 * 1000
           );
           console.log('nextDateToAnwswer', nextDateToAnwswer);
@@ -111,7 +111,7 @@ export const englishWordSlice = createSlice({
       // onsole.log('length', state.recordbook.records.length);
       const problemId = record.problemId;
       // onsole.log('problemId', problemId);
-      let level = record.level;
+      const level = record.level;
 
       const newRecordbook: RecordbookModel = removeProblemFromRecordbook(
         state.recordbook,

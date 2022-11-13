@@ -1,4 +1,3 @@
-
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -7,9 +6,9 @@ import { refreshAccessToken } from '@/features/auth';
 import { AudioModel } from '@/models/audio';
 import { jsonHeaders } from '@/utils/util';
 
-import { extractErrorMessage } from './base';
+import { backendUrl, extractErrorMessage } from './base';
 
-const baseUrl = import.meta.env.VITE_APP_BACKEND + '/v1/workbook';
+const baseUrl = `${backendUrl}/v1/workbook`;
 
 // Find audio
 export type AudioViewParameter = {
@@ -88,7 +87,7 @@ export const audioSlice = createSlice({
         state.failed = false;
         state.audio = action.payload.response;
       })
-      .addCase(getAudio.rejected, (state, action) => {
+      .addCase(getAudio.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

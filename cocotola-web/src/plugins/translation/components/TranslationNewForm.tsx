@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactElement } from 'react';
 
 import { FormikProps } from 'formik';
 import { Form } from 'formik-semantic-ui-react';
@@ -15,7 +15,7 @@ export interface TranslationNewFormValues {
 }
 export const TranslationNewForm = (
   props: FormikProps<TranslationNewFormValues>
-) => {
+): ReactElement => {
   const { isSubmitting } = props;
   return (
     <Form>

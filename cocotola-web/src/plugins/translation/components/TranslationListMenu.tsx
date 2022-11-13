@@ -20,12 +20,15 @@ export const TranslationListMenu: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const onExportButtonClick = () => {
-    dispatch(
-      exportTranslation({
-        postSuccessProcess: (blob: Blob) => saveAs(blob, 'translations.csv'),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        exportTranslation({
+          postSuccessProcess: (blob: Blob) => saveAs(blob, 'translations.csv'),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
   return (
     <Menu vertical fluid>

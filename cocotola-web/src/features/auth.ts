@@ -1,11 +1,9 @@
-
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
-import { extractErrorMessage } from '@/features/base';
-
+import { backendUrl, extractErrorMessage } from '@/features/base';
 
 // RefreshToken
 type RefreshTokenParameter = {
@@ -40,7 +38,7 @@ export const refreshAccessToken = createAsyncThunk<
     });
   }
   return await axios
-    .post(import.meta.env.VITE_APP_BACKEND + '/v1/auth/refresh_token', arg)
+    .post(`${backendUrl}/v1/auth/refresh_token`, arg)
     .then((resp: any) => {
       // onsole.log('refreshAccessToken1 a');
       const response = resp.data as RefreshTokenResponse;
@@ -74,12 +72,9 @@ export const googleAuthorize = createAsyncThunk(
   'auth/google',
   async (arg: GoogleAuthorizeArg, thunkAPI) => {
     console.log('googleauthorize');
-    console.log(`${import.meta.env.VITE_APP_BACKEND}/v1/auth/google/authorize`);
+    console.log(`${backendUrl}/v1/auth/google/authorize`);
     return await axios
-      .post(
-        `${import.meta.env.VITE_APP_BACKEND}/v1/auth/google/authorize`,
-        arg.param
-      )
+      .post(`${backendUrl}/v1/auth/google/authorize`, arg.param)
       .then((resp) => {
         console.log('callback then');
         return resp.data as GoogleAuthorizeResponse;
@@ -114,10 +109,7 @@ export const guestAuthorize = createAsyncThunk(
   'auth/guest',
   async (arg: GuestAuthorizeArg, thunkAPI) => {
     return await axios
-      .post(
-        `${import.meta.env.VITE_APP_BACKEND}/v1/auth/google/authorize`,
-        arg.param
-      )
+      .post(`${backendUrl}/v1/auth/google/authorize`, arg.param)
       .then((resp) => {
         // onsole.log('callback then');
         return resp.data as GuestAuthorizeResponse;

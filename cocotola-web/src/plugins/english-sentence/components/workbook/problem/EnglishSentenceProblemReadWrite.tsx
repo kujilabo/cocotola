@@ -25,32 +25,38 @@ export const EnglishSentenceProblemReadWrite: FC<
   const baseUrl = `/app/private/workbook/${workbookId}/problem/${problemId}`;
   const audioViewLoading = useAppSelector(selectAudioViewLoading);
   const loadAndPlay = (postFunc: (value: string) => void) => {
-    dispatch(
-      getAudio({
-        param: {
-          updatedAt: props.problem.updatedAt,
-          workbookId: workbookId,
-          problemId: problemId,
-          audioId: props.problem.properties['audioId'],
-        },
-        postFunc: postFunc,
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getAudio({
+          param: {
+            updatedAt: props.problem.updatedAt,
+            workbookId: workbookId,
+            problemId: problemId,
+            audioId: +props.problem.properties['audioId'],
+          },
+          postFunc: postFunc,
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
   const onRemoveButtonClick = () => {
-    dispatch(
-      removeProblem({
-        param: {
-          workbookId: workbookId,
-          problemId: problemId,
-          version: problemVersion,
-        },
-        postSuccessProcess: () => navigate(props.baseWorkbookPath),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        removeProblem({
+          param: {
+            workbookId: workbookId,
+            problemId: problemId,
+            version: problemVersion,
+          },
+          postSuccessProcess: () => navigate(props.baseWorkbookPath),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
   // console.log('EnglishSentenceProblemReadWrite b');
   // console.log(props.problem.properties['audioId']);

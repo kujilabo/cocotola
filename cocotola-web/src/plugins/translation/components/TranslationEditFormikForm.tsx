@@ -24,7 +24,7 @@ export interface TranslationEditFormikFormProps {
   //   onRemoveClick: () => void;
   refreshTranslations: () => void;
 }
-export const translationEditFormikForm = (
+export const TranslationEditFormikForm = (
   setSuccessMessage: React.Dispatch<React.SetStateAction<string>>,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
   setTranslation: (t: TranslationEditFormValues) => void
@@ -43,16 +43,19 @@ export const translationEditFormikForm = (
       provider: props.provider,
       //   onRemoveClick: props.onRemoveClick,
       onRemoveClick: () => {
-        dispatch(
-          removeTranslation({
-            param: {
-              text: props.text,
-              pos: +props.pos,
-            },
-            postSuccessProcess: () => props.refreshTranslations(),
-            postFailureProcess: setErrorMessage,
-          })
-        );
+        const f = async () => {
+          await dispatch(
+            removeTranslation({
+              param: {
+                text: props.text,
+                pos: +props.pos,
+              },
+              postSuccessProcess: () => props.refreshTranslations(),
+              postFailureProcess: setErrorMessage,
+            })
+          );
+        };
+        f().catch(console.error);
       },
     }),
     validationSchema: Yup.object().shape({
@@ -70,24 +73,27 @@ export const translationEditFormikForm = (
 
       setErrorMessage('');
       setSuccessMessage('');
-      dispatch(
-        updateTranslation({
-          param: {
-            lang2: formikBag.props.lang2,
-            text: formValues.text,
-            pos: +formValues.pos,
-            translated: formValues.translated,
-          },
-          postSuccessProcess: () => {
-            setErrorMessage('');
-            setSuccessMessage('Word has been updated successfully');
-          },
-          postFailureProcess: (err: string) => {
-            setErrorMessage(err);
-            setSuccessMessage('');
-          },
-        })
-      );
+      const f = async () => {
+        await dispatch(
+          updateTranslation({
+            param: {
+              lang2: formikBag.props.lang2,
+              text: formValues.text,
+              pos: +formValues.pos,
+              translated: formValues.translated,
+            },
+            postSuccessProcess: () => {
+              setErrorMessage('');
+              setSuccessMessage('Word has been updated successfully');
+            },
+            postFailureProcess: (err: string) => {
+              setErrorMessage(err);
+              setSuccessMessage('');
+            },
+          })
+        );
+      };
+      f().catch(console.error);
     },
   })(TranslationEditForm);
 };

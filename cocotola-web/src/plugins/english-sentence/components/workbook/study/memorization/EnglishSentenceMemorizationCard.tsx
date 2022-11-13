@@ -24,19 +24,22 @@ export const EnglishSentenceMemorizationCard: FC<
   const audioViewLoading = useAppSelector(selectAudioViewLoading);
 
   const loadAndPlay = (postFunc: (value: string) => void) => {
-    dispatch(
-      getAudio({
-        param: {
-          workbookId: props.workbookId,
-          problemId: props.problemId,
-          audioId: props.audioId,
-          updatedAt: props.updatedAt,
-        },
-        postFunc: postFunc,
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: props.setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getAudio({
+          param: {
+            workbookId: props.workbookId,
+            problemId: props.problemId,
+            audioId: props.audioId,
+            updatedAt: props.updatedAt,
+          },
+          postFunc: postFunc,
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: props.setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   return (

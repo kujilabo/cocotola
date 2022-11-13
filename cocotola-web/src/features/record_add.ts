@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/study/workbook`;
+const baseUrl = `${backendUrl}/v1/study/workbook`;
 
 // Add record
 export type RecordAddParameter = {

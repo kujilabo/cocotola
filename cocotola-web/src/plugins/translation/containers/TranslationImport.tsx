@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import { ReactElement, ChangeEvent, useState } from 'react';
 
 import { Card, Container, Divider, Header, Form } from 'semantic-ui-react';
 
@@ -11,7 +11,7 @@ import {
   selectTranslationImportLoading,
 } from '../features/translation_import';
 
-export const TranslationImport = (): React.ReactElement => {
+export const TranslationImport = (): ReactElement => {
   const translationImportLoading = useAppSelector(
     selectTranslationImportLoading
   );
@@ -38,13 +38,16 @@ export const TranslationImport = (): React.ReactElement => {
     const formData = new FormData();
     formData.append('file', file as Blob);
 
-    dispatch(
-      importTranslation({
-        param: formData,
-        postSuccessProcess: () => setErrorMessage(''),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        importTranslation({
+          param: formData,
+          postSuccessProcess: () => setErrorMessage(''),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   return (

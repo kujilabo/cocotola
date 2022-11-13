@@ -30,13 +30,16 @@ export const EnglishWordProblemMenu: React.FC<EnglishWordProblemMenuProps> = (
   // when workbookId is changed
   useEffect(() => {
     // get the completion rate of the workbook
-    dispatch(
-      getCompletionRate({
-        param: { workbookId: props.workbook.id },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getCompletionRate({
+          param: { workbookId: props.workbook.id },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, props.workbook.id]);
 
   console.log('recordbookCompletionRateMap', recordbookCompletionRateMap);

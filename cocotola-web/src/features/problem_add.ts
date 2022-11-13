@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/workbook`;
+const baseUrl = `${backendUrl}/v1/workbook`;
 
 // Add problem
 export type ProblemAddParameter = {
@@ -73,10 +73,10 @@ export const problemAddSlice = createSlice({
       .addCase(addProblem.pending, (state) => {
         state.loading = true;
       })
-      .addCase(addProblem.fulfilled, (state, action) => {
+      .addCase(addProblem.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(addProblem.rejected, (state, action) => {
+      .addCase(addProblem.rejected, (state) => {
         state.loading = false;
       });
   },

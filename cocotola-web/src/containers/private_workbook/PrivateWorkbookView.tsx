@@ -102,30 +102,36 @@ export function PrivateWorkbookView(): ReactElement {
     setPageNo(1);
 
     // findWorkbook
-    dispatch(
-      getWorkbook({
-        param: { id: workbookId },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getWorkbook({
+          param: { id: workbookId },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, workbookId]);
 
   // when workbookId or pageNo is changed
   useEffect(() => {
     //
-    dispatch(
-      findProblems({
-        param: {
-          workbookId: workbookId,
-          pageNo: pageNo,
-          pageSize: 10,
-          keyword: '',
-        },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        findProblems({
+          param: {
+            workbookId: workbookId,
+            pageNo: pageNo,
+            pageSize: 10,
+            keyword: '',
+          },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, workbookId, pageNo]);
 
   if (workbookGetFailed || problemFindFailed) {
@@ -193,7 +199,7 @@ export function PrivateWorkbookView(): ReactElement {
                 <Message.Header>Problems are not registered.</Message.Header>
                 <p>
                   Please click{' '}
-                  <Link to={`/app/workbook/${_workbookId}/problem/new`}>
+                  <Link to={`/app/workbook/${workbookId}/problem/new`}>
                     New problem
                   </Link>{' '}
                   to register a new problem.

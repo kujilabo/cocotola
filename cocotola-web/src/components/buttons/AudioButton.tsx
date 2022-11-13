@@ -13,7 +13,10 @@ export const AudioButton: FC<AudioButtonProps> = (
 ): ReactElement => {
   const playAudio = (value: string) => {
     const audio = new Audio('data:audio/wav;base64,' + value);
-    audio.play();
+    const f = async () => {
+      await audio.play();
+    };
+    f().catch(console.error);
   };
 
   if (props.id === 0) {

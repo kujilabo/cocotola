@@ -3,10 +3,10 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = `${process.env.REACT_APP_BACKEND}`;
+const baseUrl = `${backendUrl}`;
 
 // Import translation
 export type TranslationImportArg = {
@@ -14,7 +14,7 @@ export type TranslationImportArg = {
   postSuccessProcess: () => void;
   postFailureProcess: (error: string) => void;
 };
-type TranslationImportResult = {};
+type TranslationImportResult = Record<string, never>;
 
 export const importTranslation = createAsyncThunk<
   TranslationImportResult,

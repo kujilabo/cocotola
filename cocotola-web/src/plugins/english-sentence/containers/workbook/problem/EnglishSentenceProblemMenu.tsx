@@ -11,6 +11,11 @@ import {
 import { WorkbookModel } from '@/models/workbook';
 import { emptyFunction } from '@/utils/util';
 
+type EnglishSentenceProblemMenuProps = {
+  initStudy: (s: string) => void;
+  workbook: WorkbookModel;
+};
+
 export const EnglishSentenceProblemMenu: FC<EnglishSentenceProblemMenuProps> = (
   props: EnglishSentenceProblemMenuProps
 ) => {
@@ -27,16 +32,20 @@ export const EnglishSentenceProblemMenu: FC<EnglishSentenceProblemMenuProps> = (
   const onImportButtonClick = () => {
     navigate(`/app/private/workbook/${props.workbook.id}/import`);
   };
+
   // when workbookId is changed
   useEffect(() => {
     // get the completion rate of the workbook
-    dispatch(
-      getCompletionRate({
-        param: { workbookId: props.workbook.id },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getCompletionRate({
+          param: { workbookId: props.workbook.id },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, props.workbook.id]);
 
   console.log('recordbookCompletionRateMap', recordbookCompletionRateMap);
@@ -109,8 +118,4 @@ export const EnglishSentenceProblemMenu: FC<EnglishSentenceProblemMenuProps> = (
       </Menu>
     );
   }
-};
-type EnglishSentenceProblemMenuProps = {
-  initStudy: (s: string) => void;
-  workbook: WorkbookModel;
 };

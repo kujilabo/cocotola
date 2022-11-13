@@ -1,6 +1,6 @@
 import { ReactElement, Dispatch, ComponentType, SetStateAction } from 'react';
 
-import { FormikProps, withFormik, FormikBag } from 'formik';
+import { FormikProps, withFormik } from 'formik';
 import { Form } from 'formik-semantic-ui-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Header } from 'semantic-ui-react';
@@ -10,14 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { AddButton, AppDimmer } from '@/components';
 import { addProblem, selectProblemAddLoading } from '@/features/problem_add';
 
-export interface FormValues {}
-
-export interface FormikFormProps {}
-
-export interface problemNewFormikFormArgs<
-  V extends FormValues,
-  P extends FormikFormProps
-> {
+export interface problemNewFormikFormArgs<V extends object, P extends object> {
   workbookId: number;
   problemType: string;
   toContent: (v: V) => ReactElement;
@@ -28,10 +21,7 @@ export interface problemNewFormikFormArgs<
   setErrorMessage: Dispatch<SetStateAction<string>>;
 }
 
-export const problemNewFormikForm = <
-  V extends FormValues,
-  P extends FormikFormProps
->(
+export const ProblemNewFormikForm = <V extends object, P extends object>(
   args: problemNewFormikFormArgs<V, P>
 ): ComponentType<P> => {
   const navigate = useNavigate();
@@ -71,19 +61,22 @@ export const problemNewFormikForm = <
   return withFormik<P, V>({
     mapPropsToValues: (props: P) => propsToValues(props),
     validationSchema: validationSchema,
-    handleSubmit: (values: V, formikBag: FormikBag<P, V>) => {
-      dispatch(
-        addProblem({
-          workbookId: workbookId,
-          param: {
-            problemType: problemType,
-            properties: valuesToProperties(values),
-          },
-          postSuccessProcess: () =>
-            navigate(`/app/private/workbook/${workbookId}`),
-          postFailureProcess: setErrorMessage,
-        })
-      );
+    handleSubmit: (values: V) => {
+      const f = async () => {
+        await dispatch(
+          addProblem({
+            workbookId: workbookId,
+            param: {
+              problemType: problemType,
+              properties: valuesToProperties(values),
+            },
+            postSuccessProcess: () =>
+              navigate(`/app/private/workbook/${workbookId}`),
+            postFailureProcess: setErrorMessage,
+          })
+        );
+      };
+      f().catch(console.error);
       resetValues(values);
     },
   })(NewForm);

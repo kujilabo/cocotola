@@ -51,24 +51,30 @@ export const PrivateProblemImport = (): ReactElement => {
     const formData = new FormData();
     formData.append('file', file as Blob);
 
-    dispatch(
-      importProblem({
-        workbookId: workbookId,
-        param: formData,
-        postSuccessProcess: () => setErrorMessage(''),
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        importProblem({
+          workbookId: workbookId,
+          param: formData,
+          postSuccessProcess: () => setErrorMessage(''),
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   };
 
   useEffect(() => {
-    dispatch(
-      getWorkbook({
-        param: { id: workbookId },
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
+    const f = async () => {
+      await dispatch(
+        getWorkbook({
+          param: { id: workbookId },
+          postSuccessProcess: emptyFunction,
+          postFailureProcess: setErrorMessage,
+        })
+      );
+    };
+    f().catch(console.error);
   }, [dispatch, workbookId]);
 
   if (workbookGetFailed) {

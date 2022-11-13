@@ -3,11 +3,11 @@ import axios from 'axios';
 
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
-import { extractErrorMessage } from '@/features/base';
+import { backendUrl, extractErrorMessage } from '@/features/base';
 // import { TranslationModel } from '../models/translation';
 import { jsonRequestConfig } from '@/utils/util';
 
-const baseUrl = process.env.REACT_APP_BACKEND + '/plugin/translation';
+const baseUrl = `${backendUrl}/plugin/translation`;
 
 // Update translation
 export type TranslationUpdateParameter = {
@@ -33,11 +33,11 @@ export const updateTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .put(url, arg.param, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return {
             param: arg.param,
@@ -69,12 +69,12 @@ export const translationUpdateSlice = createSlice({
       .addCase(updateTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(updateTranslation.fulfilled, (state, action) => {
+      .addCase(updateTranslation.fulfilled, (state) => {
         // onsole.log('workbook', action.payload.response);
         state.loading = false;
         state.failed = false;
       })
-      .addCase(updateTranslation.rejected, (state, action) => {
+      .addCase(updateTranslation.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;
