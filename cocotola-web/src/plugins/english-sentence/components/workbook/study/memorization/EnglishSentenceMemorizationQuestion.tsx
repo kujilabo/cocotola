@@ -1,46 +1,51 @@
-import { FC, useState } from 'react';
-
-import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
+import { ReactElement, FC, useState } from 'react';
 
 import { useParams } from 'react-router-dom';
 import {
   Accordion,
   Button,
-  Card,
   Container,
   Divider,
-  Header,
   Icon,
   Message,
 } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
-import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { AppBreadcrumbLink, ErrorMessage } from '@/components';
 import { selectProblemMap } from '@/features/problem_find';
 import { addRecord } from '@/features/record_add';
 import { selectWorkbook } from '@/features/workbook_get';
+
 import {
   selectEnglishSentenceRecordbook,
   setEnglishSentenceStatus,
   setEnglishSentenceRecord,
   ENGLISH_SENTENCE_STATUS_ANSWER,
-} from '@/plugins/english-sentence/features/english_sentence_study';
-import { emptyFunction } from '@/utils/util';
+} from '../../../../features/english_sentence_study';
+
+import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
+import { EnglishSentenceMemorizationCard } from './EnglishSentenceMemorizationCard';
 
 type ParamTypes = {
   _workbookId: string;
   _studyType: string;
 };
+
+type EnglishSentenceMemorizationQuestionProps = {
+  breadcrumbLinks: AppBreadcrumbLink[];
+  workbookUrl: string;
+};
+
 export const EnglishSentenceMemorizationQuestion: FC<
   EnglishSentenceMemorizationQuestionProps
-> = (props: EnglishSentenceMemorizationQuestionProps) => {
-  //onsole.log('EnglishSentenceMemorizationQuestion');
+> = (props: EnglishSentenceMemorizationQuestionProps): ReactElement => {
+  console.log('EnglishSentenceMemorizationQuestion');
   const { _workbookId, _studyType } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
+  const studyType = _studyType || '';
   const dispatch = useAppDispatch();
   const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
-  const audioViewLoading = useAppSelector(selectAudioViewLoading);
   const englishSentenceRecordbook = useAppSelector(
     selectEnglishSentenceRecordbook
   );
@@ -51,7 +56,7 @@ export const EnglishSentenceMemorizationQuestion: FC<
       breadcrumbLinks={props.breadcrumbLinks}
       workbookUrl={props.workbookUrl}
       name={workbook.name}
-      id={+(_workbookId || '')}
+      id={workbookId}
     />
   );
   if (englishSentenceRecordbook.records.length === 0) {
@@ -67,33 +72,21 @@ export const EnglishSentenceMemorizationQuestion: FC<
 
   const problemId = englishSentenceRecordbook.records[0].problemId;
   const problem = problemMap[problemId];
+  if (!problem) {
+    return <div>undefined</div>;
+  }
+
   // onsole.log('englishSentenceRecordbook.records', englishSentenceRecordbook.records);
   // onsole.log('problemMap', problemMap);
   // onsole.log('problemId', problemId);
   // onsole.log('problem', problem);
 
-  const loadAndPlay = (postFunc: (value: string) => void) => {
-    dispatch(
-      getAudio({
-        param: {
-          workbookId: +(_workbookId || ''),
-          problemId: problemId,
-          audioId: problem.properties['audioId'],
-          updatedAt: problem.updatedAt,
-        },
-        postFunc: postFunc,
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  };
-
   const setRecord = (result: boolean) => {
     dispatch(
       addRecord({
         param: {
-          workbookId: +(_workbookId || ''),
-          studyType: _studyType || '',
+          workbookId: workbookId,
+          studyType: studyType,
           problemId: problemId,
           result: result,
           memorized: false,
@@ -113,43 +106,24 @@ export const EnglishSentenceMemorizationQuestion: FC<
   // onsole.log('problemId', problemId);
   // onsole.log('problem', problem);
   // onsole.log('problemMap', problemMap);
-  if (!problem) {
-    return <div>undefined</div>;
-  }
-
   return (
     <Container fluid>
       {breadcrumb}
       <Divider hidden />
-      <Card>
-        <Card.Content>
-          <Header component="h2">
-            {problem.properties['text']}
-            <AudioButton
-              id={problem.properties['audioId']}
-              loadAndPlay={loadAndPlay}
-              disabled={audioViewLoading}
-            />
-          </Header>
-        </Card.Content>
-        {/* <Card.Content>
-      <Form.Checkbox
-        checked={memorized}
-        label="完璧に覚えた"
-        onClick={onMemorizeButtonClick}
-      />
-    </Card.Content> */}
-        <Card.Content>
-          <Button.Group fluid>
+      <EnglishSentenceMemorizationCard
+        workbookId={workbookId}
+        problemId={problemId}
+        audioId={problem.properties['audioId']}
+        updatedAt={problem.updatedAt}
+        headerText={problem.properties['text']}
+        contentList={[
+          <div className="ui fluid buttons">
             <Button onClick={onNoButtonClick}>わからない</Button>
             <Button.Or />
             <Button positive onClick={onYesButtonClick}>
               わかる
             </Button>
-          </Button.Group>
-        </Card.Content>
-
-        <Card.Content>
+          </div>,
           <Accordion>
             <Accordion.Title
               active={answerOpen}
@@ -162,9 +136,10 @@ export const EnglishSentenceMemorizationQuestion: FC<
             <Accordion.Content active={answerOpen}>
               <p>{problem.properties['translated']}</p>
             </Accordion.Content>
-          </Accordion>
-        </Card.Content>
-      </Card>
+          </Accordion>,
+        ]}
+        setErrorMessage={setErrorMessage}
+      />
       <ErrorMessage message={errorMessage} />
       {englishSentenceRecordbook.records.length}
       {englishSentenceRecordbook.records.map((record) => {
@@ -178,9 +153,4 @@ export const EnglishSentenceMemorizationQuestion: FC<
       })}
     </Container>
   );
-};
-
-type EnglishSentenceMemorizationQuestionProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
 };

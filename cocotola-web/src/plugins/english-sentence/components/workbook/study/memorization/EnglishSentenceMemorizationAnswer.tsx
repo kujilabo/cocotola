@@ -1,59 +1,88 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 
-import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
-
-import { useTranslation } from 'react-i18next';
+import { Input } from 'formik-semantic-ui-react';
 import { useParams } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Container,
-  Divider,
-  Form,
-  Header,
-} from 'semantic-ui-react';
+import { Button, Container, Divider, Form, Message } from 'semantic-ui-react';
+import * as Yup from 'yup';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
-import { LinkButton } from '@/components/buttons';
-import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { AppBreadcrumbLink, ErrorMessage, AppDimmer } from '@/components';
+import {
+  FormValues,
+  FormikFormProps,
+  problemPropertyEditFormikForm,
+} from '@/components/problem/ProblemPropertyEditFormikForm';
 import { selectProblemMap } from '@/features/problem_find';
-import { getProblem } from '@/features/problem_get';
+import { selectProblemUpdateLoading } from '@/features/problem_update';
 import { addRecord } from '@/features/record_add';
 import { selectWorkbook } from '@/features/workbook_get';
-import { ProblemModel } from '@/models/problem';
+import { EnglishSentenceProblemTypeId } from '@/models/problem';
+import { emptyFunction } from '@/utils/util';
+
 import {
   selectEnglishSentenceRecordbook,
   nextEnglishSentenceProblem,
-} from '@/plugins/english-sentence/features/english_sentence_study';
-import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
-import { emptyFunction } from '@/utils/util';
+} from '../../../../features/english_sentence_study';
+import { EnglishSentenceProblemModel } from '../../../../models/english-sentence-problem';
+
+import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
+import { EnglishSentenceMemorizationCard } from './EnglishSentenceMemorizationCard';
 
 type ParamTypes = {
   _workbookId: string;
   _studyType: string;
 };
+
+type EnglishSentenceMemorizationAnswerProps = {
+  breadcrumbLinks: AppBreadcrumbLink[];
+  workbookUrl: string;
+};
+
+interface formikFormPropsTranslated extends FormikFormProps {
+  translated: string;
+}
+
+interface formValuesTranslated extends FormValues {
+  translated: string;
+}
+
 export const EnglishSentenceMemorizationAnswer: FC<
   EnglishSentenceMemorizationAnswerProps
 > = (props: EnglishSentenceMemorizationAnswerProps) => {
   const { _workbookId, _studyType } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
   const dispatch = useAppDispatch();
-  const [t] = useTranslation();
   const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
-  const audioViewLoading = useAppSelector(selectAudioViewLoading);
   const englishSentenceRecordbook = useAppSelector(
     selectEnglishSentenceRecordbook
   );
+  const loading = useAppSelector(selectProblemUpdateLoading);
   const [memorized, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const breadcrumb = (
+    <EnglishSentenceMemorizationBreadcrumb
+      breadcrumbLinks={props.breadcrumbLinks}
+      workbookUrl={props.workbookUrl}
+      name={workbook.name}
+      id={workbookId}
+    />
+  );
   if (englishSentenceRecordbook.records.length === 0) {
-    return <div></div>;
+    return (
+      <Container fluid>
+        {breadcrumb}
+        <Message info>
+          <p>You answered all problems. Please try again in a few days.</p>
+        </Message>
+      </Container>
+    );
   }
   const problemId = englishSentenceRecordbook.records[0].problemId;
   const problem = EnglishSentenceProblemModel.of(problemMap[problemId]);
-  const baseUrl = `/app/private/workbook/${_workbookId}/problem/${problemId}`;
   console.log('problem', problem);
+  console.log('problemId', problemId);
+  console.log('problem.translated', problem.translated);
   // let sentence1 = emptyTatoebaSentence;
   // let sentence2 = emptyTatoebaSentence;
   // if (problem.senexampleSentenceNote && values.exampleSentenceNote !== '') {
@@ -76,41 +105,27 @@ export const EnglishSentenceMemorizationAnswer: FC<
   //     console.log(e);
   //   }
   // }
-  useEffect(() => {
-    dispatch(
-      getProblem({
-        param: { workbookId: +_workbookId, problemId: problemId },
-        postSuccessProcess: (p: ProblemModel) => {
-          const e = EnglishSentenceProblemModel.of(p);
-          console.log(e);
-        },
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  }, [dispatch, _workbookId, problemId, problem.version]);
+  // useEffect(() => {
+  //   console.log('get problem');
+  //   dispatch(
+  //     getProblem({
+  //       param: { workbookId: workbookId, problemId: problemId },
+  //       postSuccessProcess: (p: ProblemModel) => {
+  //         const e = EnglishSentenceProblemModel.of(p);
+  //         console.log(e);
+  //       },
+  //       postFailureProcess: setErrorMessage,
+  //     })
+  //   );
+  //   }, [dispatch, workbookId, problemId, problem.version]);
 
-  const loadAndPlay = (postFunc: (value: string) => void) => {
-    dispatch(
-      getAudio({
-        param: {
-          workbookId: +_workbookId,
-          problemId: problemId,
-          audioId: +problem.audioId,
-          updatedAt: problem.updatedAt,
-        },
-        postFunc: postFunc,
-        postSuccessProcess: emptyFunction,
-        postFailureProcess: setErrorMessage,
-      })
-    );
-  };
   const onNextButtonClick = () => {
     if (memorized) {
       dispatch(
         addRecord({
           param: {
-            workbookId: +_workbookId,
-            studyType: _studyType,
+            workbookId: workbookId,
+            studyType: _studyType || '',
             problemId: problemId,
             result: true,
             memorized: true,
@@ -124,52 +139,55 @@ export const EnglishSentenceMemorizationAnswer: FC<
   };
   const onMemorizeButtonClick = () => setMemorized(!memorized);
 
+  const EnglishSentenceProblemEditFormikForm = problemPropertyEditFormikForm<
+    formValuesTranslated,
+    formikFormPropsTranslated
+  >(
+    workbookId,
+    problem.id,
+    problem.version,
+    EnglishSentenceProblemTypeId,
+    Yup.object().shape({
+      translated: Yup.string().required('Sentence is required'),
+    }),
+    setErrorMessage,
+    (values: FormValues) => {},
+    (props: formikFormPropsTranslated) => ({ ...props }),
+    (values: formValuesTranslated) => ({ translated: values.translated }),
+    <Input name="translated" placeholder="translated sentence" errorPrompt />
+  );
+
   return (
     <Container fluid>
-      <EnglishSentenceMemorizationBreadcrumb
-        breadcrumbLinks={props.breadcrumbLinks}
-        workbookUrl={props.workbookUrl}
-        name={workbook.name}
-        id={+_workbookId}
-      />
+      {breadcrumb}
       <Divider hidden />
-      <Card>
-        <Card.Content>
-          <Header component="h2">
-            {problem.text}
-            <AudioButton
-              id={+problem.audioId}
-              loadAndPlay={loadAndPlay}
-              disabled={audioViewLoading}
+      <EnglishSentenceMemorizationCard
+        workbookId={workbookId}
+        problemId={problemId}
+        audioId={+problem.audioId}
+        updatedAt={problem.updatedAt}
+        headerText={problem.text}
+        contentList={[
+          <div>
+            {loading ? <AppDimmer /> : <div />}
+            <EnglishSentenceProblemEditFormikForm
+              translated={problem.translated}
             />
-          </Header>
-        </Card.Content>
-        <Card.Content>
-          {/* <p>{toDsiplayText(+problem.pos)}</p> */}
-        </Card.Content>
-        <Card.Content>
-          <p>{problem.translated}</p>
-        </Card.Content>
-        <Card.Content>
-          <Button.Group fluid>
-            <LinkButton to={`${baseUrl}/edit`} value={t('Edit')} />
-          </Button.Group>
-        </Card.Content>
-        <Card.Content>
+          </div>,
           <Form.Checkbox
             checked={memorized}
             label="完璧に覚えた"
             onClick={onMemorizeButtonClick}
-          />
-        </Card.Content>
-        <Card.Content>
-          <Button.Group fluid>
+          />,
+
+          <div className="ui fluid buttons">
             <Button color="teal" onClick={onNextButtonClick}>
               Next
             </Button>
-          </Button.Group>
-        </Card.Content>
-      </Card>
+          </div>,
+        ]}
+        setErrorMessage={setErrorMessage}
+      />
       <ErrorMessage message={errorMessage} />
       {englishSentenceRecordbook.records.map((record) => {
         return (
@@ -180,9 +198,4 @@ export const EnglishSentenceMemorizationAnswer: FC<
       })}
     </Container>
   );
-};
-
-type EnglishSentenceMemorizationAnswerProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
 };

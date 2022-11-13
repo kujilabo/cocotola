@@ -1,16 +1,17 @@
 import { FC, useEffect, useState } from 'react';
 
-import { englishSentenceProblemEditFormikForm } from '../../../components/workbook/problem/EnglishSentenceProblemEditFormikForm';
-
 import { useParams } from 'react-router-dom';
 import { Container, Divider } from 'semantic-ui-react';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { ErrorMessage, PrivateProblemBreadcrumb } from '@/components';
-import { selectProblem } from '@/features/problem_get';
+// import { selectProblem } from '@/features/problem_get';
+import { selectProblemMap } from '@/features/problem_find';
 import { ProblemModel } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
-import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
+
+import { englishSentenceProblemEditFormikForm } from '../../../components/workbook/problem/EnglishSentenceProblemEditFormikForm';
+import { EnglishSentenceProblemModel } from '../../../models/english-sentence-problem';
 
 type ParamTypes = {
   _workbookId: string;
@@ -20,10 +21,13 @@ type ParamTypes = {
 export const EnglishSentenceProblemEdit: FC<EnglishSentenceProblemEditProps> = (
   props: EnglishSentenceProblemEditProps
 ) => {
-  const { _workbookId } = useParams<ParamTypes>();
+  const { _workbookId, _problemId } = useParams<ParamTypes>();
   const workbookId = +(_workbookId || '');
+  const problemId = +(_problemId || '');
   const dispatch = useAppDispatch();
-  const problem = EnglishSentenceProblemModel.of(useAppSelector(selectProblem));
+  // const problem = EnglishSentenceProblemModel.of(useAppSelector(selectProblem));
+  const problemMap = useAppSelector(selectProblemMap);
+  const problem = EnglishSentenceProblemModel.of(problemMap[problemId]);
   const [values, setValues] = useState({
     number: problem.number,
     text: problem.text,

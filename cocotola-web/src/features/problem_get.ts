@@ -1,3 +1,4 @@
+/*
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -114,3 +115,4 @@ export const selectLoadedProblemId = (state: RootState) =>
   state.problemGet.loadedProblemId;
 
 export default problemGetSlice.reducer;
+*/

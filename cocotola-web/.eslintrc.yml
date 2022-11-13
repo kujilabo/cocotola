@@ -36,10 +36,10 @@ rules:
     - error
     - groups:
       - builtin
-      - sibling
-      - parent
       - external
       - internal
+      - parent
+      - sibling
       - index
       - object
       - type

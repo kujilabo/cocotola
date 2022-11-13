@@ -5,8 +5,9 @@ import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
 import { extractErrorMessage } from '@/features/base';
 import { removeProblem } from '@/features/problem_remove';
+import { updateProblemProperty } from '@/features/problem_update';
 import { ProblemModel } from '@/models/problem';
-import { jsonRequestConfig } from '@/utils/util';
+import { jsonRequestConfig, jsonHeaders } from '@/utils/util';
 
 const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/workbook`;
 
@@ -103,8 +104,51 @@ export const findAllProblems = createAsyncThunk<
     });
 });
 
+// Get problem
+export type ProblemGetParameter = {
+  workbookId: number;
+  problemId: number;
+};
+export type ProblemGetArg = {
+  param: ProblemGetParameter;
+  postSuccessProcess: (problem: ProblemModel) => void;
+  postFailureProcess: (error: string) => void;
+};
+
+type ProblemGetReult = {
+  param: ProblemGetParameter;
+  response: ProblemModel;
+};
+
+export const getProblem = createAsyncThunk<
+  ProblemGetReult,
+  ProblemGetArg,
+  BaseThunkApiConfig
+>('problem/get', async (arg: ProblemGetArg, thunkAPI) => {
+  const url = `${baseUrl}/${arg.param.workbookId}/problem/${arg.param.problemId}`;
+  const { refreshToken } = thunkAPI.getState().auth;
+  return await thunkAPI
+    .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
+    .then((resp) => {
+      const { accessToken } = thunkAPI.getState().auth;
+      return axios
+        .get(url, { headers: jsonHeaders(accessToken), data: {} })
+        .then((resp) => {
+          const response = resp.data as ProblemModel;
+          arg.postSuccessProcess(response);
+          return { param: arg.param, response: response } as ProblemGetReult;
+        })
+        .catch((err: Error) => {
+          const errorMessage = extractErrorMessage(err);
+          arg.postFailureProcess(errorMessage);
+          return thunkAPI.rejectWithValue(errorMessage);
+        });
+    });
+});
+
 export interface problemFindState {
   loading: boolean;
+  loadingMap: { [key: number]: boolean };
   failed: boolean;
   problems: ProblemModel[];
   problemMap: { [key: number]: ProblemModel };
@@ -114,6 +158,7 @@ export interface problemFindState {
 const initialState: problemFindState = {
   loading: false,
   failed: false,
+  loadingMap: {},
   problems: [],
   problemMap: {},
   problemsTotalCount: 0,
@@ -163,6 +208,18 @@ export const problemFindSlice = createSlice({
         state.loading = false;
         state.failed = true;
       })
+      // updateProblemProperty
+      .addCase(updateProblemProperty.fulfilled, (state, action) => {
+        const problem = state.problemMap[action.payload.param.problemId];
+        problem.version = action.payload.param.version + 1;
+        console.log('problem', problem);
+        problem.properties = {
+          ...state.problemMap[action.payload.param.problemId].properties,
+          ...action.payload.param.properties,
+        };
+        console.log('problem', problem);
+        console.log('updateProblemProperty');
+      })
       // removeProblem
       .addCase(removeProblem.fulfilled, (state, action) => {
         const removedProblemId = action.payload.param.problemId;
@@ -175,6 +232,21 @@ export const problemFindSlice = createSlice({
           state.problemMap[problem.id] = problem;
         }
         state.problemsTotalCount--;
+      })
+      .addCase(getProblem.pending, (state, action) => {
+        console.log('param', action);
+        state.loading = true;
+      })
+      .addCase(getProblem.fulfilled, (state, action) => {
+        // onsole.log('problem', action.payload.response);
+        state.loading = false;
+        state.failed = false;
+        state.problemMap[action.payload.response.id] = action.payload.response;
+      })
+      .addCase(getProblem.rejected, (state, action) => {
+        // onsole.log('rejected', action);
+        state.loading = false;
+        state.failed = true;
       });
   },
 });

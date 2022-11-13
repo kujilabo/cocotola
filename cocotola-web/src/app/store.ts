@@ -17,7 +17,7 @@ import audioReducer from '@/features/audio';
 import authReducer from '@/features/auth';
 import problemAddReducer from '@/features/problem_add';
 import problemFindReducer from '@/features/problem_find';
-import problemGetReducer from '@/features/problem_get';
+// import problemGetReducer from '@/features/problem_get';
 import problemImportReducer from '@/features/problem_import';
 import problemRemoveReducer from '@/features/problem_remove';
 import problemUpdateReducer from '@/features/problem_update';
@@ -50,13 +50,13 @@ export const problemFactory = new ProblemFactory({
   // english_word: englishWordProblem,
   english_sentence: englishSentenceProblem,
 });
-// const reducers = {
-//   englishWord: englishWordProblem.getReducer(),
-//   englishSentence: englishSentenceProblem.getReducer(),
-// };
+const reducers = {
+  //   englishWord: englishWordProblem.getReducer(),
+  englishSentence: englishSentenceProblem.getReducer(),
+};
 
 export const rootReducer = combineReducers({
-  // ...reducers,
+  ...reducers,
   auth: authReducer,
   // router: routerReducer,
 
@@ -68,7 +68,7 @@ export const rootReducer = combineReducers({
   problemFind: problemFindReducer,
   problemAdd: problemAddReducer,
   problemUpdate: problemUpdateReducer,
-  problemGet: problemGetReducer,
+  // problemGet: problemGetReducer,
   problemRemove: problemRemoveReducer,
   problemImport: problemImportReducer,
   recordbookGet: recordbookGetReducer,

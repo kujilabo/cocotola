@@ -12,7 +12,8 @@ import {
   selectWorkbookGetLoading,
 } from '@/features/workbook_get';
 import { WorkbookModel } from '@/models/workbook';
-import { englishSentenceProblemNewFormikForm } from '@/plugins/english-sentence/components/workbook/problem/EnglishSentenceProblemNewFormikForm';
+
+import { englishSentenceProblemNewFormikForm } from '../../../components/workbook/problem/EnglishSentenceProblemNewFormikForm';
 
 type ParamTypes = {
   _workbookId: string;

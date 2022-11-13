@@ -1,13 +1,5 @@
 import { FC, useEffect } from 'react';
 
-import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
-
-import {
-  setEnglishSentenceRecordbook,
-  selectTs,
-  selectEnglishSentenceRecordbook,
-} from '../../../../features/english_sentence_study';
-
 import { useParams } from 'react-router-dom';
 import { Container } from 'semantic-ui-react';
 
@@ -17,14 +9,29 @@ import { selectProblemMap } from '@/features/problem_find';
 import { selectRecordbook } from '@/features/recordbook_get';
 import { selectWorkbook } from '@/features/workbook_get';
 
+import {
+  setEnglishSentenceRecordbook,
+  selectTs,
+  selectEnglishSentenceRecordbook,
+} from '../../../../features/english_sentence_study';
+
+import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
+
 type ParamTypes = {
   _workbookId: string;
   _studyType: string;
 };
+
+type EnglishSentenceMemorizationInitProps = {
+  breadcrumbLinks: AppBreadcrumbLink[];
+  workbookUrl: string;
+};
+
 export const EnglishSentenceMemorizationInit: FC<
   EnglishSentenceMemorizationInitProps
 > = (props: EnglishSentenceMemorizationInitProps) => {
   const { _workbookId } = useParams<ParamTypes>();
+  const workbookId = +(_workbookId || '');
   const dispatch = useAppDispatch();
   const workbook = useAppSelector(selectWorkbook);
   const recordbook = useAppSelector(selectRecordbook);
@@ -58,13 +65,8 @@ export const EnglishSentenceMemorizationInit: FC<
         breadcrumbLinks={props.breadcrumbLinks}
         workbookUrl={props.workbookUrl}
         name={workbook.name}
-        id={+_workbookId}
+        id={workbookId}
       />
     </Container>
   );
-};
-
-type EnglishSentenceMemorizationInitProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
 };

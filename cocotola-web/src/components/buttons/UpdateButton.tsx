@@ -1,12 +1,12 @@
 import { FC } from 'react';
 
-import { StandardButton } from './StandardButton';
-
 import { useTranslation } from 'react-i18next';
+
+import { StandardButton } from './StandardButton';
 
 type UpdateButtonProps = {
   type: 'submit' | 'reset' | 'button';
-  disabled: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 };
 

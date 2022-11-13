@@ -57,12 +57,10 @@ export const removeProblem = createAsyncThunk<
 });
 
 export interface ProblemRemoveState {
-  value: number;
   loading: boolean;
 }
 
 const initialState: ProblemRemoveState = {
-  value: 0,
   loading: false,
 };
 

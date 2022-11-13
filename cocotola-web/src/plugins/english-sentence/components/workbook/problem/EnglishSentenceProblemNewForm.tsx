@@ -12,6 +12,7 @@ export interface EnglishSentenceProblemNewFormValues {
   translated: string;
   loading: boolean;
 }
+
 export const EnglishSentenceProblemNewForm = (
   props: FormikProps<EnglishSentenceProblemNewFormValues>
 ): ReactElement => {

@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-import { StandardButton } from './StandardButton';
-
 import { useTranslation } from 'react-i18next';
+
+import { StandardButton } from './StandardButton';
 
 type AddButtonProps = {
   type: 'submit' | 'reset' | 'button';

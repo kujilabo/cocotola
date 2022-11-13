@@ -4,7 +4,7 @@ import axios from 'axios';
 import { RootState, BaseThunkApiConfig } from '@/app/store';
 import { refreshAccessToken } from '@/features/auth';
 import { extractErrorMessage } from '@/features/base';
-import { resetLoadedProblemId } from '@/features/problem_get';
+// import { resetLoadedProblemId } from '@/features/problem_get';
 import { jsonRequestConfig } from '@/utils/util';
 
 const baseUrl = `${import.meta.env.VITE_APP_BACKEND}/v1/workbook`;
@@ -48,13 +48,67 @@ export const updateProblem = createAsyncThunk<
         .then((resp) => {
           const response = resp.data as ProblemUpdateResponse;
           arg.postSuccessProcess(response.id);
-          thunkAPI.dispatch(
-            resetLoadedProblemId(`${arg.param.problemId}:${arg.param.version}`)
-          );
+          // thunkAPI.dispatch(
+          //   resetLoadedProblemId(`${arg.param.problemId}:${arg.param.version}`)
+          // );
           return {
             param: arg.param,
             response: response,
           } as ProblemUpdateResult;
+        })
+        .catch((err: Error) => {
+          const errorMessage = extractErrorMessage(err);
+          arg.postFailureProcess(errorMessage);
+          return thunkAPI.rejectWithValue(errorMessage);
+        });
+    });
+});
+
+// Update problem property
+export type ProblemPropertyUpdateParameter = {
+  workbookId: number;
+  problemId: number;
+  version: number;
+  problemType: string;
+  properties: { [key: string]: string };
+};
+export type ProblemPropertyUpdateArg = {
+  param: ProblemPropertyUpdateParameter;
+  postSuccessProcess: (id: number) => void;
+  postFailureProcess: (error: string) => void;
+};
+type ProblemPropertyUpdateResponse = {
+  id: number;
+};
+type ProblemPropertyUpdateResult = {
+  param: ProblemPropertyUpdateParameter;
+  response: ProblemPropertyUpdateResponse;
+};
+
+export const updateProblemProperty = createAsyncThunk<
+  ProblemPropertyUpdateResult,
+  ProblemPropertyUpdateArg,
+  BaseThunkApiConfig
+>('problem/update', async (arg: ProblemPropertyUpdateArg, thunkAPI) => {
+  const url = `${baseUrl}/${arg.param.workbookId}/problem/${arg.param.problemId}/property?version=${arg.param.version}`;
+  const { refreshToken } = thunkAPI.getState().auth;
+  return await thunkAPI
+    .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
+    .then((resp) => {
+      const { accessToken } = thunkAPI.getState().auth;
+
+      return axios
+        .put(url, arg.param, jsonRequestConfig(accessToken))
+        .then((resp) => {
+          const response = resp.data as ProblemPropertyUpdateResponse;
+          arg.postSuccessProcess(response.id);
+          // thunkAPI.dispatch(
+          //   resetLoadedProblemId(`${arg.param.problemId}:${arg.param.version}`)
+          // );
+          return {
+            param: arg.param,
+            response: response,
+          } as ProblemPropertyUpdateResult;
         })
         .catch((err: Error) => {
           const errorMessage = extractErrorMessage(err);
@@ -93,6 +147,9 @@ export const problemUpdateSlice = createSlice({
 });
 
 export const selectProblemEditLoading = (state: RootState) =>
+  state.problemUpdate.loading;
+
+export const selectProblemUpdateLoading = (state: RootState) =>
   state.problemUpdate.loading;
 
 export default problemUpdateSlice.reducer;

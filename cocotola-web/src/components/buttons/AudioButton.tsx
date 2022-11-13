@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, ReactElement } from 'react';
 
 import { Button, Icon } from 'semantic-ui-react';
 
@@ -8,7 +8,9 @@ type AudioButtonProps = {
   loadAndPlay: (postFunc: (value: string) => void) => void;
 };
 
-export const AudioButton: FC<AudioButtonProps> = (props: AudioButtonProps) => {
+export const AudioButton: FC<AudioButtonProps> = (
+  props: AudioButtonProps
+): ReactElement => {
   const playAudio = (value: string) => {
     const audio = new Audio('data:audio/wav;base64,' + value);
     audio.play();

@@ -1,12 +1,5 @@
 import { ReactElement } from 'react';
 
-import { EnglishSentenceProblemEdit } from './EnglishSentenceProblemEdit';
-import { EnglishSentenceProblemMenu } from './EnglishSentenceProblemMenu';
-import { EnglishSentenceProblemNew } from './EnglishSentenceProblemNew';
-
-import { EnglishSentenceProblemReadOnly } from '../../../components/workbook/problem/EnglishSentenceProblemReadOnly';
-import { EnglishSentenceProblemReadWrite } from '../../../components/workbook/problem/EnglishSentenceProblemReadWrite';
-
 // import EnglishSentenceDictation from '../../../components/workbook/study/dictation/EnglishSentenceDictation';
 
 import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
@@ -14,11 +7,18 @@ import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
 import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';
 import { ProblemModel } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
-import { EnglishSentenceMemorization } from '@/plugins/english-sentence/components/workbook/study/memorization/EnglishSentenceMemorization';
+
 import {
   englishSentenceSlice,
   initEnglishSentenceStatus,
-} from '@/plugins/english-sentence/features/english_sentence_study';
+} from '../../..//features/english_sentence_study';
+import { EnglishSentenceProblemReadOnly } from '../../../components/workbook/problem/EnglishSentenceProblemReadOnly';
+import { EnglishSentenceProblemReadWrite } from '../../../components/workbook/problem/EnglishSentenceProblemReadWrite';
+import { EnglishSentenceMemorization } from '../../../components/workbook/study/memorization/EnglishSentenceMemorization';
+
+import { EnglishSentenceProblemEdit } from './EnglishSentenceProblemEdit';
+import { EnglishSentenceProblemMenu } from './EnglishSentenceProblemMenu';
+import { EnglishSentenceProblemNew } from './EnglishSentenceProblemNew';
 
 export class EnglishSentenceProblem extends CustomProblem {
   getName(): string {
@@ -75,7 +75,7 @@ export class EnglishSentenceProblem extends CustomProblem {
 
   createProblemStudy(studyType: string): ReactElement {
     if (studyType === 'memorization') {
-      // onsole.log('createProblemStudy.memorization');
+      console.log('createProblemStudy.memorization');
       return (
         <EnglishSentenceMemorization
           breadcrumbLinks={[

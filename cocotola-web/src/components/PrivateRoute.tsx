@@ -42,7 +42,6 @@ export const PrivateRoute: FC<PrivateRouteProps> = (
   }
 
   useEffect(() => {
-    // onsole.log('failed', failed)
     if (!failed && !loading && isAccessTokenExpired && !isRefreshTokenExpired) {
       // onsole.log('xxx refreshAccessToken');
       dispatch(
@@ -51,13 +50,7 @@ export const PrivateRoute: FC<PrivateRouteProps> = (
         })
       );
     }
-  }, [
-    dispatch,
-    loading,
-    refreshToken,
-    isAccessTokenExpired,
-    isRefreshTokenExpired,
-  ]);
+  }, [loading, refreshToken, isAccessTokenExpired, isRefreshTokenExpired]);
 
   if (failed) {
     return <div>Authentication Failure</div>;

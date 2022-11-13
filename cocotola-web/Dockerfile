@@ -1,7 +1,7 @@
-FROM node:slim as builder
+FROM node:14.21-slim as builder
 
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm install
 
 COPY . .
@@ -10,7 +10,7 @@ RUN npm run-script build
 # Application image
 FROM nginx:1.21.4
 
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/conf.d/default.conf

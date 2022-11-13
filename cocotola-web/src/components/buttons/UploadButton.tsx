@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { StandardButton } from './StandardButton';
 
-import { useTranslation } from 'react-i18next';
 
 type UploadButtonProps = {
   type: 'submit' | 'reset' | 'button';

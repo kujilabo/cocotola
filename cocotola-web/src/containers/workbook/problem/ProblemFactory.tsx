@@ -117,7 +117,7 @@ export class ProblemFactory {
   }
 
   createProblemStudy(problemType: string, studyType: string): ReactElement {
-    // onsole.log('createProblemStudy 1');
+    console.log('createProblemStudy 1');
     const problemCreator = this.problemMap[problemType];
     if (!problemCreator) {
       console.log('problemCreator not found', problemType, this.problemMap);

@@ -2,7 +2,7 @@ import { FC, ReactElement, ReactNode, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button, Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
+import { Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { AudioButton, DangerModal, ErrorMessage } from '@/components';
@@ -14,6 +14,7 @@ import { emptyFunction } from '@/utils/util';
 export const EnglishSentenceProblemReadWrite: FC<
   EnglishSentenceProblemReadWriteProps
 > = (props: EnglishSentenceProblemReadWriteProps): ReactElement => {
+  console.log('EnglishSentenceProblemReadWrite a');
   const workbookId = props.workbookId;
   const problemId = props.problem.id;
   const problemVersion = props.problem.version;
@@ -51,7 +52,8 @@ export const EnglishSentenceProblemReadWrite: FC<
       })
     );
   };
-
+  // console.log('EnglishSentenceProblemReadWrite b');
+  // console.log(props.problem.properties['audioId']);
   return (
     <Card fluid>
       <Card.Content>
@@ -107,16 +109,16 @@ export const EnglishSentenceProblemReadWrite: FC<
       </Card.Content>
       <Card.Content extra>
         {props.problem.properties['audioId'] !== '0' ? (
-          <Button.Group floated="left">
-            <AudioButton
-              id={props.problem.properties['audioId']}
-              loadAndPlay={(postFunc: (value: string) => void) =>
-                loadAndPlay(postFunc)
-              }
-              disabled={audioViewLoading}
-            />
-          </Button.Group>
+          // <utton.Group floated="left">
+          <AudioButton
+            id={+props.problem.properties['audioId']}
+            loadAndPlay={(postFunc: (value: string) => void) =>
+              loadAndPlay(postFunc)
+            }
+            disabled={audioViewLoading}
+          />
         ) : (
+          // </utton.Group>
           <div />
         )}
       </Card.Content>

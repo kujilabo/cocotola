@@ -11,6 +11,10 @@ import { PrivateWorkbookEdit } from '@/containers/private_workbook/PrivateWorkbo
 import { PrivateWorkbookList } from '@/containers/private_workbook/PrivateWorkbookList';
 import { PrivateWorkbookNew } from '@/containers/private_workbook/PrivateWorkbookNew';
 import { PrivateWorkbookView } from '@/containers/private_workbook/PrivateWorkbookView';
+import { PrivateProblemEdit } from '@/containers/workbook/problem/PrivateProblemEdit';
+import { PrivateProblemImport } from '@/containers/workbook/problem/PrivateProblemImport';
+import { PrivateProblemNew } from '@/containers/workbook/problem/PrivateProblemNew';
+import { WorkbookStudy } from '@/containers/workbook/study/WorkbookStudy';
 import { logout, selectAccessToken } from '@/features/auth';
 
 export interface AppJwtPayload extends JwtPayload {
@@ -85,15 +89,35 @@ export const App = (): ReactElement => {
           path={`/app/private/workbook`}
           element={<PrivateWorkbookList />}
         />
-        <Route path="/app/private/workbook/new">
+        <Route
+          path="/app/private/workbook/new"
           element={<PrivateWorkbookNew />}
-        </Route>
-        <Route path="/app/private/workbook/:_workbookId">
+        />
+        <Route
+          path="/app/private/workbook/:_workbookId"
           element={<PrivateWorkbookView />}
-        </Route>
-        <Route path="/app/private/workbook/:_workbookId/edit">
+        />
+        <Route
+          path="/app/private/workbook/:_workbookId/edit"
           element={<PrivateWorkbookEdit />}
-        </Route>
+        />
+
+        <Route
+          path="/app/private/workbook/:_workbookId/problem/new"
+          element={<PrivateProblemNew />}
+        />
+        <Route
+          path="/app/private/workbook/:_workbookId/problem/:_problemId/edit"
+          element={<PrivateProblemEdit />}
+        />
+        <Route
+          path="/app/private/workbook/:_workbookId/import"
+          element={<PrivateProblemImport />}
+        />
+        <Route
+          path="/app/workbook/:_workbookId/study/:_studyType"
+          element={<WorkbookStudy />}
+        />
       </Routes>
     </div>
   );
