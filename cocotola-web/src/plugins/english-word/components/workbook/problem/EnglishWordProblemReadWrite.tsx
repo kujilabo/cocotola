@@ -97,7 +97,7 @@ export const EnglishWordProblemReadWrite: React.FC<
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {toDsiplayText(String(props.problem.properties['pos']))}
+                {toDsiplayText(+props.problem.properties['pos'])}
               </Header>
             </Grid.Column>
             <Grid.Column>

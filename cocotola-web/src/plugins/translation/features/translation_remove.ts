@@ -31,11 +31,11 @@ export const removeTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .delete(url, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return {
             param: arg.param,
@@ -67,12 +67,12 @@ export const translationRemoveSlice = createSlice({
       .addCase(removeTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(removeTranslation.fulfilled, (state, action) => {
+      .addCase(removeTranslation.fulfilled, (state) => {
         // onsole.log('workbook', action.payload.response);
         state.loading = false;
         state.failed = false;
       })
-      .addCase(removeTranslation.rejected, (state, action) => {
+      .addCase(removeTranslation.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

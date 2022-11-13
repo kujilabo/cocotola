@@ -34,7 +34,8 @@ export const LoginCallback = (): ReactElement => {
     return <div>Failed</div>;
   } else if (authLoading === false && isAccessTokenExpired) {
     const parsed = parse(location);
-    const code = '' || parsed.code || '';
+    // const code: string '' || parsed.code || '';
+    const code = parsed ? String(parsed.code) : '';
 
     const f = async () => {
       await dispatch(

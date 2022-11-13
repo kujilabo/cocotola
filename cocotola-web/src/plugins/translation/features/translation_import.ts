@@ -25,11 +25,11 @@ export const importTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .post(url, arg.param, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return {} as TranslationImportResult;
         })
@@ -60,11 +60,11 @@ export const translationImportSlice = createSlice({
       .addCase(importTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(importTranslation.fulfilled, (state, action) => {
+      .addCase(importTranslation.fulfilled, (state) => {
         state.loading = false;
         state.failed = false;
       })
-      .addCase(importTranslation.rejected, (state, action) => {
+      .addCase(importTranslation.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       });
