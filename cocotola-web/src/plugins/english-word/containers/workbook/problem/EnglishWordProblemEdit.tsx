@@ -1,41 +1,204 @@
-import React, { useEffect, useState } from 'react';
+import {
+  Dispatch,
+  FC,
+  ReactElement,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 
-import { useParams } from 'react-router-dom';
+import { FormikProps } from 'formik';
+import { Input, Select } from 'formik-semantic-ui-react';
 import { Container, Divider } from 'semantic-ui-react';
+import * as Yup from 'yup';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { ErrorMessage, PrivateProblemBreadcrumb } from '@/components';
-import { selectProblemMap } from '@/features/problem_find';
-import { ProblemModel } from '@/models/problem';
+import {
+  ErrorMessage,
+  PrivateProblemBreadcrumb,
+  langOptions,
+} from '@/components';
+import { ProblemEditFormikForm } from '@/components/problem/ProblemEditFormikForm';
+import { ProblemModel, EnglishWordProblemTypeId } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
+import { ExampleTatoebaSentence } from '@/plugins/english-word/components/workbook/problem/ExampleTatoebaSentence';
+import { ExampleTatoebaSentenceList } from '@/plugins/english-word/components/workbook/problem/ExampleTatoebaSentenceList';
+import { EnglishWordProblemModel } from '@/plugins/english-word/models/english-word-problem';
 import {
   findTatoebaSentences,
   selectTatoebaSentences,
   selectTatoebaFindLoading,
 } from '@/plugins/tatoeba/features/tatoeba_find';
+import {
+  TatoebaSentencePairModel,
+  TatoebaSentenceModel,
+} from '@/plugins/tatoeba/models/tatoeba';
+import { posOptions } from '@/plugins/translation/components';
 import { emptyFunction } from '@/utils/util';
 
-import { EnglishWordProblemEditFormikForm } from '../../../components/workbook/problem/EnglishWordProblemEditFormikForm';
-import { EnglishWordProblemModel } from '../../../models/english-word-problem';
+interface formikFormProps {
+  text: string;
+  pos: string;
+  translated: string;
+  lang2: string;
+  exampleSentenceText: string;
+  exampleSentenceTranslated: string;
+  exampleSentenceNote: string;
+  sentenceProvider: string;
+  tatoebaSentenceNumber1: string;
+  tatoebaSentenceNumber2: string;
+  tatoebaSentences: TatoebaSentencePairModel[];
+}
 
-type ParamTypes = {
-  _workbookId: string;
-  _problemId: string;
+interface formValues {
+  text: string;
+  pos: string;
+  translated: string;
+  lang2: string;
+  exampleSentenceText: string;
+  exampleSentenceTranslated: string;
+  exampleSentenceNote: string;
+  sentenceProvider: string;
+  tatoebaSentenceNumber1: string;
+  tatoebaSentenceNumber2: string;
+  tatoebaSentences: TatoebaSentencePairModel[];
+}
+
+const editFormikForm = (
+  workbookId: number,
+  problemId: number,
+  problemVersion: number,
+  resetValues: (v: formValues) => void,
+  setErrorMessage: Dispatch<SetStateAction<string>>
+) => {
+  const emptyTatoebaSentence: TatoebaSentenceModel = {
+    text: '',
+    author: '',
+    sentenceNumber: 0,
+    lang2: '',
+  };
+  return ProblemEditFormikForm({
+    workbookId: workbookId,
+    problemId: problemId,
+    problemVersion: problemVersion,
+    problemType: EnglishWordProblemTypeId,
+    toContent: (props: FormikProps<formValues>) => {
+      const { values, setFieldValue } = props;
+
+      const onCheckboxChange = (
+        sentenceNumber1: number,
+        sentenceNumber2: number,
+        checked: boolean
+      ): void => {
+        if (checked) {
+          setFieldValue('sentenceProvider', 'tatoeba');
+          setFieldValue('tatoebaSentenceNumber1', sentenceNumber1.toString());
+          setFieldValue('tatoebaSentenceNumber2', sentenceNumber2.toString());
+        } else {
+          setFieldValue('sentenceProvider', '');
+          setFieldValue('tatoebaSentenceNumber1', '');
+          setFieldValue('tatoebaSentenceNumber2', '');
+        }
+      };
+
+      let sentence1 = emptyTatoebaSentence;
+      let sentence2 = emptyTatoebaSentence;
+      if (values.exampleSentenceNote && values.exampleSentenceNote !== '') {
+        try {
+          const noteObj = JSON.parse(values.exampleSentenceNote);
+          console.log('noteObj', noteObj);
+          sentence1 = {
+            text: values.exampleSentenceText,
+            author: noteObj['tatoebaAuthor1'],
+            sentenceNumber: +noteObj['tatoebaSentenceNumber1'],
+            lang2: 'en',
+          };
+          sentence2 = {
+            text: values.exampleSentenceTranslated,
+            author: noteObj['tatoebaAuthor2'],
+            sentenceNumber: +noteObj['tatoebaSentenceNumber2'],
+            lang2: 'ja',
+          };
+        } catch (e) {
+          console.log(e);
+        }
+      }
+
+      return (
+        <>
+          <Input
+            name="text"
+            label="Sentence"
+            placeholder="english sentence"
+            errorPrompt
+          />
+          <Select
+            name="pos"
+            label="Pos"
+            options={posOptions}
+            value={values.pos}
+            errorPrompt
+          />
+          <Select
+            name="lang2"
+            label="Lang"
+            options={langOptions}
+            value={values.lang2}
+            errorPrompt
+          />
+          <Input
+            name="translated"
+            label="Translated sentence"
+            placeholder="translated sentence"
+            errorPrompt
+          />
+
+          {sentence1.text !== '' ? (
+            <ExampleTatoebaSentence
+              sentence1={sentence1}
+              sentence2={sentence2}
+            />
+          ) : (
+            <div />
+          )}
+          <ExampleTatoebaSentenceList
+            sentences={values.tatoebaSentences}
+            onCheckboxChange={onCheckboxChange}
+          />
+        </>
+      );
+    },
+    validationSchema: Yup.object().shape({
+      text: Yup.string().required('Sentence is required'),
+    }),
+    propsToValues: (props: formikFormProps) => ({ ...props }),
+    valuesToProperties: (values: formValues) => ({
+      text: values.text,
+      pos: values.pos,
+      translated: values.translated,
+      lang2: values.lang2,
+      sentenceProvider: values.sentenceProvider,
+      tatoebaSentenceNumber1: values.tatoebaSentenceNumber1,
+      tatoebaSentenceNumber2: values.tatoebaSentenceNumber2,
+    }),
+    resetValues: (values: formValues) => resetValues(values),
+    setErrorMessage: setErrorMessage,
+  });
 };
 
-export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
+type EnglishWordProblemEditProps = {
+  workbook: WorkbookModel;
+  problem: ProblemModel;
+};
+
+export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
   props: EnglishWordProblemEditProps
-) => {
-  const { _workbookId, _problemId } = useParams<ParamTypes>();
-  const workbookId = +(_workbookId || '');
-  const problemId = +(_problemId || '');
+): ReactElement => {
   const dispatch = useAppDispatch();
-  const problemMap = useAppSelector(selectProblemMap);
-  const problem = EnglishWordProblemModel.of(problemMap[problemId]);
+  const problem = EnglishWordProblemModel.of(props.problem);
   const tatoebaSentences = useAppSelector(selectTatoebaSentences);
   const tatoebaSentenceFindLoading = useAppSelector(selectTatoebaFindLoading);
   const [values, setValues] = useState({
-    number: problem.number,
     text: problem.text,
     pos: problem.pos,
     lang2: problem.lang2,
@@ -52,7 +215,6 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
   useEffect(() => {
     setValues({
       ...values,
-      number: problem.number,
       text: problem.text,
       pos: problem.pos,
       lang2: problem.lang2,
@@ -61,7 +223,8 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
       exampleSentenceTranslated: problem.sentence1.translated,
       exampleSentenceNote: problem.sentence1.note,
     });
-  }, [dispatch, problem.id, problem.version]);
+  }, [problem.id, problem.version]);
+
   useEffect(() => {
     if (values.text.length === 0) {
       return;
@@ -86,16 +249,12 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
     f().catch(console.error);
   }, [dispatch, values.text, tatoebaSentenceFindLoading]);
 
-  const selectSentence = (index: number, checked: boolean): void => {
-    // dispatch(selectTatoebaSentence);
-  };
-
-  const EditFormikForm = EnglishWordProblemEditFormikForm(
-    workbookId,
-    problem,
-    setErrorMessage,
+  const EnglishWordProblemEditFormikForm = editFormikForm(
+    props.workbook.id,
+    problem.id,
+    problem.version,
     setValues,
-    selectSentence
+    setErrorMessage
   );
 
   console.log('note', values.exampleSentenceNote);
@@ -104,12 +263,11 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
     <Container fluid>
       <PrivateProblemBreadcrumb
         name={props.workbook.name}
-        id={workbookId}
-        text={String(props.problem.number)}
+        id={props.workbook.id}
+        text={props.problem.number.toString()}
       />
       <Divider hidden />
-      <EditFormikForm
-        number={values.number}
+      <EnglishWordProblemEditFormikForm
         text={values.text}
         pos={values.pos}
         lang2={values.lang2}
@@ -125,9 +283,4 @@ export const EnglishWordProblemEdit: React.FC<EnglishWordProblemEditProps> = (
       <ErrorMessage message={errorMessage} />
     </Container>
   );
-};
-
-type EnglishWordProblemEditProps = {
-  workbook: WorkbookModel;
-  problem: ProblemModel;
 };

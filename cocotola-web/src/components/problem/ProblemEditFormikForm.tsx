@@ -18,7 +18,7 @@ export interface problemEditFormikFormArgs<V extends object, P extends object> {
   problemId: number;
   problemVersion: number;
   problemType: string;
-  toContent: (v: V) => ReactElement;
+  toContent: (props: FormikProps<V>) => ReactElement;
   validationSchema: Yup.ObjectSchema<any>;
   propsToValues: (props: P) => V;
   valuesToProperties: (values: V) => { [key: string]: string };
@@ -47,17 +47,17 @@ export const ProblemEditFormikForm = <V extends object, P extends object>(
   } = args;
 
   const EditForm = (props: FormikProps<V>): ReactElement => {
-    const { values, isSubmitting } = props;
+    // const { values, isSubmitting } = props;
     return (
       <Form>
         <Card fluid>
           <Card.Content>
             <Header component="h2">Edit problem</Header>
           </Card.Content>
-          <Card.Content>{toContent(values)}</Card.Content>
+          <Card.Content>{toContent(props)}</Card.Content>
           <Card.Content>
             {loading ? <AppDimmer /> : <div />}
-            <UpdateButton type="submit" disabled={isSubmitting} />
+            <UpdateButton type="submit" disabled={props.isSubmitting} />
           </Card.Content>
         </Card>
       </Form>

@@ -1,62 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Container,
-  Divider,
-  Form,
-  Header,
-} from 'semantic-ui-react';
+import { Button, Form, Message } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
+import { ErrorMessage } from '@/components';
 import { LinkButton } from '@/components/buttons';
-import { getAudio, selectAudioViewLoading } from '@/features/audio';
-import { selectProblemMap, getProblem } from '@/features/problem_find';
+import { selectProblemMap } from '@/features/problem_find';
 import { addRecord } from '@/features/record_add';
-import { selectWorkbook } from '@/features/workbook_get';
-import { ProblemModel } from '@/models/problem';
-import { emptyFunction } from '@/utils/util';
-
+import { WorkbookModel } from '@/models/workbook';
 import {
   selectEnglishWordRecordbook,
   nextEnglishWordProblem,
-} from '../../../../features/english_word_study';
-import { EnglishWordProblemModel } from '../../../../models/english-word-problem';
-import { toDsiplayText } from '../../../../utils/util';
+} from '@/plugins/english-word/features/english_word_study';
+import { EnglishWordProblemModel } from '@/plugins/english-word/models/english-word-problem';
+import { toDsiplayText } from '@/plugins/english-word/utils/util';
+import { emptyFunction } from '@/utils/util';
 
-import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
-
-type ParamTypes = {
-  _workbookId: string;
-  _studyType: string;
-};
+import { EnglishWordMemorizationCard } from './EnglishWordMemorizationCard';
 
 type EnglishWordMemorizationAnswerProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
+  workbook: WorkbookModel;
+  studyType: string;
 };
 
-export const EnglishWordMemorizationAnswer: React.FC<
+export const EnglishWordMemorizationAnswer: FC<
   EnglishWordMemorizationAnswerProps
 > = (props: EnglishWordMemorizationAnswerProps) => {
-  const { _workbookId, _studyType } = useParams<ParamTypes>();
-  const workbookId = +(_workbookId || '');
-  const studyType = _studyType || '';
   const dispatch = useAppDispatch();
   const [t] = useTranslation();
-  const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
-  const audioViewLoading = useAppSelector(selectAudioViewLoading);
   const englishWordRecordbook = useAppSelector(selectEnglishWordRecordbook);
   const [memorized, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const problemId = englishWordRecordbook.records[0].problemId;
   const problem = EnglishWordProblemModel.of(problemMap[problemId]);
-  const baseUrl = `/app/private/workbook/${workbookId}/problem/${problemId}`;
+  const baseUrl = `/app/private/workbook/${props.workbook.id}/problem/${problemId}`;
   console.log('problem', problem);
   // let sentence1 = emptyTatoebaSentence;
   // let sentence2 = emptyTatoebaSentence;
@@ -80,51 +59,23 @@ export const EnglishWordMemorizationAnswer: React.FC<
   //     console.log(e);
   //   }
   // }
-  useEffect(() => {
-    const f = async () => {
-      await dispatch(
-        getProblem({
-          param: { workbookId: workbookId, problemId: problemId },
-          postSuccessProcess: (p: ProblemModel) => {
-            const e = EnglishWordProblemModel.of(p);
-            console.log(e);
-          },
-          postFailureProcess: setErrorMessage,
-        })
-      );
-    };
-    f().catch(console.error);
-  }, [dispatch, _workbookId, problemId, problem.version]);
 
   if (englishWordRecordbook.records.length === 0) {
-    return <div></div>;
+    return (
+      <Message info>
+        <p>You answered all problems. Please try again in a few days.</p>
+      </Message>
+    );
   }
-  const loadAndPlay = (postFunc: (value: string) => void) => {
-    const f = async () => {
-      await dispatch(
-        getAudio({
-          param: {
-            workbookId: workbookId,
-            problemId: problemId,
-            audioId: +problem.audioId,
-            updatedAt: problem.updatedAt,
-          },
-          postFunc: postFunc,
-          postSuccessProcess: emptyFunction,
-          postFailureProcess: setErrorMessage,
-        })
-      );
-    };
-    f().catch(console.error);
-  };
+
   const onNextButtonClick = () => {
     if (memorized) {
       const f = async () => {
         await dispatch(
           addRecord({
             param: {
-              workbookId: workbookId,
-              studyType: studyType,
+              workbookId: props.workbook.id,
+              studyType: props.studyType,
               problemId: problemId,
               result: true,
               memorized: true,
@@ -141,51 +92,33 @@ export const EnglishWordMemorizationAnswer: React.FC<
   const onMemorizeButtonClick = () => setMemorized(!memorized);
 
   return (
-    <Container fluid>
-      <EnglishWordMemorizationBreadcrumb
-        breadcrumbLinks={props.breadcrumbLinks}
-        workbookUrl={props.workbookUrl}
-        name={workbook.name}
-        id={workbookId}
-      />
-      <Divider hidden />
-      <Card>
-        <Card.Content>
-          <Header component="h2">
-            {problem.text}
-            <AudioButton
-              id={+problem.audioId}
-              loadAndPlay={loadAndPlay}
-              disabled={audioViewLoading}
-            />
-          </Header>
-        </Card.Content>
-        <Card.Content>
-          <p>{toDsiplayText(+problem.pos)}</p>
-        </Card.Content>
-        <Card.Content>
-          <p>{problem.translated}</p>
-        </Card.Content>
-        <Card.Content>
+    <>
+      <EnglishWordMemorizationCard
+        workbookId={props.workbook.id}
+        problemId={problemId}
+        audioId={problem.audioId}
+        updatedAt={problem.updatedAt}
+        headerText={problem.text}
+        contentList={[
+          <p>{toDsiplayText(+problem.pos)}</p>,
+          <p>{problem.translated}</p>,
           <Button.Group fluid>
             <LinkButton to={`${baseUrl}/edit`} value={t('Edit')} />
-          </Button.Group>
-        </Card.Content>
-        <Card.Content>
+          </Button.Group>,
           <Form.Checkbox
             checked={memorized}
             label="完璧に覚えた"
             onClick={onMemorizeButtonClick}
-          />
-        </Card.Content>
-        <Card.Content>
+          />,
+
           <Button.Group fluid>
             <Button color="teal" onClick={onNextButtonClick}>
               Next
             </Button>
-          </Button.Group>
-        </Card.Content>
-      </Card>
+          </Button.Group>,
+        ]}
+        setErrorMessage={setErrorMessage}
+      ></EnglishWordMemorizationCard>
       <ErrorMessage message={errorMessage} />
       {englishWordRecordbook.records.map((record) => {
         return (
@@ -194,6 +127,6 @@ export const EnglishWordMemorizationAnswer: React.FC<
           </div>
         );
       })}
-    </Container>
+    </>
   );
 };

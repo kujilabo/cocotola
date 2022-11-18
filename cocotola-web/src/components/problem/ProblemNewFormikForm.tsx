@@ -13,7 +13,7 @@ import { addProblem, selectProblemAddLoading } from '@/features/problem_add';
 export interface problemNewFormikFormArgs<V extends object, P extends object> {
   workbookId: number;
   problemType: string;
-  toContent: (v: V) => ReactElement;
+  toContent: (props: FormikProps<V>) => ReactElement;
   validationSchema: Yup.ObjectSchema<any>;
   propsToValues: (props: P) => V;
   valuesToProperties: (values: V) => { [key: string]: string };
@@ -40,18 +40,16 @@ export const ProblemNewFormikForm = <V extends object, P extends object>(
   } = args;
 
   const NewForm = (props: FormikProps<V>): ReactElement => {
-    const { values, isSubmitting } = props;
-
     return (
       <Form>
         <Card>
           <Card.Content>
             <Header component="h2">New problem</Header>
           </Card.Content>
-          <Card.Content>{toContent(values)}</Card.Content>
+          <Card.Content>{toContent(props)}</Card.Content>
           <Card.Content>
             {loading ? <AppDimmer /> : <div />}
-            <AddButton type="submit" disabled={isSubmitting} />
+            <AddButton type="submit" disabled={props.isSubmitting} />
           </Card.Content>
         </Card>
       </Form>

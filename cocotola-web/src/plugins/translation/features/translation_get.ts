@@ -33,7 +33,7 @@ export const getTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .get(url, { headers: jsonHeaders(accessToken), data: {} })
@@ -89,7 +89,7 @@ export const translationGetSlice = createSlice({
         state.failed = false;
         state.translation = action.payload.response;
       })
-      .addCase(getTranslation.rejected, (state, action) => {
+      .addCase(getTranslation.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

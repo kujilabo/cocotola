@@ -1,36 +1,28 @@
-import { FC, useState } from 'react';
+import { FC, ReactElement, useState } from 'react';
 
 import { Input } from 'formik-semantic-ui-react';
-import { useParams } from 'react-router-dom';
-import { Button, Container, Divider, Form, Message } from 'semantic-ui-react';
+import { Button, Form, Message } from 'semantic-ui-react';
 import * as Yup from 'yup';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, ErrorMessage } from '@/components';
+import { ErrorMessage } from '@/components';
 import { ProblemPropertyEditFormikForm } from '@/components/problem/ProblemPropertyEditFormikForm';
 import { selectProblemMap } from '@/features/problem_find';
 import { addRecord } from '@/features/record_add';
-import { selectWorkbook } from '@/features/workbook_get';
 import { EnglishSentenceProblemTypeId } from '@/models/problem';
-import { emptyFunction } from '@/utils/util';
-
+import { WorkbookModel } from '@/models/workbook';
 import {
   selectEnglishSentenceRecordbook,
   nextEnglishSentenceProblem,
-} from '../../../../features/english_sentence_study';
-import { EnglishSentenceProblemModel } from '../../../../models/english-sentence-problem';
+} from '@/plugins/english-sentence/features/english_sentence_study';
+import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
+import { emptyFunction } from '@/utils/util';
 
-import { EnglishSentenceMemorizationBreadcrumb } from './EnglishSentenceMemorizationBreadcrumb';
 import { EnglishSentenceMemorizationCard } from './EnglishSentenceMemorizationCard';
 
-type ParamTypes = {
-  _workbookId: string;
-  _studyType: string;
-};
-
 type EnglishSentenceMemorizationAnswerProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
+  workbook: WorkbookModel;
+  studyType: string;
 };
 
 interface formikFormPropsTranslated extends Object {
@@ -43,33 +35,20 @@ interface formValuesTranslated extends Object {
 
 export const EnglishSentenceMemorizationAnswer: FC<
   EnglishSentenceMemorizationAnswerProps
-> = (props: EnglishSentenceMemorizationAnswerProps) => {
-  const { _workbookId, _studyType } = useParams<ParamTypes>();
-  const workbookId = +(_workbookId || '');
+> = (props: EnglishSentenceMemorizationAnswerProps): ReactElement => {
   const dispatch = useAppDispatch();
-  const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
   const englishSentenceRecordbook = useAppSelector(
     selectEnglishSentenceRecordbook
   );
   const [memorized, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const breadcrumb = (
-    <EnglishSentenceMemorizationBreadcrumb
-      breadcrumbLinks={props.breadcrumbLinks}
-      workbookUrl={props.workbookUrl}
-      name={workbook.name}
-      id={workbookId}
-    />
-  );
+
   if (englishSentenceRecordbook.records.length === 0) {
     return (
-      <Container fluid>
-        {breadcrumb}
-        <Message info>
-          <p>You answered all problems. Please try again in a few days.</p>
-        </Message>
-      </Container>
+      <Message info>
+        <p>You answered all problems. Please try again in a few days.</p>
+      </Message>
     );
   }
   const problemId = englishSentenceRecordbook.records[0].problemId;
@@ -119,8 +98,8 @@ export const EnglishSentenceMemorizationAnswer: FC<
         await dispatch(
           addRecord({
             param: {
-              workbookId: workbookId,
-              studyType: _studyType || '',
+              workbookId: props.workbook.id,
+              studyType: props.studyType,
               problemId: problemId,
               result: true,
               memorized: true,
@@ -140,7 +119,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
     formValuesTranslated,
     formikFormPropsTranslated
   >({
-    workbookId: workbookId,
+    workbookId: props.workbook.id,
     problemId: problem.id,
     problemVersion: problem.version,
     problemType: EnglishSentenceProblemTypeId,
@@ -159,11 +138,9 @@ export const EnglishSentenceMemorizationAnswer: FC<
   });
 
   return (
-    <Container fluid>
-      {breadcrumb}
-      <Divider hidden />
+    <>
       <EnglishSentenceMemorizationCard
-        workbookId={workbookId}
+        workbookId={props.workbook.id}
         problemId={problemId}
         audioId={+problem.audioId}
         updatedAt={problem.updatedAt}
@@ -196,6 +173,6 @@ export const EnglishSentenceMemorizationAnswer: FC<
           </div>
         );
       })}
-    </Container>
+    </>
   );
 };

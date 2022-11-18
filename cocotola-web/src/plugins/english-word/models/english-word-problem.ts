@@ -26,7 +26,7 @@ export class EnglishWordProblemModel {
   updatedAt: string;
   number: number;
   problemType: string;
-  audioId: string;
+  audioId: number;
   text: string;
   pos: string;
   lang2: string;
@@ -38,7 +38,7 @@ export class EnglishWordProblemModel {
     updatedAt: string,
     number: number,
     problemType: string,
-    audioId: string,
+    audioId: number,
     text: string,
     pos: string,
     lang2: string,
@@ -66,7 +66,7 @@ export class EnglishWordProblemModel {
     };
 
     const sentences = p.properties['sentences'];
-    const sentence = sentences[0];
+    const sentence: { [key: string]: string } = sentences[0];
     if (sentence) {
       sentence1.text = sentence['text'];
       sentence1.translated = sentence['translated'];
@@ -83,7 +83,7 @@ export class EnglishWordProblemModel {
       updatedAt: p.updatedAt,
       number: p.number,
       problemType: p.problemType,
-      audioId: String(p.properties['audioId']),
+      audioId: +p.properties['audioId'],
       text: String(p.properties['text']),
       pos: String(p.properties['pos']),
       lang2: String(p.properties['lang2']),

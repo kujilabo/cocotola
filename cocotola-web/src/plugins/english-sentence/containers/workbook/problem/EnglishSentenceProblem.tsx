@@ -20,7 +20,7 @@ import { EnglishSentenceProblemNew } from './EnglishSentenceProblemNew';
 
 export class EnglishSentenceProblem extends CustomProblem {
   getName(): string {
-    return 'english_word';
+    return 'english_sentence';
   }
 
   getReducer(): Reducer {
@@ -80,6 +80,7 @@ export class EnglishSentenceProblem extends CustomProblem {
             { url: '/app/private/workbook', text: 'My Workbooks' },
           ]}
           workbookUrl={'/app/private/workbook/'}
+          studyType={studyType}
         />
       );
     } else {
@@ -87,14 +88,6 @@ export class EnglishSentenceProblem extends CustomProblem {
       return <div>xxx</div>;
     }
   }
-
-  // createBreadcrumbs(studyType: string): React.ReactElement {
-  //   if (studyType == 'memorization') {
-
-  //   } else {
-
-  //   }
-  // }
 
   initProblemStudy(): ActionCreatorWithPayload<string> {
     // onsole.log('eng initProblemStudy');

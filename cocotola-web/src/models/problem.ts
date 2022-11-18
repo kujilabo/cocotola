@@ -4,14 +4,21 @@ export class ProblemModel {
   updatedAt: string;
   number: number;
   problemType: string;
-  properties: { [key: string]: any };
+  properties: {
+    [key: string]:
+      | number
+      | string
+      | boolean
+      | string[]
+      | { [key: string]: number | string | boolean };
+  };
   constructor(
     id: number,
     version: number,
     updatedAt: string,
     number: number,
     problemType: string,
-    properties: { [key: string]: any }
+    properties: { [key: string]: number | string | boolean }
   ) {
     this.id = id;
     this.version = version;

@@ -1,5 +1,6 @@
 import { FC, useState, Dispatch, SetStateAction } from 'react';
 
+import { FormikProps } from 'formik';
 import { Input, Select } from 'formik-semantic-ui-react';
 import { Container, Divider } from 'semantic-ui-react';
 import * as Yup from 'yup';
@@ -30,7 +31,8 @@ const newFormikForm = (
   return ProblemNewFormikForm({
     workbookId: workbookId,
     problemType: EnglishSentenceProblemTypeId,
-    toContent: (values: formValues) => {
+    toContent: (props: FormikProps<formValues>) => {
+      const { values } = props;
       return (
         <>
           <Input
@@ -76,7 +78,6 @@ type EnglishSentenceProblemNewProps = {
 export const EnglishSentenceProblemNew: FC<EnglishSentenceProblemNewProps> = (
   props: EnglishSentenceProblemNewProps
 ) => {
-  const workbook = props.workbook;
   const [values, setValues] = useState({
     text: 'pen',
     lang2: 'ja',
@@ -84,7 +85,7 @@ export const EnglishSentenceProblemNew: FC<EnglishSentenceProblemNewProps> = (
   });
   const [errorMessage, setErrorMessage] = useState('');
   const EnglishSentenceProblemNewFormikForm = newFormikForm(
-    workbook.id,
+    props.workbook.id,
     (values: formValues) => setValues(values),
     setErrorMessage
   );
@@ -92,15 +93,15 @@ export const EnglishSentenceProblemNew: FC<EnglishSentenceProblemNewProps> = (
   return (
     <Container fluid>
       <PrivateProblemBreadcrumb
-        name={workbook.name}
-        id={workbook.id}
+        name={props.workbook.name}
+        id={props.workbook.id}
         text={'New problem'}
       />
       <Divider hidden />
       <EnglishSentenceProblemNewFormikForm
         text={values.text}
-        lang2={values.lang2}
         translated={values.translated}
+        lang2={values.lang2}
       />
       <ErrorMessage message={errorMessage} />
     </Container>
