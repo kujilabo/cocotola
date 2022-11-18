@@ -1,10 +1,10 @@
-import React from 'react';
+import { FC, ReactElement } from 'react';
 
 import { AppBreadcrumb, AppBreadcrumbLink } from '@/components';
 
-export const EnglishWordMemorizationBreadcrumb: React.FC<
+export const EnglishWordMemorizationBreadcrumb: FC<
   EnglishWordMemorizationBreadcrumbProps
-> = (props: EnglishWordMemorizationBreadcrumbProps) => {
+> = (props: EnglishWordMemorizationBreadcrumbProps): ReactElement => {
   const links = [...props.breadcrumbLinks];
   links.push(
     new AppBreadcrumbLink(`${props.workbookUrl}${props.id}`, props.name)

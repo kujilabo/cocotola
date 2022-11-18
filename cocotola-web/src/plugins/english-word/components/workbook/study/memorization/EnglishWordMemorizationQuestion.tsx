@@ -1,110 +1,56 @@
-import { FC, useState } from 'react';
+import { FC, ReactElement, useState } from 'react';
 
-import { useParams } from 'react-router-dom';
-import {
-  Accordion,
-  Button,
-  Card,
-  Container,
-  Divider,
-  Header,
-  Icon,
-  Message,
-} from 'semantic-ui-react';
+import { Accordion, Button, Icon, Message } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
-import { AppBreadcrumbLink, AudioButton, ErrorMessage } from '@/components';
-import { getAudio, selectAudioViewLoading } from '@/features/audio';
+import { ErrorMessage } from '@/components';
 import { selectProblemMap } from '@/features/problem_find';
 import { addRecord } from '@/features/record_add';
-import { selectWorkbook } from '@/features/workbook_get';
-import { emptyFunction } from '@/utils/util';
-
+import { WorkbookModel } from '@/models/workbook';
 import {
   selectEnglishWordRecordbook,
   setEnglishWordStatus,
   setEnglishWordRecord,
   ENGLISH_WORD_STATUS_ANSWER,
-} from '../../../../features/english_word_study';
+} from '@/plugins/english-word/features/english_word_study';
+import { EnglishWordProblemModel } from '@/plugins/english-word/models/english-word-problem';
 
-import { EnglishWordMemorizationBreadcrumb } from './EnglishWordMemorizationBreadcrumb';
-
-type ParamTypes = {
-  _workbookId: string;
-  _studyType: string;
-};
-
+import { EnglishWordMemorizationCard } from './EnglishWordMemorizationCard';
 type EnglishWordMemorizationQuestionProps = {
-  breadcrumbLinks: AppBreadcrumbLink[];
-  workbookUrl: string;
+  workbook: WorkbookModel;
+  studyType: string;
 };
 
 export const EnglishWordMemorizationQuestion: FC<
   EnglishWordMemorizationQuestionProps
-> = (props: EnglishWordMemorizationQuestionProps) => {
-  //onsole.log('EnglishWordMemorizationQuestion');
-  const { _workbookId, _studyType } = useParams<ParamTypes>();
-  const workbookId = +(_workbookId || '');
-  const studyType = _studyType || '';
+> = (props: EnglishWordMemorizationQuestionProps): ReactElement => {
   const dispatch = useAppDispatch();
-  const workbook = useAppSelector(selectWorkbook);
   const problemMap = useAppSelector(selectProblemMap);
-  const audioViewLoading = useAppSelector(selectAudioViewLoading);
   const englishWordRecordbook = useAppSelector(selectEnglishWordRecordbook);
   const [answerOpen, setAnswerOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const breadcrumb = (
-    <EnglishWordMemorizationBreadcrumb
-      breadcrumbLinks={props.breadcrumbLinks}
-      workbookUrl={props.workbookUrl}
-      name={workbook.name}
-      id={workbookId}
-    />
-  );
   if (englishWordRecordbook.records.length === 0) {
     return (
-      <Container fluid>
-        {breadcrumb}
-        <Message info>
-          <p>You answered all problems. Please try again in a few days.</p>
-        </Message>
-      </Container>
+      <Message info>
+        <p>You answered all problems. Please try again in a few days.</p>
+      </Message>
     );
   }
 
   const problemId = englishWordRecordbook.records[0].problemId;
-  const problem = problemMap[problemId];
+  const problem = EnglishWordProblemModel.of(problemMap[problemId]);
   // onsole.log('englishWordRecordbook.records', englishWordRecordbook.records);
   // onsole.log('problemMap', problemMap);
   // onsole.log('problemId', problemId);
   // onsole.log('problem', problem);
-
-  const loadAndPlay = (postFunc: (value: string) => void) => {
-    const f = async () => {
-      await dispatch(
-        getAudio({
-          param: {
-            workbookId: workbookId,
-            problemId: problemId,
-            audioId: +problem.properties['audioId'],
-            updatedAt: problem.updatedAt,
-          },
-          postFunc: postFunc,
-          postSuccessProcess: emptyFunction,
-          postFailureProcess: setErrorMessage,
-        })
-      );
-    };
-    f().catch(console.error);
-  };
 
   const setRecord = (result: boolean) => {
     const f = async () => {
       await dispatch(
         addRecord({
           param: {
-            workbookId: workbookId,
-            studyType: studyType,
+            workbookId: props.workbook.id,
+            studyType: props.studyType,
             problemId: problemId,
             result: result,
             memorized: false,
@@ -121,48 +67,27 @@ export const EnglishWordMemorizationQuestion: FC<
   };
   const onYesButtonClick = () => setRecord(true);
   const onNoButtonClick = () => setRecord(false);
-  // const onMemorizeButtonClick = () => setMemorized(!memorized);
-  // onsole.log('englishWordRecordbook', englishWordRecordbook);
-  // onsole.log('problemId', problemId);
-  // onsole.log('problem', problem);
-  // onsole.log('problemMap', problemMap);
+
   if (!problem) {
     return <div>undefined</div>;
   }
 
   return (
-    <Container fluid>
-      {breadcrumb}
-      <Divider hidden />
-      <Card>
-        <Card.Content>
-          <Header component="h2">
-            {problem.properties['text']}
-            <AudioButton
-              id={+problem.properties['audioId']}
-              loadAndPlay={loadAndPlay}
-              disabled={audioViewLoading}
-            />
-          </Header>
-        </Card.Content>
-        {/* <Card.Content>
-      <Form.Checkbox
-        checked={memorized}
-        label="完璧に覚えた"
-        onClick={onMemorizeButtonClick}
-      />
-    </Card.Content> */}
-        <Card.Content>
+    <>
+      <EnglishWordMemorizationCard
+        workbookId={props.workbook.id}
+        problemId={problemId}
+        audioId={problem.audioId}
+        updatedAt={problem.updatedAt}
+        headerText={problem.text}
+        contentList={[
           <Button.Group fluid>
             <Button onClick={onNoButtonClick}>わからない</Button>
             <Button.Or />
             <Button positive onClick={onYesButtonClick}>
               わかる
             </Button>
-          </Button.Group>
-        </Card.Content>
-
-        <Card.Content>
+          </Button.Group>,
           <Accordion>
             <Accordion.Title
               active={answerOpen}
@@ -173,11 +98,12 @@ export const EnglishWordMemorizationQuestion: FC<
               Answer
             </Accordion.Title>
             <Accordion.Content active={answerOpen}>
-              <p>{problem.properties['translated']}</p>
+              <p>{problem.translated}</p>
             </Accordion.Content>
-          </Accordion>
-        </Card.Content>
-      </Card>
+          </Accordion>,
+        ]}
+        setErrorMessage={setErrorMessage}
+      ></EnglishWordMemorizationCard>
       <ErrorMessage message={errorMessage} />
       {englishWordRecordbook.records.length}
       {englishWordRecordbook.records.map((record) => {
@@ -189,6 +115,6 @@ export const EnglishWordMemorizationQuestion: FC<
           </div>
         );
       })}
-    </Container>
+    </>
   );
 };

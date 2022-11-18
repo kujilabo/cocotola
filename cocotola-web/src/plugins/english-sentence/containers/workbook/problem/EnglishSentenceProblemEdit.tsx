@@ -1,5 +1,6 @@
 import { FC, useEffect, useState, Dispatch, SetStateAction } from 'react';
 
+import { FormikProps } from 'formik';
 import { Input, Select } from 'formik-semantic-ui-react';
 import { Container, Divider } from 'semantic-ui-react';
 import * as Yup from 'yup';
@@ -12,8 +13,7 @@ import {
 import { ProblemEditFormikForm } from '@/components/problem/ProblemEditFormikForm';
 import { ProblemModel, EnglishSentenceProblemTypeId } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
-
-import { EnglishSentenceProblemModel } from '../../../models/english-sentence-problem';
+import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
 
 interface formikFormProps {
   text: string;
@@ -39,7 +39,8 @@ const editFormikForm = (
     problemId: problemId,
     problemVersion: problemVersion,
     problemType: EnglishSentenceProblemTypeId,
-    toContent: (values: formValues) => {
+    toContent: (props: FormikProps<formValues>) => {
+      const { values } = props;
       return (
         <>
           <Input
@@ -91,7 +92,6 @@ export const EnglishSentenceProblemEdit: FC<EnglishSentenceProblemEditProps> = (
   // const problemId = +(_problemId || '');
   // const problemMap = useAppSelector(selectProblemMap);
   // const problem = EnglishSentenceProblemModel.of(problemMap[problemId]);
-  const workbook = props.workbook;
   const problem = EnglishSentenceProblemModel.of(props.problem);
   const [values, setValues] = useState({
     // number: problem.number,
@@ -112,7 +112,7 @@ export const EnglishSentenceProblemEdit: FC<EnglishSentenceProblemEditProps> = (
   }, [problem.id, problem.version]);
 
   const EnglishSentenceProblemEditFormikForm = editFormikForm(
-    workbook.id,
+    props.workbook.id,
     problem.id,
     problem.version,
     setValues,
@@ -123,7 +123,7 @@ export const EnglishSentenceProblemEdit: FC<EnglishSentenceProblemEditProps> = (
     <Container fluid>
       <PrivateProblemBreadcrumb
         name={props.workbook.name}
-        id={workbook.id}
+        id={props.workbook.id}
         text={props.problem.number.toString()}
       />
       <Divider hidden />
