@@ -1,6 +1,7 @@
 package config
 
 import (
+	"embed"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -48,8 +49,12 @@ type Config struct {
 	Swagger     *libconfig.SwaggerConfig `yaml:"swagger" validate:"required"`
 }
 
+//go:embed local.yml
+//go:embed production.yml
+var config embed.FS
+
 func LoadConfig(env string) (*Config, error) {
-	confContent, err := os.ReadFile("./configs/" + env + ".yml")
+	confContent, err := config.ReadFile(env + ".yml")
 	if err != nil {
 		return nil, err
 	}
