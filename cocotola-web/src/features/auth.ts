@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
@@ -15,7 +15,7 @@ type RefreshTokenResponse = {
 };
 export const tokenExpired = (token: string): boolean => {
   try {
-    return jwtDecode<any>(token).exp < new Date().getTime() / 1000;
+    return jwtDecode<{ exp: number }>(token).exp < new Date().getTime() / 1000;
   } catch (e) {
     return true;
   }
@@ -39,7 +39,7 @@ export const refreshAccessToken = createAsyncThunk<
   }
   return await axios
     .post(`${backendUrl}/v1/auth/refresh_token`, arg)
-    .then((resp: any) => {
+    .then((resp) => {
       // onsole.log('refreshAccessToken1 a');
       const response = resp.data as RefreshTokenResponse;
       return response;
@@ -146,16 +146,19 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState: initialState,
   reducers: {
-    redirectTo: (state, action) => {
+    redirectTo: (state, action: PayloadAction<{ url: string }>) => {
       state.loading = false;
       state.failed = false;
       state.redirectUrl = action.payload.url;
     },
-    setAccessToken: (state, action) => {
+    setAccessToken: (state, action: PayloadAction<{ accessToken: string }>) => {
       state.accessToken = action.payload.accessToken;
       localStorage.setItem('accessToken', state.accessToken);
     },
-    setRefreshToken: (state, action) => {
+    setRefreshToken: (
+      state,
+      action: PayloadAction<{ refreshToken: string }>
+    ) => {
       state.refreshToken = action.payload.refreshToken;
       localStorage.setItem('refreshToken', state.refreshToken);
     },
@@ -187,7 +190,7 @@ export const authSlice = createSlice({
         state.loading = false;
         state.failed = false;
       })
-      .addCase(googleAuthorize.rejected, (state, action) => {
+      .addCase(googleAuthorize.rejected, (state) => {
         authSlice.caseReducers.resetAccessToken(state);
         authSlice.caseReducers.resetRefreshToken(state);
         console.log('callback rejected');
@@ -205,7 +208,7 @@ export const authSlice = createSlice({
         state.loading = false;
         state.failed = false;
       })
-      .addCase(guestAuthorize.rejected, (state, action) => {
+      .addCase(guestAuthorize.rejected, (state) => {
         authSlice.caseReducers.resetAccessToken(state);
         authSlice.caseReducers.resetRefreshToken(state);
         console.log('callback rejected');

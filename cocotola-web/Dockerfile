@@ -1,4 +1,4 @@
-FROM node:14.21-slim as builder
+FROM node:16.18.1-slim as builder
 
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./

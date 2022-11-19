@@ -24,7 +24,7 @@ export const exportTranslation = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .post(url, {}, blobRequestConfig(accessToken))
@@ -59,11 +59,11 @@ export const translationExportSlice = createSlice({
       .addCase(exportTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(exportTranslation.fulfilled, (state, action) => {
+      .addCase(exportTranslation.fulfilled, (state) => {
         state.loading = false;
         state.failed = false;
       })
-      .addCase(exportTranslation.rejected, (state, action) => {
+      .addCase(exportTranslation.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       });

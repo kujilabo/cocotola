@@ -2,8 +2,8 @@ import { ReactElement } from 'react';
 
 import {
   ActionCreatorWithPayload,
-  PayloadAction,
   createSlice,
+  PayloadAction,
 } from '@reduxjs/toolkit';
 
 import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';
@@ -23,9 +23,11 @@ export const emptySlice = createSlice({
     nothing: (state) => {
       state.status = 0;
     },
+    /* eslint-disable */
     stringPayload: (state, action: PayloadAction<string>) => {
       state.status = 0;
     },
+    /* eslint-enable */
   },
 });
 export class ProblemFactory {

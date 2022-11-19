@@ -109,7 +109,7 @@ export const EnglishSentenceProblemEdit: FC<EnglishSentenceProblemEditProps> = (
       lang2: problem.lang2,
       translated: problem.translated,
     });
-  }, [problem.id, problem.version]);
+  }, [problem.id, problem.version]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const EnglishSentenceProblemEditFormikForm = editFormikForm(
     props.workbook.id,

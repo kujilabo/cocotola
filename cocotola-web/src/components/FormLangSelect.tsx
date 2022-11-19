@@ -5,7 +5,7 @@ import { Form, Select } from 'semantic-ui-react';
 type FormLangSelectProps = {
   label?: string;
   value: string;
-  onChange: (e: ChangeEvent<HTMLSelectElement>, d: any) => any;
+  onChange: (e: ChangeEvent<HTMLSelectElement>, d: any) => any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 export const langOptions = [{ key: 'ja', text: 'ja', value: 'ja' }];

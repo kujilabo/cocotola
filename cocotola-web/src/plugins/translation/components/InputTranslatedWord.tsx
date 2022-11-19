@@ -13,7 +13,7 @@ export const InputTrasnslatedWord = (
   return (
     <Input
       name="translated"
-      label={t('Translated')}
+      label={String(t('Translated'))}
       placeholder="translated"
       errorPrompt
       disabled={props.disabled}

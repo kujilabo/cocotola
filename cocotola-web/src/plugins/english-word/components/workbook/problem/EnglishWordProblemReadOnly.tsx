@@ -3,36 +3,35 @@ import React from 'react';
 import { Button, Card, Grid, Header } from 'semantic-ui-react';
 
 import { ProblemModel } from '@/models/problem';
+import { EnglishWordProblemModel } from '@/plugins/english-word/models/english-word-problem';
+import { toDsiplayText } from '@/plugins/english-word/utils/util';
 
-import { toDsiplayText } from '../../../utils/util';
+type EnglishWordProblemReadOnlyProps = {
+  workbookId: number;
+  problem: ProblemModel;
+};
 
 export const EnglishWordProblemReadOnly: React.FC<
   EnglishWordProblemReadOnlyProps
 > = (props: EnglishWordProblemReadOnlyProps) => {
-  // const history = useHistory();
-  // const baseUrl =
-  //   '/app/workbook/' + props.workbookId + '/problem/' + props.problem.id;
-  // const playAudio = (value: string) => {
-  //   const audio = new Audio('data:audio/wav;base64,' + value);
-  //   audio.play();
-  // };
+  const problem = EnglishWordProblemModel.of(props.problem);
 
   return (
     <Card fluid>
       <Card.Content>
-        <Card.Header>{props.problem.properties['text']}</Card.Header>
+        <Card.Header>{problem.text}</Card.Header>
       </Card.Content>
       <Card.Content>
         <Grid columns={2}>
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {toDsiplayText(+props.problem.properties['pos'])}
+                {toDsiplayText(problem.pos)}
               </Header>
             </Grid.Column>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['translated']}
+                {problem.translated}
               </Header>
             </Grid.Column>
           </Grid.Row>
@@ -41,7 +40,7 @@ export const EnglishWordProblemReadOnly: React.FC<
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['phonetic']}
+                {/* {problem.phonetic} */}
               </Header>
             </Grid.Column>
             <Grid.Column></Grid.Column>
@@ -67,14 +66,4 @@ export const EnglishWordProblemReadOnly: React.FC<
       </Card.Content>
     </Card>
   );
-};
-
-type EnglishWordProblemReadOnlyProps = {
-  workbookId: number;
-  problem: ProblemModel;
-  // getAudio: (
-  //   id: number,
-  //   timestamp: string,
-  //   postFunc: (value: string) => void
-  // ) => void;
 };

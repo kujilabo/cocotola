@@ -8,8 +8,8 @@ type DangerModalProps = {
   standardValue: string;
   dangerValue: string;
   triggerLayout: (children: ReactNode) => ReactElement;
-  standardFunc: () => any;
-  dangerFunc: () => any;
+  standardFunc: () => any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  dangerFunc: () => any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 export const DangerModal: FC<DangerModalProps> = (props: DangerModalProps) => {

@@ -22,7 +22,7 @@ export const SelectPos = (props: SelectPosProps): React.ReactElement => {
   return (
     <Select
       name="pos"
-      label={t('Pos')}
+      label={String(t('Pos'))}
       options={posOptions}
       errorPrompt
       disabled={props.disabled}

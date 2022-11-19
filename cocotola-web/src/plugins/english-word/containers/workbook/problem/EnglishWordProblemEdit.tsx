@@ -105,11 +105,15 @@ const editFormikForm = (
       let sentence2 = emptyTatoebaSentence;
       if (values.exampleSentenceNote && values.exampleSentenceNote !== '') {
         try {
-          const noteObj = JSON.parse(values.exampleSentenceNote);
+          /* eslint-disable */
+          const noteObj: { [key: string]: string } = JSON.parse(
+            values.exampleSentenceNote
+          );
+          /* eslint-enable */
           console.log('noteObj', noteObj);
           sentence1 = {
             text: values.exampleSentenceText,
-            author: noteObj['tatoebaAuthor1'],
+            author: String(noteObj['tatoebaAuthor1']),
             sentenceNumber: +noteObj['tatoebaSentenceNumber1'],
             lang2: 'en',
           };
@@ -200,7 +204,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
   const tatoebaSentenceFindLoading = useAppSelector(selectTatoebaFindLoading);
   const [values, setValues] = useState({
     text: problem.text,
-    pos: problem.pos,
+    pos: String(problem.pos),
     lang2: problem.lang2,
     translated: problem.translated,
     exampleSentenceText: problem.sentence1.text,
@@ -216,14 +220,14 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
     setValues({
       ...values,
       text: problem.text,
-      pos: problem.pos,
+      pos: String(problem.pos),
       lang2: problem.lang2,
       translated: problem.translated,
       exampleSentenceText: problem.sentence1.text,
       exampleSentenceTranslated: problem.sentence1.translated,
       exampleSentenceNote: problem.sentence1.note,
     });
-  }, [problem.id, problem.version]);
+  }, [problem.id, problem.version]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (values.text.length === 0) {
@@ -269,7 +273,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
       <Divider hidden />
       <EnglishWordProblemEditFormikForm
         text={values.text}
-        pos={values.pos}
+        pos={String(values.pos)}
         lang2={values.lang2}
         translated={values.translated}
         exampleSentenceText={values.exampleSentenceText}

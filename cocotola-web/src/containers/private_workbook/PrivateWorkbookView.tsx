@@ -162,7 +162,7 @@ export function PrivateWorkbookView(): ReactElement {
             <WorkbookMenu
               problemFactory={problemFactory}
               workbook={workbook}
-              initStudy={(_) => {
+              initStudy={() => {
                 console.log('initstudy');
               }}
             ></WorkbookMenu>

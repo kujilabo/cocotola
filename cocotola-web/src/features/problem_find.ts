@@ -129,7 +129,7 @@ export const getProblem = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .get(url, { headers: jsonHeaders(accessToken), data: {} })
@@ -177,6 +177,12 @@ export const problemFindSlice = createSlice({
       .addCase(findProblems.fulfilled, (state, action) => {
         state.loading = false;
         state.failed = false;
+        // const problems: ProblemModel[] = [];
+        // for (let i = 0; i < action.payload.response.results.length; i++) {
+        //   const problem: ProblemModel = action.payload.response.results[i];
+        //   problems.push(problem);
+        // }
+        // state.problems = problems;
         state.problems = action.payload.response.results;
         state.problemMap = {};
         for (let i = 0; i < state.problems.length; i++) {
@@ -212,6 +218,7 @@ export const problemFindSlice = createSlice({
       .addCase(updateProblemProperty.fulfilled, (state, action) => {
         const problem = state.problemMap[action.payload.param.problemId];
         problem.version = action.payload.param.version + 1;
+        // problem.properties as {[key:string]any};
         console.log('problem', problem);
         problem.properties = {
           ...state.problemMap[action.payload.param.problemId].properties,

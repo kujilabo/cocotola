@@ -1,0 +1,23 @@
+---
+on: [pull_request]
+name: Build
+jobs:
+  typescript:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        workdir:
+          - cocotola-web
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+        working-directory: ${{ matrix.workdir }}
+      - run: npm run build
+        working-directory: ${{ matrix.workdir }}

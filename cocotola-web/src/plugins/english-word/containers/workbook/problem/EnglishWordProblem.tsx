@@ -5,15 +5,14 @@ import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
 import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';
 import { ProblemModel } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
-
-import { EnglishWordProblemReadOnly } from '../../../components/workbook/problem/EnglishWordProblemReadOnly';
-import { EnglishWordProblemReadWrite } from '../../../components/workbook/problem/EnglishWordProblemReadWrite';
-import { EnglishWordMemorization } from '../../../components/workbook/study/memorization/EnglishWordMemorization';
-// import EnglishWordDictation from '../../../components/workbook/study/dictation/EnglishWordDictation';
+import { EnglishWordProblemReadOnly } from '@/plugins/english-word/components/workbook/problem/EnglishWordProblemReadOnly';
+import { EnglishWordProblemReadWrite } from '@/plugins/english-word/components/workbook/problem/EnglishWordProblemReadWrite';
+import { EnglishWordMemorization } from '@/plugins/english-word/components/workbook/study/memorization/EnglishWordMemorization';
 import {
   englishWordSlice,
   initEnglishWordStatus,
-} from '../../../features/english_word_study';
+  EnglishWordState,
+} from '@/plugins/english-word/features/english_word_study';
 
 import { EnglishWordProblemEdit } from './EnglishWordProblemEdit';
 import { EnglishWordProblemMenu } from './EnglishWordProblemMenu';
@@ -24,7 +23,7 @@ export class EnglishWordProblem extends CustomProblem {
     return 'english_word';
   }
 
-  getReducer(): Reducer {
+  getReducer(): Reducer<EnglishWordState> {
     return englishWordSlice.reducer;
   }
 
@@ -84,6 +83,7 @@ export class EnglishWordProblem extends CustomProblem {
             { url: '/app/private/workbook', text: 'My Workbooks' },
           ]}
           workbookUrl={'/app/private/workbook/'}
+          studyType={studyType}
         />
       );
     } else {

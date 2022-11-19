@@ -14,7 +14,7 @@ export interface problemNewFormikFormArgs<V extends object, P extends object> {
   workbookId: number;
   problemType: string;
   toContent: (props: FormikProps<V>) => ReactElement;
-  validationSchema: Yup.ObjectSchema<any>;
+  validationSchema: Yup.ObjectSchema<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   propsToValues: (props: P) => V;
   valuesToProperties: (values: V) => { [key: string]: string };
   resetValues: (v: V) => void;

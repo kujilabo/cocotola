@@ -3,29 +3,29 @@ import { FC, ReactElement } from 'react';
 import { Button, Card, Grid, Header } from 'semantic-ui-react';
 
 import { ProblemModel } from '@/models/problem';
+import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
+
+type EnglishSentenceProblemReadOnlyProps = {
+  workbookId: number;
+  problem: ProblemModel;
+};
 
 export const EnglishSentenceProblemReadOnly: FC<
   EnglishSentenceProblemReadOnlyProps
 > = (props: EnglishSentenceProblemReadOnlyProps): ReactElement => {
-  // const history = useHistory();
-  // const baseUrl =
-  //   '/app/workbook/' + props.workbookId + '/problem/' + props.problem.id;
-  // const playAudio = (value: string) => {
-  //   const audio = new Audio('data:audio/wav;base64,' + value);
-  //   audio.play();
-  // };
+  const problem = EnglishSentenceProblemModel.of(props.problem);
 
   return (
     <Card fluid>
       <Card.Content>
-        <Card.Header>aaa{props.problem.properties['text']}</Card.Header>
+        <Card.Header>{problem.text}</Card.Header>
       </Card.Content>
       <Card.Content>
         <Grid columns={2}>
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['translated']}
+                {problem.translated}
               </Header>
             </Grid.Column>
           </Grid.Row>
@@ -34,7 +34,7 @@ export const EnglishSentenceProblemReadOnly: FC<
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['phonetic']}
+                {/* {problem.phonetic} */}
               </Header>
             </Grid.Column>
             <Grid.Column></Grid.Column>
@@ -60,14 +60,4 @@ export const EnglishSentenceProblemReadOnly: FC<
       </Card.Content>
     </Card>
   );
-};
-
-type EnglishSentenceProblemReadOnlyProps = {
-  workbookId: number;
-  problem: ProblemModel;
-  // getAudio: (
-  //   id: number,
-  //   timestamp: string,
-  //   postFunc: (value: string) => void
-  // ) => void;
 };

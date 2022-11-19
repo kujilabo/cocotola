@@ -13,6 +13,7 @@ import {
   setEnglishSentenceRecord,
   ENGLISH_SENTENCE_STATUS_ANSWER,
 } from '@/plugins/english-sentence/features/english_sentence_study';
+import { EnglishSentenceProblemModel } from '@/plugins/english-sentence/models/english-sentence-problem';
 
 import { EnglishSentenceMemorizationCard } from './EnglishSentenceMemorizationCard';
 
@@ -41,7 +42,7 @@ export const EnglishSentenceMemorizationQuestion: FC<
   }
 
   const problemId = englishSentenceRecordbook.records[0].problemId;
-  const problem = problemMap[problemId];
+  const problem = EnglishSentenceProblemModel.of(problemMap[problemId]);
   if (!problem) {
     return <div>undefined</div>;
   }
@@ -75,9 +76,9 @@ export const EnglishSentenceMemorizationQuestion: FC<
       <EnglishSentenceMemorizationCard
         workbookId={props.workbook.id}
         problemId={problemId}
-        audioId={+problem.properties['audioId']}
+        audioId={+problem.audioId}
         updatedAt={problem.updatedAt}
-        headerText={String(problem.properties['text'])}
+        headerText={String(problem.text)}
         contentList={[
           <div className="ui fluid buttons">
             <Button onClick={onNoButtonClick}>わからない</Button>
@@ -96,7 +97,7 @@ export const EnglishSentenceMemorizationQuestion: FC<
               Answer
             </Accordion.Title>
             <Accordion.Content active={answerOpen}>
-              <p>{problem.properties['translated']}</p>
+              <p>{problem.translated}</p>
             </Accordion.Content>
           </Accordion>,
         ]}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withFormik, FormikBag } from 'formik';
+import { withFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
@@ -62,13 +62,7 @@ export const EnglishWordProblemEditFormikForm = (
     validationSchema: Yup.object().shape({
       text: Yup.string().required('Word is required'),
     }),
-    handleSubmit: (
-      values: EnglishWordProblemEditFormValues,
-      formikBag: FormikBag<
-        EnglishWordProblemEditFormikFormProps,
-        EnglishWordProblemEditFormValues
-      >
-    ) => {
+    handleSubmit: (values: EnglishWordProblemEditFormValues) => {
       // onsole.log('handleSubmit');
       const f = async () => {
         await dispatch(
