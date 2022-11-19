@@ -105,9 +105,11 @@ const editFormikForm = (
       let sentence2 = emptyTatoebaSentence;
       if (values.exampleSentenceNote && values.exampleSentenceNote !== '') {
         try {
+          /* eslint-disable */
           const noteObj: { [key: string]: string } = JSON.parse(
             values.exampleSentenceNote
           );
+          /* eslint-enable */
           console.log('noteObj', noteObj);
           sentence1 = {
             text: values.exampleSentenceText,

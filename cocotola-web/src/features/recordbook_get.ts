@@ -73,7 +73,7 @@ export const getCompletionRate = createAsyncThunk<
     const { refreshToken } = thunkAPI.getState().auth;
     return await thunkAPI
       .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-      .then((resp) => {
+      .then(() => {
         const { accessToken } = thunkAPI.getState().auth;
         return axios
           .get(url, { headers: jsonHeaders(accessToken), data: {} })

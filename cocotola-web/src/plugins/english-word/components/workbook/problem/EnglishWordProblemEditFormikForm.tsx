@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { withFormik, FormikBag } from 'formik';
+import { withFormik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 
