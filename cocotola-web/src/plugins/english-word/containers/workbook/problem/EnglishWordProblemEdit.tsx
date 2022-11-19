@@ -227,7 +227,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
       exampleSentenceTranslated: problem.sentence1.translated,
       exampleSentenceNote: problem.sentence1.note,
     });
-  }, [problem.id, problem.version]);
+  }, [problem.id, problem.version]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (values.text.length === 0) {

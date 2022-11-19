@@ -53,7 +53,7 @@ export const PrivateRoute: FC<PrivateRouteProps> = (
       };
       f().catch(console.error);
     }
-  }, [loading, refreshToken, isAccessTokenExpired, isRefreshTokenExpired]);
+  }, [loading, refreshToken, isAccessTokenExpired, isRefreshTokenExpired]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (failed) {
     return <div>Authentication Failure</div>;
