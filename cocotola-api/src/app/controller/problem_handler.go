@@ -39,6 +39,8 @@ type ProblemHandler interface {
 
 	UpdateProblem(c *gin.Context)
 
+	UpdateProblemProperty(c *gin.Context)
+
 	RemoveProblem(c *gin.Context)
 }
 
@@ -74,12 +76,12 @@ func (h *problemHandler) FindProblems(c *gin.Context) {
 
 		parameter, err := converter.ToProblemSearchCondition(ctx, &param, domain.WorkbookID(workbookID))
 		if err != nil {
-			return err
+			return liberrors.Errorf("converter.ToProblemSearchCondition. err: %w", err)
 		}
 
 		result, err := h.studentUsecaseProblem.FindProblemsByWorkbookID(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), parameter)
 		if err != nil {
-			return err
+			return liberrors.Errorf("studentUsecaseProblem.FindProblemsByWorkbookID. err: %w", err)
 		}
 
 		response, err := converter.ToProblemFindResponse(ctx, result)
@@ -260,15 +262,48 @@ func (h *problemHandler) UpdateProblem(c *gin.Context) {
 		param := entity.ProblemUpdateParameter{}
 		if err := c.BindJSON(&param); err != nil {
 			logger.Infof("failed to BindJSON. err: %v", err)
+			c.Status(http.StatusBadRequest)
 			return nil
 		}
 
 		parameter, err := converter.ToProblemUpdateParameter(&param)
 		if err != nil {
-			return liberrors.Errorf("failed to ToProblemUpdateParameter. param: %+v, err: %w", parameter, err)
+			return liberrors.Errorf("converter.ToProblemUpdateParameter. param: %+v, err: %w", parameter, err)
 		}
 
 		if err := h.studentUsecaseProblem.UpdateProblem(ctx, organizationID, operatorID, id, parameter); err != nil {
+			return liberrors.Errorf("failed to UpdateProblem. param: %+v, err: %w", parameter, err)
+		}
+
+		c.Status(http.StatusOK)
+		return nil
+	}, h.errorHandle)
+}
+func (h *problemHandler) UpdateProblemProperty(c *gin.Context) {
+	ctx := c.Request.Context()
+	logger := log.FromContext(ctx)
+	logger.Infof("UpdateProblem")
+
+	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
+		id, err := h.toProblemSelectParameter2(c)
+		if err != nil {
+			c.Status(http.StatusBadRequest)
+			return nil
+		}
+
+		param := entity.ProblemUpdateParameter{}
+		if err := c.BindJSON(&param); err != nil {
+			logger.Infof("failed to BindJSON. err: %v", err)
+			c.Status(http.StatusBadRequest)
+			return nil
+		}
+
+		parameter, err := converter.ToProblemUpdateParameter(&param)
+		if err != nil {
+			return liberrors.Errorf("converter.ToProblemUpdateParameter. param: %+v, err: %w", parameter, err)
+		}
+
+		if err := h.studentUsecaseProblem.UpdateProblemProperty(ctx, organizationID, operatorID, id, parameter); err != nil {
 			return liberrors.Errorf("failed to UpdateProblem. param: %+v, err: %w", parameter, err)
 		}
 

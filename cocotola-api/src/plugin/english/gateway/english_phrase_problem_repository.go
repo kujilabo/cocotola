@@ -87,6 +87,7 @@ func toEnglishPhraseProblemProperties(lang2, text, translated string) map[string
 }
 
 type newEnglishPhraseProblemParam struct {
+	Number     int
 	AudioID    uint
 	Lang2      string
 	Text       string
@@ -99,8 +100,14 @@ func toNewEnglishPhraseProblemParam(param appS.ProblemAddParameter) (*newEnglish
 		return nil, err
 	}
 
+	number, err := param.GetIntProperty("number")
+	if err != nil {
+		return nil, err
+	}
+
 	lang2, text, translated := fromEnglishPhraseProblemProperties(param.GetProperties())
 	m := &newEnglishPhraseProblemParam{
+		Number:     number,
 		AudioID:    uint(audioID),
 		Lang2:      lang2,
 		Text:       text,
@@ -308,7 +315,7 @@ func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operato
 		OrganizationID: uint(operator.GetOrganizationID()),
 		WorkbookID:     uint(param.GetWorkbookID()),
 		AudioID:        problemParam.AudioID,
-		Number:         param.GetNumber(),
+		Number:         problemParam.Number, // param.GetNumber(),
 		Text:           problemParam.Text,
 		Lang2:          problemParam.Lang2,
 		Translated:     problemParam.Translated,
@@ -323,6 +330,10 @@ func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operato
 }
 
 func (r *englishPhraseProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+	return errors.New("not implemented")
+}
+
+func (r *englishPhraseProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
 	return errors.New("not implemented")
 }
 

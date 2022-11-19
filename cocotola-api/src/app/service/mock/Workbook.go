@@ -437,6 +437,34 @@ func (_m *Workbook) UpdateProblem(ctx context.Context, operator domain.StudentMo
 	return r0, r1, r2
 }
 
+// UpdateProblemProperty provides a mock function with given fields: ctx, operator, id, param
+func (_m *Workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) (service.Added, service.Updated, error) {
+	ret := _m.Called(ctx, operator, id, param)
+
+	var r0 service.Added
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Added); ok {
+		r0 = rf(ctx, operator, id, param)
+	} else {
+		r0 = ret.Get(0).(service.Added)
+	}
+
+	var r1 service.Updated
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Updated); ok {
+		r1 = rf(ctx, operator, id, param)
+	} else {
+		r1 = ret.Get(1).(service.Updated)
+	}
+
+	var r2 error
+	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+		r2 = rf(ctx, operator, id, param)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
 // UpdateWorkbook provides a mock function with given fields: ctx, operator, version, parameter
 func (_m *Workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter service.WorkbookUpdateParameter) error {
 	ret := _m.Called(ctx, operator, version, parameter)

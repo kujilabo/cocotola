@@ -30,6 +30,8 @@ type Workbook interface {
 
 	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
 
+	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+
 	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error
 
 	UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter WorkbookUpdateParameter) error
@@ -134,6 +136,22 @@ func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentMod
 	}
 
 	return processor.UpdateProblem(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
+}
+
+func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error) {
+	logger := log.FromContext(ctx)
+	logger.Infof("workbook.UpdateProblem")
+
+	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
+		return 0, 0, errors.New("no update privilege")
+	}
+
+	processor, err := m.pf.NewProblemUpdateProcessor(m.GetWorkbookModel().GetProblemType())
+	if err != nil {
+		return 0, 0, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
+	}
+
+	return processor.UpdateProblemProperty(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
 }
 
 func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error {

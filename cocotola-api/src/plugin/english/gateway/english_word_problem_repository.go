@@ -108,6 +108,7 @@ func (e *englishWordProblemEntity) toProblem(ctx context.Context, synthesizerCli
 }
 
 type englishWordProblemAddParemeter struct {
+	Number            int `validate:"required"`
 	AudioID           uint
 	Text              string `validate:"required"`
 	Pos               int    `validate:"required"`
@@ -146,12 +147,18 @@ func toEnglishWordProblemAddParameter(param appS.ProblemAddParameter) (*englishW
 		return nil, err
 	}
 
+	number, err := param.GetIntProperty("number")
+	if err != nil {
+		return nil, err
+	}
+
 	pos, err := strconv.Atoi(param.GetProperties()["pos"])
 	if err != nil {
 		return nil, err
 	}
 
 	m := &englishWordProblemAddParemeter{
+		Number:     number,
 		AudioID:    uint(audioID),
 		Lang2:      param.GetProperties()["lang2"],
 		Text:       param.GetProperties()["text"],
@@ -161,22 +168,23 @@ func toEnglishWordProblemAddParameter(param appS.ProblemAddParameter) (*englishW
 	return m, libD.Validator.Struct(m)
 }
 
-type englishWordProblemUpdateParemeter struct {
-	AudioID           uint
-	Text              string `validate:"required"`
-	Phonetic          string
-	PresentThird      string
-	PresentParticiple string
-	PastTense         string
-	PastParticiple    string
-	Translated        string
-	PhraseID1         uint
-	PhraseID2         uint
-	SentenceID1       uint
-	SentenceID2       uint
-}
+// type englishWordProblemUpdateParemeter struct {
+// 	Number            int
+// 	AudioID           uint
+// 	Text              string `validate:"required"`
+// 	Phonetic          string
+// 	PresentThird      string
+// 	PresentParticiple string
+// 	PastTense         string
+// 	PastParticiple    string
+// 	Translated        string
+// 	PhraseID1         uint
+// 	PhraseID2         uint
+// 	SentenceID1       uint
+// 	SentenceID2       uint
+// }
 
-func toEnglishWordProblemUpdateParameter(param appS.ProblemUpdateParameter) (*englishWordProblemUpdateParemeter, error) {
+func toEnglishWordProblemUpdateParameter(newVersion int, updatedBy uint, param appS.ProblemUpdateParameter) (*englishWordProblemEntity, error) {
 	if _, ok := param.GetProperties()[service.EnglishWordProblemUpdatePropertyAudioID]; !ok {
 		return nil, liberrors.Errorf("audioId is not defined. err: %w", libD.ErrInvalidArgument)
 	}
@@ -196,13 +204,30 @@ func toEnglishWordProblemUpdateParameter(param appS.ProblemUpdateParameter) (*en
 		return nil, err
 	}
 
-	m := &englishWordProblemUpdateParemeter{
+	m := &englishWordProblemEntity{
+		Version:     newVersion,
+		UpdatedBy:   updatedBy,
 		AudioID:     uint(audioID),
 		Text:        text,
 		Translated:  param.GetProperties()[service.EnglishWordProblemUpdatePropertyTranslated],
 		SentenceID1: uint(sentenceID),
 	}
 	return m, libD.Validator.Struct(m)
+
+	// englishWordProblem := englishWordProblemEntity{
+	// 	Version:           id.GetVersion() + 1,
+	// 	UpdatedBy:         operator.GetID(),
+	// 	AudioID:           problemParam.AudioID,
+	// 	Number:            problemParam.Number,
+	// 	Phonetic:          problemParam.Phonetic,
+	// 	PresentThird:      problemParam.PresentThird,
+	// 	PresentParticiple: problemParam.PresentParticiple,
+	// 	PastTense:         problemParam.PastTense,
+	// 	PastParticiple:    problemParam.PastParticiple,
+	// 	Translated:        problemParam.Translated,
+	// 	SentenceID1:       problemParam.SentenceID1,
+	// }
+
 }
 
 type englishWordProblemRepository struct {
@@ -399,7 +424,7 @@ func (r *englishWordProblemRepository) AddProblem(ctx context.Context, operator 
 		OrganizationID:    uint(operator.GetOrganizationID()),
 		WorkbookID:        uint(param.GetWorkbookID()),
 		AudioID:           problemParam.AudioID,
-		Number:            param.GetNumber(),
+		Number:            problemParam.Number, //            param.GetNumber(),
 		Text:              problemParam.Text,
 		Pos:               problemParam.Pos,
 		Phonetic:          problemParam.Phonetic,
@@ -425,26 +450,26 @@ func (r *englishWordProblemRepository) UpdateProblem(ctx context.Context, operat
 
 	logger := log.FromContext(ctx)
 
-	problemParam, err := toEnglishWordProblemUpdateParameter(param)
+	englishWordProblem, err := toEnglishWordProblemUpdateParameter(id.GetVersion()+1, operator.GetID(), param)
 	if err != nil {
 		return liberrors.Errorf("failed to toEnglishWordProblemUdateParameter. param: %+v, err: %w", param, err)
 	}
 
-	englishWordProblem := englishWordProblemEntity{
-		Version:           id.GetVersion() + 1,
-		UpdatedBy:         operator.GetID(),
-		AudioID:           problemParam.AudioID,
-		Number:            param.GetNumber(),
-		Phonetic:          problemParam.Phonetic,
-		PresentThird:      problemParam.PresentThird,
-		PresentParticiple: problemParam.PresentParticiple,
-		PastTense:         problemParam.PastTense,
-		PastParticiple:    problemParam.PastParticiple,
-		Translated:        problemParam.Translated,
-		SentenceID1:       problemParam.SentenceID1,
-	}
+	// englishWordProblem := englishWordProblemEntity{
+	// 	Version:           id.GetVersion() + 1,
+	// 	UpdatedBy:         operator.GetID(),
+	// 	AudioID:           problemParam.AudioID,
+	// 	Number:            problemParam.Number,
+	// 	Phonetic:          problemParam.Phonetic,
+	// 	PresentThird:      problemParam.PresentThird,
+	// 	PresentParticiple: problemParam.PresentParticiple,
+	// 	PastTense:         problemParam.PastTense,
+	// 	PastParticiple:    problemParam.PastParticiple,
+	// 	Translated:        problemParam.Translated,
+	// 	SentenceID1:       problemParam.SentenceID1,
+	// }
 
-	logger.Infof("englishWordProblemRepository.UpdateProblem. text: %s", problemParam.Text)
+	logger.Infof("englishWordProblemRepository.UpdateProblem. text: %s", englishWordProblem.Text)
 
 	result := r.db.
 		Where("organization_id = ?", uint(operator.GetOrganizationID())).
@@ -462,6 +487,12 @@ func (r *englishWordProblemRepository) UpdateProblem(ctx context.Context, operat
 	}
 
 	return nil
+}
+
+func (r *englishWordProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+	ctx, span := tracer.Start(ctx, "englishWordProblemRepository.UpdateProblem")
+	defer span.End()
+	return errors.New("not implemented")
 }
 
 func (r *englishWordProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {

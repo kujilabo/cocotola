@@ -18,6 +18,8 @@ type ProblemAddProcessor interface {
 
 type ProblemUpdateProcessor interface {
 	UpdateProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+
+	UpdateProblemProperty(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
 }
 
 type ProblemRemoveProcessor interface {

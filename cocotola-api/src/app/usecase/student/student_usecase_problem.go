@@ -32,6 +32,8 @@ type StudentUsecaseProblem interface {
 
 	UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error
 
+	UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error
+
 	RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2) error
 
 	ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType string) (service.ProblemAddParameterIterator, error)) error
@@ -185,6 +187,22 @@ func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationI
 	return nil
 }
 
+func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, id.GetWorkbookID())
+		if err != nil {
+			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
+		}
+		if err := s.updateProblemProperty(ctx, student, workbook, id, param); err != nil {
+			return liberrors.Errorf("failed to UpdateProblem. err: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2) error {
 	logger := log.FromContext(ctx)
 	logger.Debug("ProblemService.RemoveProblem")
@@ -317,6 +335,35 @@ func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student servi
 	added, updated, err := workbook.UpdateProblem(ctx, student, id, param)
 	if err != nil {
 		return liberrors.Errorf("failed to UpdateProblem. err: %w", err)
+	}
+	if added > 0 {
+		if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {
+			return err
+		}
+	} else if added < 0 {
+		if err := student.DecrementQuotaUsage(ctx, problemType, "Size", -int(added)); err != nil {
+			return err
+		}
+	}
+	if updated > 0 {
+		if err := student.IncrementQuotaUsage(ctx, problemType, "Update", int(updated)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *studentUsecaseProblem) updateProblemProperty(ctx context.Context, student service.Student, workbook service.Workbook, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+	problemType := workbook.GetProblemType()
+	if err := student.CheckQuota(ctx, problemType, "Size"); err != nil {
+		return liberrors.Errorf("student.CheckQuota(size). err: %w", err)
+	}
+	if err := student.CheckQuota(ctx, problemType, "Update"); err != nil {
+		return liberrors.Errorf("student.CheckQuota(udpate). err: %w", err)
+	}
+	added, updated, err := workbook.UpdateProblemProperty(ctx, student, id, param)
+	if err != nil {
+		return liberrors.Errorf("workbook.UpdateProblemProperty. err: %w", err)
 	}
 	if added > 0 {
 		if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {

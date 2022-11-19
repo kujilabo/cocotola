@@ -97,7 +97,7 @@ func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, op
 		"lang2":      extractedParam.Lang2,
 		"audioId":    strconv.Itoa(int(audioID)),
 	}
-	newParam, err := appS.NewProblemAddParameter(param.GetWorkbookID(), param.GetNumber(), properties)
+	newParam, err := appS.NewProblemAddParameter(param.GetWorkbookID() /*param.GetNumber(),*/, properties)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to NewParameter. err: %w", err)
 	}

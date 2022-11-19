@@ -26,6 +26,7 @@ type ProblemFindResponse struct {
 
 type SimpleProblem struct {
 	ID          uint            `json:"id" validate:"required,gte=1"`
+	Version     int             `json:"version" validate:"required,gte=1"`
 	Number      int             `json:"number"`
 	ProblemType string          `json:"problemType" validate:"required"`
 	Properties  json.RawMessage `json:"properties"`
@@ -37,12 +38,12 @@ type ProblemFindAllResponse struct {
 }
 
 type ProblemAddParameter struct {
-	Number     int             `json:"number" binding:"required"`
+	// Number     int             `json:"number" binding:"required"`
 	Properties json.RawMessage `json:"properties"`
 }
 
 type ProblemUpdateParameter struct {
-	Number     int             `json:"number" binding:"required"`
+	// Number     int             `json:"number" binding:"required"`
 	Properties json.RawMessage `json:"properties"`
 }
 

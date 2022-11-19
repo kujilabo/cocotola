@@ -37,12 +37,13 @@ func (r *englishSentenceProblemAddParameterCSVReader) Next() (appS.ProblemAddPar
 	}
 
 	properties := map[string]string{
+		"number":     "1",
 		"lang2":      "ja",
 		"text":       line[1],
 		"translated": line[2],
 	}
 
-	param, err := appS.NewProblemAddParameter(r.workbookID, r.num, properties)
+	param, err := appS.NewProblemAddParameter(r.workbookID /*r.num,*/, properties)
 	if err != nil {
 		return nil, err
 	}

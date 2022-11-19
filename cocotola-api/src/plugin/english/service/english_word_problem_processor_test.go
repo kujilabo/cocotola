@@ -82,7 +82,7 @@ func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *
 	require.Equal(t, 100, int(problemIDs[0]))
 	paramCheck := mock.MatchedBy(func(p appS.ProblemAddParameter) bool {
 		require.Equal(t, 1, int(p.GetWorkbookID()))
-		require.Equal(t, 2, p.GetNumber())
+		require.Equal(t, 2, p.GetProperties()["number"])
 		require.Equal(t, "ペン", p.GetProperties()["translated"])
 		require.Equal(t, "pen", p.GetProperties()["text"])
 		require.Equal(t, "ja", p.GetProperties()["lang2"])
@@ -131,7 +131,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 	{
 		param := (problemRepo.Calls[0].Arguments[2]).(appS.ProblemAddParameter)
 		assert.Equal(t, 1, int(param.GetWorkbookID()))
-		assert.Equal(t, 2, param.GetNumber())
+		assert.Equal(t, 2, param.GetProperties()["number"])
 		assert.Equal(t, "本", param.GetProperties()["translated"])
 		assert.Equal(t, "book", param.GetProperties()["text"])
 		assert.Equal(t, "ja", param.GetProperties()["lang2"])
@@ -141,7 +141,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 	{
 		param := (problemRepo.Calls[1].Arguments[2]).(appS.ProblemAddParameter)
 		assert.Equal(t, 1, int(param.GetWorkbookID()))
-		assert.Equal(t, 2, param.GetNumber())
+		assert.Equal(t, 2, param.GetProperties()["number"])
 		assert.Equal(t, "予約する", param.GetProperties()["translated"])
 		assert.Equal(t, "book", param.GetProperties()["text"])
 		assert.Equal(t, "ja", param.GetProperties()["lang2"])
@@ -183,7 +183,7 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	problemRepo.AssertNumberOfCalls(t, "UpdateProblem", 1)
 	{
 		param := (problemRepo.Calls[0].Arguments[3]).(appS.ProblemUpdateParameter)
-		assert.Equal(t, 2, param.GetNumber())
+		assert.Equal(t, "2", param.GetProperties()["number"])
 		assert.Equal(t, "ペン", param.GetProperties()["translated"])
 		assert.Equal(t, "pen", param.GetProperties()["text"])
 		assert.Equal(t, "0", param.GetProperties()["audioId"])
