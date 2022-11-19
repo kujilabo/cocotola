@@ -87,7 +87,7 @@ export const tatoebaSentenceFindSlice = createSlice({
         state.failed = false;
         state.sentences = action.payload.response.results || [];
       })
-      .addCase(findTatoebaSentences.rejected, (state, action) => {
+      .addCase(findTatoebaSentences.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

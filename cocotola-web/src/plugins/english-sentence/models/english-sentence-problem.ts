@@ -1,4 +1,4 @@
-import { ProblemModel, propertyObject } from '@/models/problem';
+import { ProblemModel } from '@/models/problem';
 export class EnglishSentenceProblemModel {
   id: number;
   version: number;
@@ -39,7 +39,7 @@ export class EnglishSentenceProblemModel {
 
   static of(p: ProblemModel): EnglishSentenceProblemModel {
     if (p.properties) {
-      const properties = p.properties as propertyObject;
+      const properties = p.properties;
 
       return {
         id: p.id,

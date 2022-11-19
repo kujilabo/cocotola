@@ -106,7 +106,7 @@ export const workbookFindSlice = createSlice({
         };
         // onsole.log('workbooksLoadedMap', state.workbooksLoadedMap);
       })
-      .addCase(findMyWorkbooks.rejected, (state, action) => {
+      .addCase(findMyWorkbooks.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

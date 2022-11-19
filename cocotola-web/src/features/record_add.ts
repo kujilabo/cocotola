@@ -33,11 +33,11 @@ export const addRecord = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .post(url, arg.param, jsonRequestConfig(accessToken))
-        .then((resp) => {
+        .then(() => {
           arg.postSuccessProcess();
           return { param: arg.param } as RecordAddResult;
         })
@@ -68,11 +68,11 @@ export const recordAddSlice = createSlice({
       .addCase(addRecord.pending, (state) => {
         state.loading = true;
       })
-      .addCase(addRecord.fulfilled, (state, action) => {
+      .addCase(addRecord.fulfilled, (state) => {
         state.loading = false;
         state.failed = false;
       })
-      .addCase(addRecord.rejected, (state, action) => {
+      .addCase(addRecord.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       });

@@ -5,14 +5,14 @@ import { ActionCreatorWithPayload, Reducer } from '@reduxjs/toolkit';
 import { CustomProblem } from '@/containers/workbook/problem/CustomProblem';
 import { ProblemModel } from '@/models/problem';
 import { WorkbookModel } from '@/models/workbook';
-
+import { EnglishSentenceProblemReadOnly } from '@/plugins/english-sentence/components/workbook/problem/EnglishSentenceProblemReadOnly';
+import { EnglishSentenceProblemReadWrite } from '@/plugins/english-sentence/components/workbook/problem/EnglishSentenceProblemReadWrite';
+import { EnglishSentenceMemorization } from '@/plugins/english-sentence/components/workbook/study/memorization/EnglishSentenceMemorization';
 import {
   englishSentenceSlice,
+  EnglishSentenceState,
   initEnglishSentenceStatus,
-} from '../../..//features/english_sentence_study';
-import { EnglishSentenceProblemReadOnly } from '../../../components/workbook/problem/EnglishSentenceProblemReadOnly';
-import { EnglishSentenceProblemReadWrite } from '../../../components/workbook/problem/EnglishSentenceProblemReadWrite';
-import { EnglishSentenceMemorization } from '../../../components/workbook/study/memorization/EnglishSentenceMemorization';
+} from '@/plugins/english-sentence/features/english_sentence_study';
 
 import { EnglishSentenceProblemEdit } from './EnglishSentenceProblemEdit';
 import { EnglishSentenceProblemMenu } from './EnglishSentenceProblemMenu';
@@ -23,7 +23,7 @@ export class EnglishSentenceProblem extends CustomProblem {
     return 'english_sentence';
   }
 
-  getReducer(): Reducer {
+  getReducer(): Reducer<EnglishSentenceState> {
     return englishSentenceSlice.reducer;
   }
 

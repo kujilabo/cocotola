@@ -62,13 +62,7 @@ export const EnglishWordProblemEditFormikForm = (
     validationSchema: Yup.object().shape({
       text: Yup.string().required('Word is required'),
     }),
-    handleSubmit: (
-      values: EnglishWordProblemEditFormValues,
-      formikBag: FormikBag<
-        EnglishWordProblemEditFormikFormProps,
-        EnglishWordProblemEditFormValues
-      >
-    ) => {
+    handleSubmit: (values: EnglishWordProblemEditFormValues) => {
       // onsole.log('handleSubmit');
       const f = async () => {
         await dispatch(

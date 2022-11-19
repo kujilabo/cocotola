@@ -34,7 +34,7 @@ export const removeWorkbook = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .delete(url, jsonRequestConfig(accessToken))
@@ -71,10 +71,10 @@ export const workbookRemoveSlice = createSlice({
       .addCase(removeWorkbook.pending, (state) => {
         state.loading = true;
       })
-      .addCase(removeWorkbook.fulfilled, (state, action) => {
+      .addCase(removeWorkbook.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(removeWorkbook.rejected, (state, action) => {
+      .addCase(removeWorkbook.rejected, (state) => {
         state.loading = false;
       });
   },

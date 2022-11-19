@@ -11,7 +11,7 @@ export const InputWord = (props: InputWordProps): React.ReactElement => {
   return (
     <Input
       name="text"
-      label={t('Word')}
+      label={String(t('Word'))}
       placeholder="english word"
       errorPrompt
       disabled={props.disabled}

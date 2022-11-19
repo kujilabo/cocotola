@@ -59,7 +59,9 @@ export const EnglishWordProblemEditForm = (
   let sentence2 = emptyTatoebaSentence;
   if (values.exampleSentenceNote && values.exampleSentenceNote !== '') {
     try {
-      const noteObj = JSON.parse(values.exampleSentenceNote);
+      const noteObj: { [key: string]: string } = JSON.parse(
+        values.exampleSentenceNote
+      );
       console.log('noteObj', noteObj);
       sentence1 = {
         text: values.exampleSentenceText,

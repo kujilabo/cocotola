@@ -22,7 +22,7 @@ export interface problemPropertyEditFormikFormArgs<
   problemVersion: number;
   problemType: string;
   toField: (v: V) => ReactElement;
-  validationSchema: Yup.ObjectSchema<any>;
+  validationSchema: Yup.ObjectSchema<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   propsToValues: (props: P) => V;
   valuesToProperties: (values: V) => { [key: string]: string };
   resetValues: (v: V) => void;

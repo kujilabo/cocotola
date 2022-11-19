@@ -37,7 +37,7 @@ export const updateWorkbook = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .put(url, arg.param, jsonRequestConfig(accessToken))
@@ -74,10 +74,10 @@ export const workbookUpdateSlice = createSlice({
       .addCase(updateWorkbook.pending, (state) => {
         state.loading = true;
       })
-      .addCase(updateWorkbook.fulfilled, (state, action) => {
+      .addCase(updateWorkbook.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(updateWorkbook.rejected, (state, action) => {
+      .addCase(updateWorkbook.rejected, (state) => {
         state.loading = false;
       });
   },

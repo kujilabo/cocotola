@@ -47,8 +47,7 @@ export const PrivateWorkbookNewFormikForm = (
         await dispatch(
           addWorkbook({
             param: { ...values, spaceKey: 'personal' },
-            postSuccessProcess: (id: number) =>
-              navigate('/app/private/workbook'),
+            postSuccessProcess: () => navigate('/app/private/workbook'),
             postFailureProcess: setErrorMessage,
           })
         );

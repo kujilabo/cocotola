@@ -69,12 +69,12 @@ export const translationAddSlice = createSlice({
       .addCase(addTranslation.pending, (state) => {
         state.loading = true;
       })
-      .addCase(addTranslation.fulfilled, (state, action) => {
+      .addCase(addTranslation.fulfilled, (state) => {
         // onsole.log('workbook', action.payload.response);
         state.loading = false;
         state.failed = false;
       })
-      .addCase(addTranslation.rejected, (state, action) => {
+      .addCase(addTranslation.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

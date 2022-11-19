@@ -84,7 +84,7 @@ export const translationFindSlice = createSlice({
         state.failed = false;
         state.translations = action.payload.response.results || [];
       })
-      .addCase(findTranslations.rejected, (state, action) => {
+      .addCase(findTranslations.rejected, (state) => {
         // onsole.log('rejected', action);
         state.loading = false;
         state.failed = true;

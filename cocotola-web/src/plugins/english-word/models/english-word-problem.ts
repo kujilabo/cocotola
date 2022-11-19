@@ -1,4 +1,4 @@
-import { ProblemModel, propertyObject, propertyArray } from '@/models/problem';
+import { ProblemModel, property2 } from '@/models/problem';
 
 export const POS_ADJ = 1; // 形容詞
 export const POS_ADV = 2; // 副詞
@@ -66,15 +66,15 @@ export class EnglishWordProblemModel {
     };
 
     if (p.properties) {
-      const properties = p.properties as propertyObject;
-      const sentences: propertyArray = properties['sentences'] as propertyArray;
-      const sentence: { [key: string]: string } = sentences[0] as {
-        [key: string]: string;
-      };
-      if (sentence) {
-        sentence1.text = sentence['text'];
-        sentence1.translated = String(sentence['translated']);
-        sentence1.note = String(sentence['note']);
+      const properties = p.properties;
+      const sentences = properties['sentences'] as property2[];
+      if (sentences && sentences[0]) {
+        const sentence = sentences[0] as { [key: string]: string };
+        if (sentence) {
+          sentence1.text = sentence['text'];
+          sentence1.translated = String(sentence['translated']);
+          sentence1.note = String(sentence['note']);
+        }
       }
       // console.log(sentences);
       // console.log(sentences[0]['text']);

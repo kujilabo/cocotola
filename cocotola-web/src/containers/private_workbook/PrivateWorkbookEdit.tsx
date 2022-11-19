@@ -170,7 +170,7 @@ export const PrivateWorkbookEdit = (): ReactElement => {
         await dispatch(
           updateWorkbook({
             param: { ...formValues },
-            postSuccessProcess: (id: number) =>
+            postSuccessProcess: () =>
               navigate(`/app/private/workbook/${workbookId}`),
             postFailureProcess: setErrorMessage,
           })

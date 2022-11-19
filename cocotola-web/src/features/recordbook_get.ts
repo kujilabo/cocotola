@@ -32,7 +32,7 @@ export const getRecordbook = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .get(url, { headers: jsonHeaders(accessToken), data: {} })
@@ -125,7 +125,7 @@ export const recordbookGetSlice = createSlice({
         state.failed = false;
         state.recordbook = action.payload.response;
       })
-      .addCase(getRecordbook.rejected, (state, action) => {
+      .addCase(getRecordbook.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       })
@@ -138,7 +138,7 @@ export const recordbookGetSlice = createSlice({
         state.failed = false;
         state.completionRateMap = action.payload.response;
       })
-      .addCase(getCompletionRate.rejected, (state, action) => {
+      .addCase(getCompletionRate.rejected, (state) => {
         state.loading = false;
         state.failed = true;
       });

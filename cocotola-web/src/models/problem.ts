@@ -1,16 +1,18 @@
-export type property =
+export type property3 = null | boolean | number | string;
+export type property2 =
   | null
   | boolean
   | number
   | string
-  | propertyArray
-  | propertyObject;
-
-export type propertyArray = Array<property>;
-
-export interface propertyObject {
-  [key: string]: property;
-}
+  | property3[]
+  | { [key: string]: property3 };
+export type property1 =
+  | null
+  | boolean
+  | number
+  | string
+  | property2[]
+  | { [key: string]: property2 };
 
 export class ProblemModel {
   id: number;
@@ -18,14 +20,14 @@ export class ProblemModel {
   updatedAt: string;
   number: number;
   problemType: string;
-  properties: { [key: string]: any };
+  properties: { [key: string]: property1 };
   constructor(
     id: number,
     version: number,
     updatedAt: string,
     number: number,
     problemType: string,
-    properties: { [key: string]: any }
+    properties: { [key: string]: property1 }
   ) {
     this.id = id;
     this.version = version;

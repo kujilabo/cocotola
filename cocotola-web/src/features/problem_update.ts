@@ -39,7 +39,7 @@ export const updateProblem = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
 
       return axios
@@ -93,7 +93,7 @@ export const updateProblemProperty = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
 
       return axios
@@ -136,10 +136,10 @@ export const problemUpdateSlice = createSlice({
       .addCase(updateProblem.pending, (state) => {
         state.loading = true;
       })
-      .addCase(updateProblem.fulfilled, (state, action) => {
+      .addCase(updateProblem.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(updateProblem.rejected, (state, action) => {
+      .addCase(updateProblem.rejected, (state) => {
         state.loading = false;
       });
   },

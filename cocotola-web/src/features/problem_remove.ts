@@ -36,7 +36,7 @@ export const removeProblem = createAsyncThunk<
   const { refreshToken } = thunkAPI.getState().auth;
   return await thunkAPI
     .dispatch(refreshAccessToken({ refreshToken: refreshToken }))
-    .then((resp) => {
+    .then(() => {
       const { accessToken } = thunkAPI.getState().auth;
       return axios
         .delete(url, jsonRequestConfig(accessToken))
@@ -73,10 +73,10 @@ export const problemRemoveSlice = createSlice({
       .addCase(removeProblem.pending, (state) => {
         state.loading = true;
       })
-      .addCase(removeProblem.fulfilled, (state, action) => {
+      .addCase(removeProblem.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(removeProblem.rejected, (state, action) => {
+      .addCase(removeProblem.rejected, (state) => {
         state.loading = false;
       });
   },
