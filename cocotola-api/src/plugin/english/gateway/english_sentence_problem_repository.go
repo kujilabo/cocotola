@@ -485,7 +485,7 @@ func (r *englishSentenceProblemRepository) UpdateProblem(ctx context.Context, op
 }
 
 func (r *englishSentenceProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
-	ctx, span := tracer.Start(ctx, "englishSentenceProblemRepository.UpdateProblemProperty")
+	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.UpdateProblemProperty")
 	defer span.End()
 
 	entity, err := toEnglishSentenceProblemPropertyUpdateParameter(id.GetVersion()+1, operator.GetID(), param)

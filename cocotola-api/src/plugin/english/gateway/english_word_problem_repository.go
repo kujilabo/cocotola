@@ -490,7 +490,7 @@ func (r *englishWordProblemRepository) UpdateProblem(ctx context.Context, operat
 }
 
 func (r *englishWordProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
-	ctx, span := tracer.Start(ctx, "englishWordProblemRepository.UpdateProblem")
+	_, span := tracer.Start(ctx, "englishWordProblemRepository.UpdateProblem")
 	defer span.End()
 	return errors.New("not implemented")
 }
