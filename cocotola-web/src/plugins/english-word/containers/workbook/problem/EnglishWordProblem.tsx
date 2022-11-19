@@ -84,6 +84,7 @@ export class EnglishWordProblem extends CustomProblem {
             { url: '/app/private/workbook', text: 'My Workbooks' },
           ]}
           workbookUrl={'/app/private/workbook/'}
+          studyType={studyType}
         />
       );
     } else {

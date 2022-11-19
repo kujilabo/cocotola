@@ -1,5 +1,6 @@
 import { FC, ReactElement, useState, Dispatch, SetStateAction } from 'react';
 
+import { FormikProps } from 'formik';
 import { Input, Select } from 'formik-semantic-ui-react';
 import { Container, Divider } from 'semantic-ui-react';
 import * as Yup from 'yup';
@@ -32,7 +33,8 @@ const newFormikForm = (
   return ProblemNewFormikForm({
     workbookId: workbookId,
     problemType: EnglishWordProblemTypeId,
-    toContent: (values: formValues) => {
+    toContent: (props: FormikProps<formValues>) => {
+      const { values } = props;
       return (
         <>
           <Input

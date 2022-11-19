@@ -1,4 +1,4 @@
-import { ProblemModel } from '@/models/problem';
+import { ProblemModel, propertyObject, propertyArray } from '@/models/problem';
 
 export const POS_ADJ = 1; // 形容詞
 export const POS_ADV = 2; // 副詞
@@ -28,7 +28,7 @@ export class EnglishWordProblemModel {
   problemType: string;
   audioId: number;
   text: string;
-  pos: string;
+  pos: number;
   lang2: string;
   translated: string;
   sentence1: EnglishWordProblemSentenceModel;
@@ -40,7 +40,7 @@ export class EnglishWordProblemModel {
     problemType: string,
     audioId: number,
     text: string,
-    pos: string,
+    pos: number,
     lang2: string,
     translated: string,
     sentence1: EnglishWordProblemSentenceModel
@@ -65,16 +65,34 @@ export class EnglishWordProblemModel {
       note: '',
     };
 
-    const sentences = p.properties['sentences'];
-    const sentence: { [key: string]: string } = sentences[0];
-    if (sentence) {
-      sentence1.text = sentence['text'];
-      sentence1.translated = sentence['translated'];
-      sentence1.note = sentence['note'];
+    if (p.properties) {
+      const properties = p.properties as propertyObject;
+      const sentences: propertyArray = properties['sentences'] as propertyArray;
+      const sentence: { [key: string]: string } = sentences[0] as {
+        [key: string]: string;
+      };
+      if (sentence) {
+        sentence1.text = sentence['text'];
+        sentence1.translated = String(sentence['translated']);
+        sentence1.note = String(sentence['note']);
+      }
       // console.log(sentences);
       // console.log(sentences[0]['text']);
       // console.log(sentences[0]['translated']);
       // console.log(sentences[0]['note']);
+      return {
+        id: p.id,
+        version: p.version,
+        updatedAt: p.updatedAt,
+        number: p.number,
+        problemType: p.problemType,
+        audioId: +(properties['audioId'] || 0),
+        text: String(properties['text']),
+        pos: +(properties['pos'] || 0),
+        lang2: String(properties['lang2']),
+        translated: String(properties['translated']),
+        sentence1,
+      };
     }
 
     return {
@@ -83,11 +101,11 @@ export class EnglishWordProblemModel {
       updatedAt: p.updatedAt,
       number: p.number,
       problemType: p.problemType,
-      audioId: +p.properties['audioId'],
-      text: String(p.properties['text']),
-      pos: String(p.properties['pos']),
-      lang2: String(p.properties['lang2']),
-      translated: String(p.properties['translated']),
+      audioId: 0,
+      text: '',
+      pos: 0,
+      lang2: '',
+      translated: '',
       sentence1,
     };
   }

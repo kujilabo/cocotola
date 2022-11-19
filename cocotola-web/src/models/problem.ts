@@ -1,24 +1,31 @@
+export type property =
+  | null
+  | boolean
+  | number
+  | string
+  | propertyArray
+  | propertyObject;
+
+export type propertyArray = Array<property>;
+
+export interface propertyObject {
+  [key: string]: property;
+}
+
 export class ProblemModel {
   id: number;
   version: number;
   updatedAt: string;
   number: number;
   problemType: string;
-  properties: {
-    [key: string]:
-      | number
-      | string
-      | boolean
-      | string[]
-      | { [key: string]: number | string | boolean };
-  };
+  properties: { [key: string]: any };
   constructor(
     id: number,
     version: number,
     updatedAt: string,
     number: number,
     problemType: string,
-    properties: { [key: string]: number | string | boolean }
+    properties: { [key: string]: any }
   ) {
     this.id = id;
     this.version = version;

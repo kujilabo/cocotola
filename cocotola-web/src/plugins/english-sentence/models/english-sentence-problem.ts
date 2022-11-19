@@ -1,5 +1,4 @@
-import { ProblemModel } from '@/models/problem';
-
+import { ProblemModel, propertyObject } from '@/models/problem';
 export class EnglishSentenceProblemModel {
   id: number;
   version: number;
@@ -7,7 +6,7 @@ export class EnglishSentenceProblemModel {
   number: number;
   problemType: string;
   provider: string;
-  audioId: string;
+  audioId: number;
   text: string;
   lang2: string;
   translated: string;
@@ -19,7 +18,7 @@ export class EnglishSentenceProblemModel {
     number: number,
     problemType: string,
     provider: string,
-    audioId: string,
+    audioId: number,
     text: string,
     lang2: string,
     translated: string
@@ -39,17 +38,35 @@ export class EnglishSentenceProblemModel {
   }
 
   static of(p: ProblemModel): EnglishSentenceProblemModel {
+    if (p.properties) {
+      const properties = p.properties as propertyObject;
+
+      return {
+        id: p.id,
+        version: p.version,
+        updatedAt: p.updatedAt,
+        number: p.number,
+        problemType: p.problemType,
+        provider: String(properties['provider']),
+        audioId: +(properties['audioId'] || 0),
+        text: String(properties['text']),
+        lang2: String(properties['lang2']),
+        translated: String(properties['translated']),
+        // note: '' + p.properties['note'],
+      };
+    }
+
     return {
       id: p.id,
       version: p.version,
       updatedAt: p.updatedAt,
       number: p.number,
       problemType: p.problemType,
-      provider: String(p.properties['provider']),
-      audioId: String(p.properties['audioId']),
-      text: String(p.properties['text']),
-      lang2: String(p.properties['lang2']),
-      translated: String(p.properties['translated']),
+      provider: '',
+      audioId: 0,
+      text: '',
+      lang2: '',
+      translated: '',
       // note: '' + p.properties['note'],
     };
   }

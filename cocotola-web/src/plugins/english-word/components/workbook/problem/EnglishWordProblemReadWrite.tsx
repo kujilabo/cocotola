@@ -9,6 +9,7 @@ import { AudioButton, DangerModal, ErrorMessage } from '@/components';
 import { getAudio, selectAudioViewLoading } from '@/features/audio';
 import { removeProblem } from '@/features/problem_remove';
 import { ProblemModel } from '@/models/problem';
+import { EnglishWordProblemModel } from '@/plugins/english-word/models/english-word-problem';
 import { emptyFunction } from '@/utils/util';
 
 import { toDsiplayText } from '../../../utils/util';
@@ -25,6 +26,7 @@ export const EnglishWordProblemReadWrite: React.FC<
   const [errorMessage, setErrorMessage] = useState('');
   const baseUrl = `/app/private/workbook/${workbookId}/problem/${problemId}`;
   const audioViewLoading = useAppSelector(selectAudioViewLoading);
+  const problem = EnglishWordProblemModel.of(props.problem);
   const loadAndPlay = (postFunc: (value: string) => void) => {
     const f = async () => {
       await dispatch(
@@ -33,7 +35,7 @@ export const EnglishWordProblemReadWrite: React.FC<
             updatedAt: props.problem.updatedAt,
             workbookId: workbookId,
             problemId: problemId,
-            audioId: props.problem.properties['audioId'],
+            audioId: problem.audioId,
           },
           postFunc: postFunc,
           postSuccessProcess: emptyFunction,
@@ -64,7 +66,7 @@ export const EnglishWordProblemReadWrite: React.FC<
     <Card fluid>
       <Card.Content>
         <Card.Header>
-          <Header floated="left">{props.problem.properties['text']}</Header>
+          <Header floated="left">{problem.text}</Header>
           <Header floated="right">
             <Dropdown item text="" icon="bars">
               <Dropdown.Menu>
@@ -97,12 +99,12 @@ export const EnglishWordProblemReadWrite: React.FC<
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {toDsiplayText(+props.problem.properties['pos'])}
+                {toDsiplayText(problem.pos)}
               </Header>
             </Grid.Column>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['translated']}
+                {problem.translated}
               </Header>
             </Grid.Column>
           </Grid.Row>
@@ -111,7 +113,7 @@ export const EnglishWordProblemReadWrite: React.FC<
           <Grid.Row>
             <Grid.Column>
               <Header component="h2" className="border-bottom g-mb-15">
-                {props.problem.properties['phonetic']}
+                {/* {problem.phonetic} */}
               </Header>
             </Grid.Column>
             <Grid.Column></Grid.Column>
@@ -119,10 +121,10 @@ export const EnglishWordProblemReadWrite: React.FC<
         </Grid>
       </Card.Content>
       <Card.Content extra>
-        {props.problem.properties['audioId'] !== '0' ? (
+        {problem.audioId !== 0 ? (
           <Button.Group floated="left">
             <AudioButton
-              id={props.problem.properties['audioId']}
+              id={problem.audioId}
               loadAndPlay={(postFunc: (value: string) => void) =>
                 loadAndPlay(postFunc)
               }

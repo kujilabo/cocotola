@@ -200,7 +200,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
   const tatoebaSentenceFindLoading = useAppSelector(selectTatoebaFindLoading);
   const [values, setValues] = useState({
     text: problem.text,
-    pos: problem.pos,
+    pos: String(problem.pos),
     lang2: problem.lang2,
     translated: problem.translated,
     exampleSentenceText: problem.sentence1.text,
@@ -216,7 +216,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
     setValues({
       ...values,
       text: problem.text,
-      pos: problem.pos,
+      pos: String(problem.pos),
       lang2: problem.lang2,
       translated: problem.translated,
       exampleSentenceText: problem.sentence1.text,
@@ -269,7 +269,7 @@ export const EnglishWordProblemEdit: FC<EnglishWordProblemEditProps> = (
       <Divider hidden />
       <EnglishWordProblemEditFormikForm
         text={values.text}
-        pos={values.pos}
+        pos={String(values.pos)}
         lang2={values.lang2}
         translated={values.translated}
         exampleSentenceText={values.exampleSentenceText}
