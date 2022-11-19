@@ -22,7 +22,6 @@ var ErrProblemOtherError = errors.New("problem other error")
 
 type ProblemAddParameter interface {
 	GetWorkbookID() domain.WorkbookID
-	// GetNumber() int
 	GetProperties() map[string]string
 	GetStringProperty(name string) (string, error)
 	GetIntProperty(name string) (int, error)
@@ -30,14 +29,12 @@ type ProblemAddParameter interface {
 
 type problemAddParameter struct {
 	WorkbookID domain.WorkbookID `validate:"required"`
-	// Number     int               `validate:"required"`
 	Properties map[string]string
 }
 
-func NewProblemAddParameter(workbookID domain.WorkbookID /*number int, */, properties map[string]string) (ProblemAddParameter, error) {
+func NewProblemAddParameter(workbookID domain.WorkbookID, properties map[string]string) (ProblemAddParameter, error) {
 	m := &problemAddParameter{
 		WorkbookID: workbookID,
-		// Number:     number,
 		Properties: properties,
 	}
 
@@ -127,30 +124,23 @@ func (p *problemSelectParameter2) GetVersion() int {
 }
 
 type ProblemUpdateParameter interface {
-	// GetNumber() int
 	GetProperties() map[string]string
 	GetStringProperty(name string) (string, error)
 	GetIntProperty(name string) (int, error)
 }
 
 type problemUpdateParameter struct {
-	// Number     int `validate:"required"`
 	Properties map[string]string
 }
 
-func NewProblemUpdateParameter(
-	/*number int,*/ properties map[string]string) (ProblemUpdateParameter, error) {
+func NewProblemUpdateParameter(properties map[string]string) (ProblemUpdateParameter, error) {
 	m := &problemUpdateParameter{
-		// Number:     number,
 		Properties: properties,
 	}
 
 	return m, libD.Validator.Struct(m)
 }
 
-// func (p *problemUpdateParameter) GetNumber() int {
-// 	return p.Number
-// }
 func (p *problemUpdateParameter) GetProperties() map[string]string {
 	return p.Properties
 }
@@ -170,7 +160,6 @@ func (p *problemUpdateParameter) GetIntProperty(name string) (int, error) {
 }
 
 type ProblemPropertyUpdateParameter interface {
-	// GetNumber() int
 	GetKey() string
 	GetValue() string
 }
@@ -189,12 +178,10 @@ func NewProblemPropertyUpdateParameter(key, value string) (ProblemPropertyUpdate
 	return m, libD.Validator.Struct(m)
 }
 
-// func (p *problemUpdateParameter) GetNumber() int {
-// 	return p.Number
-// }
 func (p *problemPropertyUpdateParameter) GetKey() string {
 	return p.Key
 }
+
 func (p *problemPropertyUpdateParameter) GetValue() string {
 	return p.Value
 }
@@ -271,6 +258,7 @@ type ProblemSearchResult interface {
 	GetTotalCount() int
 	GetResults() []domain.ProblemModel
 }
+
 type problemSearchResult struct {
 	TotalCount int
 	Results    []domain.ProblemModel
@@ -284,6 +272,7 @@ func NewProblemSearchResult(totalCount int, results []domain.ProblemModel) (Prob
 
 	return m, libD.Validator.Struct(m)
 }
+
 func (m *problemSearchResult) GetTotalCount() int {
 	return m.TotalCount
 }
