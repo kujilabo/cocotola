@@ -80,6 +80,7 @@ func (e *englishSentenceProblemEntity) toProblem(ctx context.Context, synthesize
 }
 
 type englishSentenceProblemAddParameter struct {
+	Number     int
 	AudioID    uint
 	Text       string `validate:"required"`
 	Lang2      string `validate:"required"`
@@ -175,13 +176,53 @@ func toEnglishSentenceProblemAddParameter(param appS.ProblemAddParameter) (*engl
 	// 	return nil, liberrors.Errorf("audioId is not integer. err: %w", lib.ErrInvalidArgument)
 	// }
 
+	// TODO
+	// number, err := param.GetIntProperty("number")
+	// if err != nil {
+	// 	return nil, err
+	// }
+	number := 1
+
 	m := &englishSentenceProblemAddParameter{
+		Number: number,
 		// AudioID:    uint(audioID),
 		Lang2:      param.GetProperties()[service.EnglishSentenceProblemAddPropertyLang2],
 		Text:       param.GetProperties()[service.EnglishSentenceProblemAddPropertyText],
 		Translated: param.GetProperties()[service.EnglishSentenceProblemAddPropertyTranslated],
 		Note:       note,
 	}
+	return m, libD.Validator.Struct(m)
+}
+
+func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy uint, param appS.ProblemUpdateParameter) (*englishSentenceProblemEntity, error) {
+	// if _, ok := param.GetProperties()[service.EnglishWordProblemUpdatePropertyAudioID]; !ok {
+	// 	return nil, liberrors.Errorf("audioId is not defined. err: %w", libD.ErrInvalidArgument)
+	// }
+
+	// text, err := param.GetStringProperty(service.EnglishWordProblemUpdatePropertyText)
+	// if err != nil {
+	// 	return nil, liberrors.Errorf("text is not defined. err: %w", libD.ErrInvalidArgument)
+	// }
+
+	// audioID, err := param.GetIntProperty(service.EnglishWordProblemUpdatePropertyAudioID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// sentenceID, err := param.GetIntProperty(service.EnglishWordProblemUpdatePropertySentenceID1)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	m := &englishSentenceProblemEntity{
+		Version:   newVersion,
+		UpdatedBy: updatedBy,
+	}
+	translated, err := param.GetStringProperty(service.EnglishSentenceProblemAddPropertyTranslated)
+	if err == nil {
+		m.Translated = translated
+	}
+
 	return m, libD.Validator.Struct(m)
 }
 
@@ -413,7 +454,7 @@ func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, opera
 
 	problemParam, err := toEnglishSentenceProblemAddParameter(param)
 	if err != nil {
-		return 0, err
+		return 0, liberrors.Errorf("toEnglishSentenceProblemAddParameter. err: %w", err)
 	}
 
 	englishSentenceProblem := englishSentenceProblemEntity{
@@ -423,7 +464,7 @@ func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, opera
 		OrganizationID: uint(operator.GetOrganizationID()),
 		WorkbookID:     uint(param.GetWorkbookID()),
 		AudioID:        problemParam.AudioID,
-		Number:         param.GetNumber(),
+		Number:         problemParam.Number, // param.GetNumber(),
 		Text:           problemParam.Text,
 		Lang2:          problemParam.Lang2,
 		Translated:     problemParam.Translated,
@@ -441,6 +482,33 @@ func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, opera
 
 func (r *englishSentenceProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
 	return errors.New("not implemented")
+}
+
+func (r *englishSentenceProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.UpdateProblemProperty")
+	defer span.End()
+
+	entity, err := toEnglishSentenceProblemPropertyUpdateParameter(id.GetVersion()+1, operator.GetID(), param)
+	if err != nil {
+		return liberrors.Errorf("toEnglishSentenceProblemPropertyUpdateParameter. param: %+v, err: %w", param, err)
+	}
+
+	result := r.db.
+		Where("organization_id = ?", uint(operator.GetOrganizationID())).
+		Where("workbook_id = ?", uint(id.GetWorkbookID())).
+		Where("id = ?", uint(id.GetProblemID())).
+		Where("version = ?", id.GetVersion()).
+		UpdateColumns(&entity)
+
+	if result.Error != nil {
+		return result.Error
+	} else if result.RowsAffected == 0 {
+		return appS.ErrProblemNotFound
+	} else if result.RowsAffected != 1 {
+		return appS.ErrProblemOtherError
+	}
+
+	return nil
 }
 
 func (r *englishSentenceProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {

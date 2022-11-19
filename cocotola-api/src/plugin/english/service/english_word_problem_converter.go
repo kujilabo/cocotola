@@ -24,18 +24,18 @@ type ToEnglishWordProblemUpdateParameter interface {
 type toSingleEnglishWordProblemAddParameter struct {
 	translatorClient pluginS.TranslatorClient
 	workbookID       appD.WorkbookID
-	number           int
-	param            *EnglishWordProblemAddParemeter
-	audioID          appD.AudioID
+	// number           int
+	param   *EnglishWordProblemAddParemeter
+	audioID appD.AudioID
 }
 
-func NewToSingleEnglishWordProblemAddParameter(translatorClient pluginS.TranslatorClient, workbookID appD.WorkbookID, number int, param *EnglishWordProblemAddParemeter, audioID appD.AudioID) ToEnglishWordProblemAddParameter {
+func NewToSingleEnglishWordProblemAddParameter(translatorClient pluginS.TranslatorClient, workbookID appD.WorkbookID, param *EnglishWordProblemAddParemeter, audioID appD.AudioID) ToEnglishWordProblemAddParameter {
 	return &toSingleEnglishWordProblemAddParameter{
 		translatorClient: translatorClient,
 		workbookID:       workbookID,
-		number:           number,
-		param:            param,
-		audioID:          audioID,
+		// number:           number,
+		param:   param,
+		audioID: audioID,
 	}
 }
 
@@ -56,7 +56,7 @@ func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]app
 	properties[EnglishSentenceProblemAddPropertyTranslated] = translated
 	properties[EnglishWordProblemAddPropertyAudioID] = strconv.Itoa(int(uint(c.audioID)))
 
-	param, err := appS.NewProblemAddParameter(c.workbookID, c.number, properties)
+	param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}
@@ -67,18 +67,18 @@ func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]app
 type toMultipleEnglishWordProblemAddParameter struct {
 	translatorClient pluginS.TranslatorClient
 	workbookID       appD.WorkbookID
-	number           int
-	param            *EnglishWordProblemAddParemeter
-	audioID          appD.AudioID
+	// number           int
+	param   *EnglishWordProblemAddParemeter
+	audioID appD.AudioID
 }
 
-func NewToMultipleEnglishWordProblemAddParameter(translatorClient pluginS.TranslatorClient, workbookID appD.WorkbookID, number int, param *EnglishWordProblemAddParemeter, audioID appD.AudioID) ToEnglishWordProblemAddParameter {
+func NewToMultipleEnglishWordProblemAddParameter(translatorClient pluginS.TranslatorClient, workbookID appD.WorkbookID, param *EnglishWordProblemAddParemeter, audioID appD.AudioID) ToEnglishWordProblemAddParameter {
 	return &toMultipleEnglishWordProblemAddParameter{
 		translatorClient: translatorClient,
 		workbookID:       workbookID,
-		number:           number,
-		param:            param,
-		audioID:          audioID,
+		// number:           number,
+		param:   param,
+		audioID: audioID,
 	}
 }
 
@@ -96,7 +96,7 @@ func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]a
 		properties := c.param.toProperties()
 		properties[EnglishWordProblemAddPropertyAudioID] = strconv.Itoa(int(uint(c.audioID)))
 
-		param, err := appS.NewProblemAddParameter(c.workbookID, c.number, properties)
+		param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 		if err != nil {
 			return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 		}
@@ -114,7 +114,7 @@ func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]a
 		properties[EnglishWordProblemAddPropertyTranslated] = t.GetTranslated()
 		properties[EnglishWordProblemAddPropertyPos] = strconv.Itoa(int(t.GetPos()))
 
-		param, err := appS.NewProblemAddParameter(c.workbookID, c.number, properties)
+		param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 		if err != nil {
 			return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 		}
@@ -163,7 +163,7 @@ func (c *toSingleEnglishWordProblemUpdateParameter) Run(ctx context.Context) ([]
 		EnglishWordProblemUpdatePropertySentenceID1: strconv.Itoa(int(c.sentenceID1)),
 	}
 
-	param, err := appS.NewProblemUpdateParameter(c.number, properties)
+	param, err := appS.NewProblemUpdateParameter( /*c.number,*/ properties)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}

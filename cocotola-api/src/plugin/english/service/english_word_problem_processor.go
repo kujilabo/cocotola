@@ -36,6 +36,7 @@ var (
 )
 
 type EnglishWordProblemAddParemeter struct {
+	Number     int            `validate:"required"`
 	Lang2      appD.Lang2     `validate:"required"`
 	Text       string         `validate:"required"`
 	Pos        plugin.WordPos `validate:"required"`
@@ -77,7 +78,13 @@ func NewEnglishWordProblemAddParemeter(param appS.ProblemAddParameter) (*English
 		return nil, liberrors.Errorf("lang2 format is invalid. err: %w", err)
 	}
 
+	number, err := param.GetIntProperty("number")
+	if err != nil {
+		return nil, err
+	}
+
 	m := &EnglishWordProblemAddParemeter{
+		Number:     number,
 		Lang2:      lang2,
 		Text:       param.GetProperties()["text"],
 		Pos:        plugin.WordPos(pos),
@@ -87,6 +94,7 @@ func NewEnglishWordProblemAddParemeter(param appS.ProblemAddParameter) (*English
 }
 
 type EnglishWordProblemUpdateParemeter struct {
+	Number                    int
 	Lang2                     appD.Lang2 `validate:"required"`
 	Text                      string     `validate:"required"`
 	Translated                string
@@ -138,7 +146,13 @@ func NewEnglishWordProblemUpdateParemeter(param appS.ProblemUpdateParameter) (*E
 		tatoebaSentenceNumberTo = to
 	}
 
+	number, err := param.GetIntProperty("number")
+	if err != nil {
+		return nil, err
+	}
+
 	m := &EnglishWordProblemUpdateParemeter{
+		Number:                    number,
 		Lang2:                     lang2,
 		Text:                      param.GetProperties()["text"],
 		Translated:                translated,
@@ -199,9 +213,9 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 
 	var converter ToEnglishWordProblemAddParameter
 	if extractedParam.Translated == "" && extractedParam.Pos == plugin.PosOther {
-		converter = NewToMultipleEnglishWordProblemAddParameter(p.translatorClient, param.GetWorkbookID(), param.GetNumber(), extractedParam, audioID)
+		converter = NewToMultipleEnglishWordProblemAddParameter(p.translatorClient, param.GetWorkbookID(), extractedParam, audioID)
 	} else {
-		converter = NewToSingleEnglishWordProblemAddParameter(p.translatorClient, param.GetWorkbookID(), param.GetNumber(), extractedParam, audioID)
+		converter = NewToSingleEnglishWordProblemAddParameter(p.translatorClient, param.GetWorkbookID(), extractedParam, audioID)
 	}
 
 	toAddParams, err := converter.Run(ctx)
@@ -260,7 +274,7 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 		sentenceID = sentenceIDtmp
 	}
 
-	converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, param.GetNumber(), extractedParam, audioID, sentenceID)
+	converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, extractedParam.Number, extractedParam, audioID, sentenceID)
 	toUpdateParams, err := converter.Run(ctx)
 	if err != nil {
 		return 0, 0, err
@@ -278,6 +292,13 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 	}
 
 	return 1, 1, nil
+}
+
+func (p *englishWordProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) (appS.Added, appS.Updated, error) {
+	logger := log.FromContext(ctx)
+	logger.Debugf("englishWordProblemProcessor.UpdateProblem, param: %+v", param)
+
+	return 0, 0, errors.New("not implemented")
 }
 
 func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
@@ -365,7 +386,7 @@ func (p *englishWordProblemProcessor) findOrAddSentenceFromTatoeba(ctx context.C
 	}
 	sentenceAddProperties := sentenceAddParam.toProperties(0)
 
-	param, err := appS.NewProblemAddParameter(appD.WorkbookID(tatoebaWorkbook.GetID()), 1, sentenceAddProperties)
+	param, err := appS.NewProblemAddParameter(appD.WorkbookID(tatoebaWorkbook.GetID()), sentenceAddProperties)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}

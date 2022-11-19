@@ -34,20 +34,6 @@ func (_m *ProblemUpdateParameter) GetIntProperty(name string) (int, error) {
 	return r0, r1
 }
 
-// GetNumber provides a mock function with given fields:
-func (_m *ProblemUpdateParameter) GetNumber() int {
-	ret := _m.Called()
-
-	var r0 int
-	if rf, ok := ret.Get(0).(func() int); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(int)
-	}
-
-	return r0
-}
-
 // GetProperties provides a mock function with given fields:
 func (_m *ProblemUpdateParameter) GetProperties() map[string]string {
 	ret := _m.Called()

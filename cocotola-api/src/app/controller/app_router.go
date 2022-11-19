@@ -79,6 +79,7 @@ func NewRouter(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU
 		v1Problem.GET(":problemID", problemHandler.FindProblemByID)
 		v1Problem.DELETE(":problemID", problemHandler.RemoveProblem)
 		v1Problem.PUT(":problemID", problemHandler.UpdateProblem)
+		v1Problem.PUT(":problemID/property", problemHandler.UpdateProblemProperty)
 		// v1Problem.GET("problem_ids", problemHandler.FindProblemIDs)
 		v1Problem.POST("find", problemHandler.FindProblems)
 		v1Problem.POST("find_all", problemHandler.FindAllProblems)

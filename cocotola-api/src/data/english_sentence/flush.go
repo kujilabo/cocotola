@@ -2,6 +2,7 @@ package english_sentence
 
 import (
 	"context"
+	"strconv"
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -42,11 +43,12 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 
 	for i, sentence := range sentences {
 		properties := map[string]string{
+			"number":     strconv.Itoa(i + 1),
 			"text":       sentence[0],
 			"lang2":      "ja",
 			"translated": sentence[1],
 		}
-		param, err := appS.NewProblemAddParameter(workbookID, i+1, properties)
+		param, err := appS.NewProblemAddParameter(workbookID, properties)
 		if err != nil {
 			return liberrors.Errorf("NewProblemAddParameter. err: %w", err)
 		}

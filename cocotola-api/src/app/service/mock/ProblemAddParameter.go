@@ -14,18 +14,25 @@ type ProblemAddParameter struct {
 	mock.Mock
 }
 
-// GetNumber provides a mock function with given fields:
-func (_m *ProblemAddParameter) GetNumber() int {
-	ret := _m.Called()
+// GetIntProperty provides a mock function with given fields: name
+func (_m *ProblemAddParameter) GetIntProperty(name string) (int, error) {
+	ret := _m.Called(name)
 
 	var r0 int
-	if rf, ok := ret.Get(0).(func() int); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) int); ok {
+		r0 = rf(name)
 	} else {
 		r0 = ret.Get(0).(int)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetProperties provides a mock function with given fields:
@@ -42,6 +49,27 @@ func (_m *ProblemAddParameter) GetProperties() map[string]string {
 	}
 
 	return r0
+}
+
+// GetStringProperty provides a mock function with given fields: name
+func (_m *ProblemAddParameter) GetStringProperty(name string) (string, error) {
+	ret := _m.Called(name)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(string) string); ok {
+		r0 = rf(name)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetWorkbookID provides a mock function with given fields:

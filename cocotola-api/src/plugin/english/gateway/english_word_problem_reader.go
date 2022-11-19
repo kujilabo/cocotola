@@ -71,7 +71,7 @@ func (r *engliushWordProblemAddParameterCSVReader) Next() (appS.ProblemAddParame
 		"translated": translated,
 		"pos":        strconv.Itoa(int(pos)),
 	}
-	param, err := appS.NewProblemAddParameter(r.workbookID, r.num, properties)
+	param, err := appS.NewProblemAddParameter(r.workbookID /*r.num,*/, properties)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}

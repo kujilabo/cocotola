@@ -60,6 +60,7 @@ func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchR
 
 		problems[i] = &entity.SimpleProblem{
 			ID:          model.ID,
+			Version:     model.Version,
 			Number:      p.GetNumber(),
 			ProblemType: p.GetProblemType(),
 			Properties:  bytes,
@@ -111,7 +112,7 @@ func ToProblemAddParameter(workbookID domain.WorkbookID, param *entity.ProblemAd
 		return nil, err
 	}
 
-	return service.NewProblemAddParameter(workbookID, param.Number, properties)
+	return service.NewProblemAddParameter(workbookID /*param.Number, */, properties)
 }
 
 func ToProblemUpdateParameter(param *entity.ProblemUpdateParameter) (service.ProblemUpdateParameter, error) {
@@ -120,5 +121,5 @@ func ToProblemUpdateParameter(param *entity.ProblemUpdateParameter) (service.Pro
 		return nil, err
 	}
 
-	return service.NewProblemUpdateParameter(param.Number, properties)
+	return service.NewProblemUpdateParameter( /*param.Number, */ properties)
 }

@@ -22,20 +22,19 @@ var ErrProblemOtherError = errors.New("problem other error")
 
 type ProblemAddParameter interface {
 	GetWorkbookID() domain.WorkbookID
-	GetNumber() int
 	GetProperties() map[string]string
+	GetStringProperty(name string) (string, error)
+	GetIntProperty(name string) (int, error)
 }
 
 type problemAddParameter struct {
 	WorkbookID domain.WorkbookID `validate:"required"`
-	Number     int               `validate:"required"`
 	Properties map[string]string
 }
 
-func NewProblemAddParameter(workbookID domain.WorkbookID, number int, properties map[string]string) (ProblemAddParameter, error) {
+func NewProblemAddParameter(workbookID domain.WorkbookID, properties map[string]string) (ProblemAddParameter, error) {
 	m := &problemAddParameter{
 		WorkbookID: workbookID,
-		Number:     number,
 		Properties: properties,
 	}
 
@@ -45,11 +44,24 @@ func NewProblemAddParameter(workbookID domain.WorkbookID, number int, properties
 func (p *problemAddParameter) GetWorkbookID() domain.WorkbookID {
 	return p.WorkbookID
 }
-func (p *problemAddParameter) GetNumber() int {
-	return p.Number
-}
+
 func (p *problemAddParameter) GetProperties() map[string]string {
 	return p.Properties
+}
+
+func (p *problemAddParameter) GetStringProperty(name string) (string, error) {
+	s, ok := p.Properties[name]
+	if !ok {
+		return "", errors.New("key not found")
+	}
+	return s, nil
+}
+func (p *problemAddParameter) GetIntProperty(name string) (int, error) {
+	i, err := strconv.Atoi(p.Properties[name])
+	if err != nil {
+		return 0, err
+	}
+	return i, nil
 }
 
 type ProblemSelectParameter1 interface {
@@ -112,29 +124,23 @@ func (p *problemSelectParameter2) GetVersion() int {
 }
 
 type ProblemUpdateParameter interface {
-	GetNumber() int
 	GetProperties() map[string]string
 	GetStringProperty(name string) (string, error)
 	GetIntProperty(name string) (int, error)
 }
 
 type problemUpdateParameter struct {
-	Number     int `validate:"required"`
 	Properties map[string]string
 }
 
-func NewProblemUpdateParameter(number int, properties map[string]string) (ProblemUpdateParameter, error) {
+func NewProblemUpdateParameter(properties map[string]string) (ProblemUpdateParameter, error) {
 	m := &problemUpdateParameter{
-		Number:     number,
 		Properties: properties,
 	}
 
 	return m, libD.Validator.Struct(m)
 }
 
-func (p *problemUpdateParameter) GetNumber() int {
-	return p.Number
-}
 func (p *problemUpdateParameter) GetProperties() map[string]string {
 	return p.Properties
 }
@@ -151,6 +157,33 @@ func (p *problemUpdateParameter) GetIntProperty(name string) (int, error) {
 		return 0, err
 	}
 	return i, nil
+}
+
+type ProblemPropertyUpdateParameter interface {
+	GetKey() string
+	GetValue() string
+}
+
+type problemPropertyUpdateParameter struct {
+	Key   string
+	Value string
+}
+
+func NewProblemPropertyUpdateParameter(key, value string) (ProblemPropertyUpdateParameter, error) {
+	m := &problemPropertyUpdateParameter{
+		Key:   key,
+		Value: value,
+	}
+
+	return m, libD.Validator.Struct(m)
+}
+
+func (p *problemPropertyUpdateParameter) GetKey() string {
+	return p.Key
+}
+
+func (p *problemPropertyUpdateParameter) GetValue() string {
+	return p.Value
 }
 
 type ProblemSearchCondition interface {
@@ -225,6 +258,7 @@ type ProblemSearchResult interface {
 	GetTotalCount() int
 	GetResults() []domain.ProblemModel
 }
+
 type problemSearchResult struct {
 	TotalCount int
 	Results    []domain.ProblemModel
@@ -238,6 +272,7 @@ func NewProblemSearchResult(totalCount int, results []domain.ProblemModel) (Prob
 
 	return m, libD.Validator.Struct(m)
 }
+
 func (m *problemSearchResult) GetTotalCount() int {
 	return m.TotalCount
 }
@@ -264,6 +299,8 @@ type ProblemRepository interface {
 	AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) (domain.ProblemID, error)
 
 	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) error
+
+	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) error
 
 	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error
 

@@ -36,7 +36,7 @@ func NewProcessorFactory(addProcessors map[string]ProblemAddProcessor, updatePro
 func (f *processorFactrory) NewProblemAddProcessor(processorType string) (ProblemAddProcessor, error) {
 	processor, ok := f.addProcessors[processorType]
 	if !ok {
-		return nil, liberrors.Errorf("newProblemProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemAddProcessor not found. processorType: %s", processorType)
 	}
 	return processor, nil
 }
@@ -44,7 +44,7 @@ func (f *processorFactrory) NewProblemAddProcessor(processorType string) (Proble
 func (f *processorFactrory) NewProblemUpdateProcessor(processorType string) (ProblemUpdateProcessor, error) {
 	processor, ok := f.updateProcessors[processorType]
 	if !ok {
-		return nil, liberrors.Errorf("newProblemProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemUpdateProcessor not found. processorType: %s", processorType)
 	}
 	return processor, nil
 }
@@ -52,7 +52,7 @@ func (f *processorFactrory) NewProblemUpdateProcessor(processorType string) (Pro
 func (f *processorFactrory) NewProblemRemoveProcessor(processorType string) (ProblemRemoveProcessor, error) {
 	processor, ok := f.removeProcessors[processorType]
 	if !ok {
-		return nil, liberrors.Errorf("newProblemRemoveProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemRemoveProcessor not found. processorType: %s", processorType)
 	}
 	return processor, nil
 }

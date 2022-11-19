@@ -278,7 +278,8 @@ func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCom
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
 	problemUpdateProcessor := map[string]appS.ProblemUpdateProcessor{
-		pluginEnglishDomain.EnglishWordProblemType: englishWordProblemProcessor,
+		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
+		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
 	problemRemoveProcessor := map[string]appS.ProblemRemoveProcessor{
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
