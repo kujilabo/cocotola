@@ -226,6 +226,20 @@ func (_m *ProblemRepository) UpdateProblem(ctx context.Context, operator domain.
 	return r0
 }
 
+// UpdateProblemProperty provides a mock function with given fields: ctx, operator, id, param
+func (_m *ProblemRepository) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+	ret := _m.Called(ctx, operator, id, param)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+		r0 = rf(ctx, operator, id, param)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewProblemRepository creates a new instance of ProblemRepository. It also registers a cleanup function to assert the mocks expectations.
 func NewProblemRepository(t testing.TB) *ProblemRepository {
 	mock := &ProblemRepository{}
