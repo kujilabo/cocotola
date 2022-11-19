@@ -48,9 +48,6 @@ func (p *problemAddParameter) GetWorkbookID() domain.WorkbookID {
 	return p.WorkbookID
 }
 
-// func (p *problemAddParameter) GetNumber() int {
-// 	return p.Number
-// }
 func (p *problemAddParameter) GetProperties() map[string]string {
 	return p.Properties
 }
