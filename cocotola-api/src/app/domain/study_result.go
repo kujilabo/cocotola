@@ -17,6 +17,6 @@ type StudyRecordWithProblemID struct {
 type StudyRecord struct {
 	Level          int
 	ResultPrev1    bool
-	Memorized      bool
+	Mastered       bool
 	LastAnsweredAt *time.Time
 }

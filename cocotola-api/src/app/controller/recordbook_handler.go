@@ -100,7 +100,7 @@ func (h *recordbookHandler) SetStudyResult(c *gin.Context) {
 		// 	return err
 		// }
 
-		if err := h.studentUsecaseStudy.SetResult(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType, domain.ProblemID(problemID), param.Result, param.Memorized); err != nil {
+		if err := h.studentUsecaseStudy.SetResult(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType, domain.ProblemID(problemID), param.Result, param.Mastered); err != nil {
 			return liberrors.Errorf("failed to SetResult. err: %w", err)
 		}
 

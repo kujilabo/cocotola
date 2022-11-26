@@ -18,7 +18,7 @@ type Recordbook interface {
 
 	GetResultsSortedLevel(ctx context.Context) ([]domain.StudyRecordWithProblemID, error)
 
-	SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, memorized bool) error
+	SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, mastered bool) error
 }
 
 type recordbook struct {
@@ -73,7 +73,7 @@ func (m *recordbook) GetResults(ctx context.Context) (map[domain.ProblemID]domai
 			results[problemID] = domain.StudyRecord{
 				Level:          0,
 				ResultPrev1:    false,
-				Memorized:      false,
+				Mastered:       false,
 				LastAnsweredAt: nil,
 			}
 		}
@@ -96,7 +96,7 @@ func (m *recordbook) GetResultsSortedLevel(ctx context.Context) ([]domain.StudyR
 			StudyRecord: domain.StudyRecord{
 				Level:          v.Level,
 				ResultPrev1:    v.ResultPrev1,
-				Memorized:      v.Memorized,
+				Mastered:       v.Mastered,
 				LastAnsweredAt: v.LastAnsweredAt,
 			},
 		}
@@ -106,10 +106,10 @@ func (m *recordbook) GetResultsSortedLevel(ctx context.Context) ([]domain.StudyR
 	return problems2, nil
 }
 
-func (m *recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, memorized bool) error {
+func (m *recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, mastered bool) error {
 	repo := m.rf.NewRecordbookRepository(ctx)
 
-	if err := repo.SetResult(ctx, m.GetStudent(), m.workbookID, m.studyType, problemType, problemID, result, memorized); err != nil {
+	if err := repo.SetResult(ctx, m.GetStudent(), m.workbookID, m.studyType, problemType, problemID, result, mastered); err != nil {
 		return liberrors.Errorf("failed to SetResult. err: %w", err)
 	}
 
@@ -147,7 +147,7 @@ func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[string]i
 	rateMax := 100
 	repo := m.rf.NewRecordbookRepository(ctx)
 
-	numberOfMemorizedProblemsMap, err := repo.CountMemorizedProblem(ctx, m.GetStudent(), m.workbookID)
+	numberOfMasteredProblemsMap, err := repo.CountMasteredProblems(ctx, m.GetStudent(), m.workbookID)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to SetResult. err: %w", err)
 	}
@@ -163,11 +163,11 @@ func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[string]i
 	}
 
 	completionRateMap := map[string]int{}
-	for studyType, numberOfMemorizedProblems := range numberOfMemorizedProblemsMap {
+	for studyType, numberOfMasteredProblems := range numberOfMasteredProblemsMap {
 		if numberOfProblems == 0 {
 			completionRateMap[studyType] = 0
 		} else {
-			completionRateMap[studyType] = numberOfMemorizedProblems * rateMax / numberOfProblems
+			completionRateMap[studyType] = numberOfMasteredProblems * rateMax / numberOfProblems
 		}
 	}
 

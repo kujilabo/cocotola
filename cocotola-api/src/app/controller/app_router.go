@@ -25,7 +25,23 @@ import (
 
 type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error)
 
-func NewRouter(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU.GuestUserUsecase, studentUsecaseWorkbook studentU.StudentUsecaseWorkbook, studentUsecaseProblem studentU.StudentUsecaseProblem, studentUsecaseAudio studentU.StudentUsecaseAudio, studentUsecaseStudy studentU.StudentUsecaseStudy, translatorClient pluginCommonService.TranslatorClient, tatoebaClient pluginCommonService.TatoebaClient, newIteratorFunc NewIteratorFunc, authTokenManager service.AuthTokenManager, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) *gin.Engine {
+type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup)
+
+func NewInitAuthRouterFunc(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU.GuestUserUsecase, authTokenManager service.AuthTokenManager) func(parentRouterGroup *gin.RouterGroup) {
+	return func(parentRouterGroup *gin.RouterGroup) {
+		v1auth := parentRouterGroup.Group("auth")
+		// googleUserUsecase := authU.NewGoogleUserUsecase(db, googleAuthClient, authTokenManager, registerAppUserCallback)
+		// guestUserUsecase := authU.NewGuestUserUsecase(authTokenManager)
+		authHandler := authH.NewAuthHandler(authTokenManager)
+		googleAuthHandler := authH.NewGoogleAuthHandler(googleUserUsecase)
+		guestAuthHandler := authH.NewGuestAuthHandler(guestUserUsecase)
+		v1auth.POST("google/authorize", googleAuthHandler.Authorize)
+		v1auth.POST("guest/authorize", guestAuthHandler.Authorize)
+		v1auth.POST("refresh_token", authHandler.RefreshToken)
+	}
+}
+
+func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook studentU.StudentUsecaseWorkbook, studentUsecaseProblem studentU.StudentUsecaseProblem, studentUsecaseAudio studentU.StudentUsecaseAudio, studentUsecaseStudy studentU.StudentUsecaseStudy, translatorClient pluginCommonService.TranslatorClient, tatoebaClient pluginCommonService.TatoebaClient, newIteratorFunc NewIteratorFunc, authTokenManager service.AuthTokenManager, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) *gin.Engine {
 	if !debugConfig.GinMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -53,15 +69,8 @@ func NewRouter(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU
 	{
 		v1.Use(otelgin.Middleware(appConfig.Name))
 		v1.Use(middleware.NewTraceLogMiddleware(appConfig.Name))
-		v1auth := v1.Group("auth")
-		// googleUserUsecase := authU.NewGoogleUserUsecase(db, googleAuthClient, authTokenManager, registerAppUserCallback)
-		// guestUserUsecase := authU.NewGuestUserUsecase(authTokenManager)
-		authHandler := authH.NewAuthHandler(authTokenManager)
-		googleAuthHandler := authH.NewGoogleAuthHandler(googleUserUsecase)
-		guestAuthHandler := authH.NewGuestAuthHandler(guestUserUsecase)
-		v1auth.POST("google/authorize", googleAuthHandler.Authorize)
-		v1auth.POST("guest/authorize", guestAuthHandler.Authorize)
-		v1auth.POST("refresh_token", authHandler.RefreshToken)
+
+		initAuthRouterFunc(v1)
 
 		v1Workbook := v1.Group("private/workbook")
 		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
@@ -93,8 +102,12 @@ func NewRouter(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU
 		v1Study.POST("study_type/:studyType/problem/:problemID/record", recordbookHandler.SetStudyResult)
 		v1Study.GET("completion_rate", recordbookHandler.GetCompletionRate)
 
-		v1Audio := v1.Group("workbook/:workbookID/problem/:problemID/audio")
+		v1Stat := v1.Group("stat")
+		statHandler := NewStatHandler()
+		v1Stat.Use(authMiddleware)
+		v1Stat.GET("", statHandler.GetStat)
 
+		v1Audio := v1.Group("workbook/:workbookID/problem/:problemID/audio")
 		audioHandler := NewAudioHandler(studentUsecaseAudio)
 		v1Audio.Use(authMiddleware)
 		v1Audio.GET(":audioID", audioHandler.FindAudioByID)

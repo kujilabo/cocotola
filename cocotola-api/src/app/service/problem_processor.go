@@ -9,21 +9,21 @@ import (
 	// pluginCommon "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 )
 
-type Added int
-type Updated int
+// type Added int
+// type Updated int
 
 type ProblemAddProcessor interface {
-	AddProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, param ProblemAddParameter) ([]domain.ProblemID, error)
+	AddProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemUpdateProcessor interface {
-	UpdateProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+	UpdateProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblemProperty(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+	UpdateProblemProperty(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemRemoveProcessor interface {
-	RemoveProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, id ProblemSelectParameter2) error
+	RemoveProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemImportProcessor interface {

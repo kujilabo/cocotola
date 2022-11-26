@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -11,6 +12,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	mocks "github.com/kujilabo/cocotola/cocotola-api/src/app/service/mock"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	user_mock "github.com/kujilabo/cocotola/cocotola-api/src/user/domain/mock"
 	userSM "github.com/kujilabo/cocotola/cocotola-api/src/user/service/mock"
 )
@@ -206,14 +208,23 @@ func Test_student_CheckQuota(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, userRf, _, userQuotaRepo, rf, problemQuotaProcessor, pf := student_Init(t, ctx)
-			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
+			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
 			problemQuotaProcessor.On("GetUnitForSizeQuota").Return(service.QuotaUnitPersitance)
 			problemQuotaProcessor.On("GetLimitForSizeQuota").Return(tt.quotaLimit)
 			problemQuotaProcessor.On("GetUnitForUpdateQuota").Return(service.QuotaUnitDay)
 			problemQuotaProcessor.On("GetLimitForUpdateQuota").Return(tt.quotaLimit)
 
-			s, err := service.NewStudent(pf, rf, userRf, nil)
+			orgID := userD.OrganizationID(1)
+			model, err := userD.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
 			require.NoError(t, err)
+			userModel, err := userD.NewAppUserModel(model, orgID, "login_id", "username", []string{}, map[string]string{})
+			require.NoError(t, err)
+			sm, err := domain.NewStudentModel(userModel)
+			require.NoError(t, err)
+
+			s, err := service.NewStudent(pf, rf, userRf, sm)
+			require.NoError(t, err)
+			require.NotNil(t, s)
 			err = s.CheckQuota(ctx, tt.args.problemType, tt.args.name)
 			if err == nil && tt.err != nil {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
@@ -222,7 +233,7 @@ func Test_student_CheckQuota(t *testing.T) {
 			} else if err != nil && tt.err != nil && !errors.Is(err, tt.err) {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			}
-			userQuotaRepo.AssertCalled(t, "IsExceeded", mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit)
+			userQuotaRepo.AssertCalled(t, "IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit)
 			userQuotaRepo.AssertNumberOfCalls(t, "IsExceeded", 1)
 		})
 	}

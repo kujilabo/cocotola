@@ -40,10 +40,11 @@ type StudentUsecaseProblem interface {
 }
 
 type studentUsecaseProblem struct {
-	db         *gorm.DB
-	pf         service.ProcessorFactory
-	rfFunc     service.RepositoryFactoryFunc
-	userRfFunc userS.RepositoryFactoryFunc
+	db             *gorm.DB
+	pf             service.ProcessorFactory
+	rfFunc         service.RepositoryFactoryFunc
+	userRfFunc     userS.RepositoryFactoryFunc
+	problemMonitor service.ProblemMonitor
 }
 
 func NewStudentUsecaseProblem(db *gorm.DB, pf service.ProcessorFactory, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) StudentUsecaseProblem {
@@ -212,13 +213,21 @@ func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationI
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
-		if err := workbook.RemoveProblem(ctx, student, id); err != nil {
+		_, _, removedIDs, err := workbook.RemoveProblem(ctx, student, id)
+		if err != nil {
 			return liberrors.Errorf("workbook.RemoveProblem. err: %w", err)
 		}
 		problemType := workbook.GetProblemType()
-		if err := student.DecrementQuotaUsage(ctx, problemType, "Size", 1); err != nil {
-			return liberrors.Errorf("student.DecrementQuotaUsage. err: %w", err)
+
+		{
+			event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeRemove, problemType, removedIDs)
+			if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+				return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
+			}
 		}
+		// if err := student.DecrementQuotaUsage(ctx, problemType, "Size", 1); err != nil {
+		// 	return liberrors.Errorf("student.DecrementQuotaUsage. err: %w", err)
+		// }
 
 		return nil
 	}); err != nil {
@@ -311,16 +320,16 @@ func (s *studentUsecaseProblem) addProblem(ctx context.Context, student service.
 	if err := student.CheckQuota(ctx, problemType, "Update"); err != nil {
 		return nil, liberrors.Errorf("student.CheckQuota. err: %w", err)
 	}
-	addedIDs, err := workbook.AddProblem(ctx, student, param)
+	addedIDs, _, _, err := workbook.AddProblem(ctx, student, param)
 	if err != nil {
 		return nil, liberrors.Errorf("workbook.AddProblem. err: %w", err)
 	}
-	if err := student.IncrementQuotaUsage(ctx, problemType, "Size", len(addedIDs)); err != nil {
+
+	event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeAdd, problemType, addedIDs)
+	if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 		return nil, liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 	}
-	if err := student.IncrementQuotaUsage(ctx, problemType, "Update", len(addedIDs)); err != nil {
-		return nil, liberrors.Errorf("student.IncrementQuotaUsage(Update). err: %w", err)
-	}
+
 	return addedIDs, nil
 }
 
@@ -332,24 +341,45 @@ func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student servi
 	if err := student.CheckQuota(ctx, problemType, "Update"); err != nil {
 		return liberrors.Errorf("student.CheckQuota(udpate). err: %w", err)
 	}
-	added, updated, err := workbook.UpdateProblem(ctx, student, id, param)
+	addedIDs, updatedIDs, removedIDs, err := workbook.UpdateProblem(ctx, student, id, param)
 	if err != nil {
 		return liberrors.Errorf("failed to UpdateProblem. err: %w", err)
 	}
-	if added > 0 {
-		if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {
-			return err
-		}
-	} else if added < 0 {
-		if err := student.DecrementQuotaUsage(ctx, problemType, "Size", -int(added)); err != nil {
-			return err
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeAdd, problemType, addedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
-	if updated > 0 {
-		if err := student.IncrementQuotaUsage(ctx, problemType, "Update", int(updated)); err != nil {
-			return err
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeUpdate, problemType, updatedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeRemove, problemType, removedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
+		}
+	}
+
+	// 	if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {
+	// 		return err
+	// 	}
+	// } else if added < 0 {
+	// 	if err := student.DecrementQuotaUsage(ctx, problemType, "Size", -int(added)); err != nil {
+	// 		return err
+	// 	}
+	// }
+	// if updated > 0 {
+	// 	if err := student.IncrementQuotaUsage(ctx, problemType, "Update", int(updated)); err != nil {
+	// 		return err
+	// 	}
+	// }
 	return nil
 }
 
@@ -361,23 +391,45 @@ func (s *studentUsecaseProblem) updateProblemProperty(ctx context.Context, stude
 	if err := student.CheckQuota(ctx, problemType, "Update"); err != nil {
 		return liberrors.Errorf("student.CheckQuota(udpate). err: %w", err)
 	}
-	added, updated, err := workbook.UpdateProblemProperty(ctx, student, id, param)
+	addedIDs, updatedIDs, removedIDs, err := workbook.UpdateProblemProperty(ctx, student, id, param)
 	if err != nil {
 		return liberrors.Errorf("workbook.UpdateProblemProperty. err: %w", err)
 	}
-	if added > 0 {
-		if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {
-			return err
-		}
-	} else if added < 0 {
-		if err := student.DecrementQuotaUsage(ctx, problemType, "Size", -int(added)); err != nil {
-			return err
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeAdd, problemType, addedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
-	if updated > 0 {
-		if err := student.IncrementQuotaUsage(ctx, problemType, "Update", int(updated)); err != nil {
-			return err
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeUpdate, problemType, updatedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
+
+	{
+		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeRemove, problemType, removedIDs)
+		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
+			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
+		}
+	}
+
+	// if added > 0 {
+	// 	if err := student.IncrementQuotaUsage(ctx, problemType, "Size", int(added)); err != nil {
+	// 		return err
+	// 	}
+	// } else if added < 0 {
+	// 	if err := student.DecrementQuotaUsage(ctx, problemType, "Size", -int(added)); err != nil {
+	// 		return err
+	// 	}
+	// }
+	// if updated > 0 {
+	// 	if err := student.IncrementQuotaUsage(ctx, problemType, "Update", int(updated)); err != nil {
+	// 		return err
+	// 	}
+	// }
 	return nil
 }

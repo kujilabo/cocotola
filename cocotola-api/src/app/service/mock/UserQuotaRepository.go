@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
+	domain "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	mock "github.com/stretchr/testify/mock"
 
 	service "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -18,20 +18,20 @@ type UserQuotaRepository struct {
 	mock.Mock
 }
 
-// Increment provides a mock function with given fields: ctx, operator, name, unit, limit, count
-func (_m *UserQuotaRepository) Increment(ctx context.Context, operator domain.StudentModel, name string, unit service.QuotaUnit, limit int, count int) (bool, error) {
-	ret := _m.Called(ctx, operator, name, unit, limit, count)
+// Increment provides a mock function with given fields: ctx, organizationID, appUserID, name, unit, limit, count
+func (_m *UserQuotaRepository) Increment(ctx context.Context, organizationID domain.OrganizationID, appUserID domain.AppUserID, name string, unit service.QuotaUnit, limit int, count int) (bool, error) {
+	ret := _m.Called(ctx, organizationID, appUserID, name, unit, limit, count)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, string, service.QuotaUnit, int, int) bool); ok {
-		r0 = rf(ctx, operator, name, unit, limit, count)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, string, service.QuotaUnit, int, int) bool); ok {
+		r0 = rf(ctx, organizationID, appUserID, name, unit, limit, count)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, string, service.QuotaUnit, int, int) error); ok {
-		r1 = rf(ctx, operator, name, unit, limit, count)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, string, service.QuotaUnit, int, int) error); ok {
+		r1 = rf(ctx, organizationID, appUserID, name, unit, limit, count)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -39,20 +39,20 @@ func (_m *UserQuotaRepository) Increment(ctx context.Context, operator domain.St
 	return r0, r1
 }
 
-// IsExceeded provides a mock function with given fields: ctx, operator, name, unit, limit
-func (_m *UserQuotaRepository) IsExceeded(ctx context.Context, operator domain.StudentModel, name string, unit service.QuotaUnit, limit int) (bool, error) {
-	ret := _m.Called(ctx, operator, name, unit, limit)
+// IsExceeded provides a mock function with given fields: ctx, organizationID, appUserID, name, unit, limit
+func (_m *UserQuotaRepository) IsExceeded(ctx context.Context, organizationID domain.OrganizationID, appUserID domain.AppUserID, name string, unit service.QuotaUnit, limit int) (bool, error) {
+	ret := _m.Called(ctx, organizationID, appUserID, name, unit, limit)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, string, service.QuotaUnit, int) bool); ok {
-		r0 = rf(ctx, operator, name, unit, limit)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, string, service.QuotaUnit, int) bool); ok {
+		r0 = rf(ctx, organizationID, appUserID, name, unit, limit)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, string, service.QuotaUnit, int) error); ok {
-		r1 = rf(ctx, operator, name, unit, limit)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, string, service.QuotaUnit, int) error); ok {
+		r1 = rf(ctx, organizationID, appUserID, name, unit, limit)
 	} else {
 		r1 = ret.Error(1)
 	}

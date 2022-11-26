@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
@@ -31,13 +32,11 @@ type Student interface {
 
 	CheckQuota(ctx context.Context, problemType string, name QuotaName) error
 
-	IncrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error
-
-	DecrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error
-
 	FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error)
 
 	FindRecordbookSummary(ctx context.Context, workbookID domain.WorkbookID) (RecordbookSummary, error)
+
+	GetStat(ctx context.Context) (Stat, error)
 }
 
 type student struct {
@@ -153,12 +152,19 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	}
 
 	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
+	if userQuotaRepo == nil {
+		panic(errors.New("userQuotaRepo is nil"))
+	}
+
+	if s == nil {
+		panic(errors.New("s is nil"))
+	}
 
 	switch name {
 	case QuotaNameSize:
 		unit := processor.GetUnitForSizeQuota()
 		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s, problemType+"_size", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_size", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(size). err: %w", err)
 		}
@@ -171,7 +177,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameUpdate:
 		unit := processor.GetUnitForUpdateQuota()
 		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s, problemType+"_update", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_update", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(update). err: %w", err)
 		}
@@ -186,54 +192,20 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	}
 }
 
-func (s *student) IncrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error {
-	processor, err := s.pf.NewProblemQuotaProcessor(problemType)
-	if err != nil {
-		return err
-	}
-
-	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
-
-	switch name {
-	case QuotaNameSize:
-		unit := processor.GetUnitForSizeQuota()
-		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.Increment(ctx, s, problemType+"_size", unit, limit, value)
-		if err != nil {
-			return err
-		}
-
-		if isExceeded {
-			return ErrQuotaExceeded
-		}
-
-		return nil
-	case QuotaNameUpdate:
-		unit := processor.GetUnitForUpdateQuota()
-		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.Increment(ctx, s, problemType+"_update", unit, limit, value)
-		if err != nil {
-			return err
-		}
-
-		if isExceeded {
-			return ErrQuotaExceeded
-		}
-
-		return nil
-	default:
-		return liberrors.Errorf("invalid name. name: %s", name)
-	}
-}
-
-func (s *student) DecrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error {
-	return nil
-}
-
 func (s *student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error) {
 	return NewRecordbook(s.rf, s, workbookID, studyType)
 }
 
 func (s *student) FindRecordbookSummary(ctx context.Context, workbookID domain.WorkbookID) (RecordbookSummary, error) {
 	return NewRecordbookSummary(s.rf, s, workbookID)
+}
+
+func (s *student) GetStat(ctx context.Context) (Stat, error) {
+	return nil, errors.New("NotImplemented")
+	// workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
+	// if err != nil {
+	// 	return nil, liberrors.Errorf("s.rf.NewWorkbookRepository. err: %w", err)
+	// }
+
+	// return workbookRepo.FindWorkbookByID(ctx, s, id)
 }

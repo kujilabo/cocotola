@@ -75,11 +75,13 @@ func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *
 		"translated": "ペン",
 		"lang2":      "ja",
 	})
-	problemIDs, err := processor.AddProblem(ctx, rf, operator, workbookModel, param)
+	added, updated, removed, err := processor.AddProblem(ctx, rf, operator, workbookModel, param)
 	require.NoError(t, err)
 	// then
-	require.Equal(t, 1, len(problemIDs))
-	require.Equal(t, 100, int(problemIDs[0]))
+	require.Equal(t, 1, len(added))
+	require.Equal(t, 100, int(added[0]))
+	require.Equal(t, 0, len(updated))
+	require.Equal(t, 0, len(removed))
 	paramCheck := mock.MatchedBy(func(p appS.ProblemAddParameter) bool {
 		require.Equal(t, 1, int(p.GetWorkbookID()))
 		require.Equal(t, "ペン", p.GetProperties()["translated"])
@@ -121,11 +123,13 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 		"translated": "",
 		"lang2":      "ja",
 	})
-	problemIDs, err := processor.AddProblem(ctx, rf, operator, workbookModel, param)
+	added, updated, removed, err := processor.AddProblem(ctx, rf, operator, workbookModel, param)
 	require.NoError(t, err)
 	// then
-	require.Equal(t, 2, len(problemIDs))
-	require.Equal(t, 100, int(problemIDs[0]))
+	require.Equal(t, 2, len(added))
+	require.Equal(t, 100, int(added[0]))
+	require.Equal(t, 0, len(updated))
+	require.Equal(t, 0, len(removed))
 	problemRepo.AssertNumberOfCalls(t, "AddProblem", 2)
 	{
 		param := (problemRepo.Calls[0].Arguments[2]).(appS.ProblemAddParameter)
@@ -161,7 +165,7 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	// when
 	// - param
 	paramSelect := new(appSM.ProblemSelectParameter2)
-	paramSelect.On("GetProblem")
+	paramSelect.On("GetProblemID").Return(appD.ProblemID(1))
 
 	param := new(appSM.ProblemUpdateParameter)
 	param.On("GetWorkbookID").Return(appD.WorkbookID(1))
@@ -172,11 +176,12 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 		"translated": "ペン",
 		"lang2":      "ja",
 	})
-	added, updated, err := processor.UpdateProblem(ctx, rf, operator, workbookModel, paramSelect, param)
+	added, updated, removed, err := processor.UpdateProblem(ctx, rf, operator, workbookModel, paramSelect, param)
 	require.NoError(t, err)
 	// then
-	require.Equal(t, 1, int(added))
-	require.Equal(t, 1, int(updated))
+	require.Equal(t, 0, len(added))
+	require.Equal(t, 1, len(updated))
+	require.Equal(t, 0, len(removed))
 	problemRepo.AssertNumberOfCalls(t, "UpdateProblem", 1)
 	{
 		param := (problemRepo.Calls[0].Arguments[3]).(appS.ProblemUpdateParameter)

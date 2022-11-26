@@ -224,7 +224,9 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(db, pf, rfFunc, userRfFunc)
 	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(db, pf, rfFunc, userRfFunc, synthesizerClient)
 
-	router := controller.NewRouter(googleUserUsecase, guestUserUsecase, studentUsecaseWorkbook, studentUsecaseProblem, studentUsecaseAudio, studentUseCaseStudy, translatorClient, tatoebaClient, newIteratorFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	authRouterGroupFunc := controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager)
+
+	router := controller.NewRouter(authRouterGroupFunc, studentUsecaseWorkbook, studentUsecaseProblem, studentUsecaseAudio, studentUseCaseStudy, translatorClient, tatoebaClient, newIteratorFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
 
 	if cfg.Swagger.Enabled {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

@@ -104,18 +104,18 @@ func NewEnglishSentenceProblemProcessor(synthesizerClient appS.SynthesizerClient
 	}
 }
 
-func (p *englishSentenceProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, error) {
+func (p *englishSentenceProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Info("englishSentenceProblemProcessor.AddProblem")
 
 	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishSentenceProblemType)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 	}
 
 	extractedParam, err := toEnglishSentenceProblemAddParemeter(param)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to toNewEnglishSentenceProblemParemeter. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to toNewEnglishSentenceProblemParemeter. err: %w", err)
 	}
 
 	audioID := appD.AudioID(0)
@@ -123,7 +123,7 @@ func (p *englishSentenceProblemProcessor) AddProblem(ctx context.Context, rf app
 		logger.Infof("audioEnabled is true")
 		audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 		if err != nil {
-			return nil, liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
+			return nil, nil, nil, liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
 		}
 
 		audioID = appD.AudioID(audio.GetAudioModel().GetID())
@@ -133,10 +133,10 @@ func (p *englishSentenceProblemProcessor) AddProblem(ctx context.Context, rf app
 
 	problemID, err := p.addSingleProblem(ctx, operator, problemRepo, param, extractedParam, audioID)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to addSingleProblem: extractedParam: %+v, err: %w", extractedParam, err)
+		return nil, nil, nil, liberrors.Errorf("failed to addSingleProblem: extractedParam: %+v, err: %w", extractedParam, err)
 	}
 
-	return []appD.ProblemID{problemID}, nil
+	return []appD.ProblemID{problemID}, nil, nil, nil
 }
 
 func (p *englishSentenceProblemProcessor) addSingleProblem(ctx context.Context, operator appD.StudentModel, problemRepo appS.ProblemRepository, param appS.ProblemAddParameter, extractedParam *englishSentenceProblemAddParemeter, audioID appD.AudioID) (appD.ProblemID, error) {
@@ -158,38 +158,52 @@ func (p *englishSentenceProblemProcessor) addSingleProblem(ctx context.Context, 
 	return problemID, nil
 }
 
-func (p *englishSentenceProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) (appS.Added, appS.Updated, error) {
+func (p *englishSentenceProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishSentenceProblemProcessor.UpdateProblem, param: %+v", param)
 
-	return 0, 0, errors.New("NotImplemented")
+	return nil, nil, nil, errors.New("NotImplemented")
 }
 
-func (p *englishSentenceProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) (appS.Added, appS.Updated, error) {
+func (p *englishSentenceProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishSentenceProblemProcessor.UpdateProblem, param: %+v", param)
 
-	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishSentenceProblemType)
-	if err != nil {
-		return 0, 0, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+	fn := func() error {
+		problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishSentenceProblemType)
+		if err != nil {
+			return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		}
+		if err := problemRepo.UpdateProblemProperty(ctx, operator, id, param); err != nil {
+			return err
+		}
+		return nil
 	}
-	if err := problemRepo.UpdateProblemProperty(ctx, operator, id, param); err != nil {
-		return 0, 0, err
+	if err := fn(); err != nil {
+		return nil, nil, nil, err
 	}
-	return 0, 1, nil
+
+	return nil, []appD.ProblemID{id.GetProblemID()}, nil, nil
 }
 
-func (p *englishSentenceProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
-	problemRepo, err := repo.NewProblemRepository(ctx, domain.EnglishSentenceProblemType)
-	if err != nil {
-		return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+func (p *englishSentenceProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+	fn := func() error {
+		problemRepo, err := repo.NewProblemRepository(ctx, domain.EnglishSentenceProblemType)
+		if err != nil {
+			return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		}
+
+		if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
+			return liberrors.Errorf("failed to RemoveProblem. err: %w", err)
+		}
+
+		return nil
+	}
+	if err := fn(); err != nil {
+		return nil, nil, nil, err
 	}
 
-	if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
-		return liberrors.Errorf("failed to RemoveProblem. err: %w", err)
-	}
-
-	return nil
+	return []appD.ProblemID{id.GetProblemID()}, nil, nil, nil
 }
 
 func (p *englishSentenceProblemProcessor) CreateCSVReader(ctx context.Context, workbookID appD.WorkbookID, reader io.Reader) (appS.ProblemAddParameterIterator, error) {

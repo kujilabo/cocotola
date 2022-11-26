@@ -58,31 +58,31 @@ func NewEnglishPhraseProblemProcessor(synthesizerClient appS.SynthesizerClient, 
 	}
 }
 
-func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, error) {
+func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("AddProblem1")
 
 	problemRepo, err := repo.NewProblemRepository(ctx, domain.EnglishPhraseProblemType)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 	}
 
 	extractedParam, err := toEnglishPhraseProblemAddParemeter(param)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to toNewEnglishPhraseProblemParemeter. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to toNewEnglishPhraseProblemParemeter. err: %w", err)
 	}
 
 	audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	problemID, err := p.addSingleProblem(ctx, operator, problemRepo, param, extractedParam, appD.AudioID(audio.GetAudioModel().GetID()))
 	if err != nil {
-		return nil, liberrors.Errorf("failed to addSingleProblem: extractedParam: %+v, err: %w", extractedParam, err)
+		return nil, nil, nil, liberrors.Errorf("failed to addSingleProblem: extractedParam: %+v, err: %w", extractedParam, err)
 	}
 
-	return []appD.ProblemID{problemID}, err
+	return []appD.ProblemID{problemID}, nil, nil, err
 }
 
 func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, operator appD.StudentModel, problemRepo appS.ProblemRepository, param appS.ProblemAddParameter, extractedParam *englishPhraseProblemAddParemeter, audioID appD.AudioID) (appD.ProblemID, error) {
@@ -111,15 +111,15 @@ func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, op
 
 }
 
-func (p *englishPhraseProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
+func (p *englishPhraseProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	problemRepo, err := repo.NewProblemRepository(ctx, domain.EnglishPhraseProblemType)
 	if err != nil {
-		return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 	}
 
 	if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
-	return nil
+	return nil, nil, []appD.ProblemID{id.GetProblemID()}, nil
 }

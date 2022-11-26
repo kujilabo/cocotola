@@ -23,7 +23,7 @@ type Workbook struct {
 }
 
 // AddProblem provides a mock function with given fields: ctx, operator, param
-func (_m *Workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param service.ProblemAddParameter) ([]domain.ProblemID, error) {
+func (_m *Workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param service.ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	ret := _m.Called(ctx, operator, param)
 
 	var r0 []domain.ProblemID
@@ -35,14 +35,32 @@ func (_m *Workbook) AddProblem(ctx context.Context, operator domain.StudentModel
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) error); ok {
+	var r1 []domain.ProblemID
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) []domain.ProblemID); ok {
 		r1 = rf(ctx, operator, param)
 	} else {
-		r1 = ret.Error(1)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]domain.ProblemID)
+		}
 	}
 
-	return r0, r1
+	var r2 []domain.ProblemID
+	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) []domain.ProblemID); ok {
+		r2 = rf(ctx, operator, param)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]domain.ProblemID)
+		}
+	}
+
+	var r3 error
+	if rf, ok := ret.Get(3).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) error); ok {
+		r3 = rf(ctx, operator, param)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // CountProblems provides a mock function with given fields: ctx, operator
@@ -382,17 +400,44 @@ func (_m *Workbook) HasPrivilege(privilege userdomain.RBACAction) bool {
 }
 
 // RemoveProblem provides a mock function with given fields: ctx, operator, id
-func (_m *Workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2) error {
+func (_m *Workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	ret := _m.Called(ctx, operator, id)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) error); ok {
+	var r0 []domain.ProblemID
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) []domain.ProblemID); ok {
 		r0 = rf(ctx, operator, id)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.ProblemID)
+		}
 	}
 
-	return r0
+	var r1 []domain.ProblemID
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) []domain.ProblemID); ok {
+		r1 = rf(ctx, operator, id)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]domain.ProblemID)
+		}
+	}
+
+	var r2 []domain.ProblemID
+	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) []domain.ProblemID); ok {
+		r2 = rf(ctx, operator, id)
+	} else {
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]domain.ProblemID)
+		}
+	}
+
+	var r3 error
+	if rf, ok := ret.Get(3).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) error); ok {
+		r3 = rf(ctx, operator, id)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // RemoveWorkbook provides a mock function with given fields: ctx, operator, version
@@ -410,59 +455,85 @@ func (_m *Workbook) RemoveWorkbook(ctx context.Context, operator domain.StudentM
 }
 
 // UpdateProblem provides a mock function with given fields: ctx, operator, id, param
-func (_m *Workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) (service.Added, service.Updated, error) {
+func (_m *Workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	ret := _m.Called(ctx, operator, id, param)
 
-	var r0 service.Added
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Added); ok {
+	var r0 []domain.ProblemID
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r0 = rf(ctx, operator, id, param)
 	} else {
-		r0 = ret.Get(0).(service.Added)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.ProblemID)
+		}
 	}
 
-	var r1 service.Updated
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Updated); ok {
+	var r1 []domain.ProblemID
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r1 = rf(ctx, operator, id, param)
 	} else {
-		r1 = ret.Get(1).(service.Updated)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]domain.ProblemID)
+		}
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	var r2 []domain.ProblemID
+	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r2 = rf(ctx, operator, id, param)
 	} else {
-		r2 = ret.Error(2)
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]domain.ProblemID)
+		}
 	}
 
-	return r0, r1, r2
+	var r3 error
+	if rf, ok := ret.Get(3).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+		r3 = rf(ctx, operator, id, param)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // UpdateProblemProperty provides a mock function with given fields: ctx, operator, id, param
-func (_m *Workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) (service.Added, service.Updated, error) {
+func (_m *Workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	ret := _m.Called(ctx, operator, id, param)
 
-	var r0 service.Added
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Added); ok {
+	var r0 []domain.ProblemID
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r0 = rf(ctx, operator, id, param)
 	} else {
-		r0 = ret.Get(0).(service.Added)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.ProblemID)
+		}
 	}
 
-	var r1 service.Updated
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) service.Updated); ok {
+	var r1 []domain.ProblemID
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r1 = rf(ctx, operator, id, param)
 	} else {
-		r1 = ret.Get(1).(service.Updated)
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).([]domain.ProblemID)
+		}
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	var r2 []domain.ProblemID
+	if rf, ok := ret.Get(2).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) []domain.ProblemID); ok {
 		r2 = rf(ctx, operator, id, param)
 	} else {
-		r2 = ret.Error(2)
+		if ret.Get(2) != nil {
+			r2 = ret.Get(2).([]domain.ProblemID)
+		}
 	}
 
-	return r0, r1, r2
+	var r3 error
+	if rf, ok := ret.Get(3).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+		r3 = rf(ctx, operator, id, param)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // UpdateWorkbook provides a mock function with given fields: ctx, operator, version, parameter

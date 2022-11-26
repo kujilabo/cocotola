@@ -26,13 +26,13 @@ type Workbook interface {
 	// FindProblems searches for problem based on a problem ID
 	FindProblemByID(ctx context.Context, operator domain.StudentModel, problemID domain.ProblemID) (Problem, error)
 
-	AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, error)
+	AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error)
+	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error
+	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
 	UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter WorkbookUpdateParameter) error
 
@@ -105,66 +105,66 @@ func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentM
 	return problemRepo.FindProblemByID(ctx, operator, id)
 }
 
-func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, error) {
+func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.AddProblem")
 
 	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
-		return nil, errors.New("no update privilege")
+		return nil, nil, nil, errors.New("no update privilege")
 	}
 
 	processor, err := m.pf.NewProblemAddProcessor(m.GetWorkbookModel().GetProblemType())
 	if err != nil {
-		return nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
+		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
 	logger.Infof("processor.AddProblem")
 	return processor.AddProblem(ctx, m.rf, operator, m.GetWorkbookModel(), param)
 }
 
-func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error) {
+func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.UpdateProblem")
 
 	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
-		return 0, 0, errors.New("no update privilege")
+		return nil, nil, nil, errors.New("no update privilege")
 	}
 
 	processor, err := m.pf.NewProblemUpdateProcessor(m.GetWorkbookModel().GetProblemType())
 	if err != nil {
-		return 0, 0, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
+		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
 	return processor.UpdateProblem(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
 }
 
-func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) (Added, Updated, error) {
+func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.UpdateProblem")
 
 	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
-		return 0, 0, errors.New("no update privilege")
+		return nil, nil, nil, errors.New("no update privilege")
 	}
 
 	processor, err := m.pf.NewProblemUpdateProcessor(m.GetWorkbookModel().GetProblemType())
 	if err != nil {
-		return 0, 0, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
+		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
 	return processor.UpdateProblemProperty(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
 }
 
-func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error {
+func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.RemoveProblem")
 
 	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
-		return errors.New("no update privilege")
+		return nil, nil, nil, errors.New("no update privilege")
 	}
 
 	processor, err := m.pf.NewProblemRemoveProcessor(m.GetWorkbookModel().GetProblemType())
 	if err != nil {
-		return liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
+		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
 	return processor.RemoveProblem(ctx, m.rf, operator, id)

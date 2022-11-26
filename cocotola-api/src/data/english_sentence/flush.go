@@ -53,11 +53,11 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 			return liberrors.Errorf("NewProblemAddParameter. err: %w", err)
 		}
 
-		problemIDs, err := workbook.AddProblem(ctx, student, param)
+		added, _, _, err := workbook.AddProblem(ctx, student, param)
 		if err != nil {
 			return liberrors.Errorf("workbook.NewProblemAddParameter. err: %w", err)
 		}
-		logger.Infof("problemIDs: %v", problemIDs)
+		logger.Infof("problemIDs: %v", added)
 	}
 
 	logger.Infof("Example %d", workbookID)

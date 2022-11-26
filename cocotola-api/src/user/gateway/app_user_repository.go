@@ -333,3 +333,22 @@ func (r *appUserRepository) AddFirstOwner(ctx context.Context, operator domain.S
 	}
 	return r.addAppUser(ctx, &appUserEntity)
 }
+
+func (r *appUserRepository) FindAppUserIDs(ctx context.Context, operator domain.SystemOwnerModel, pageNo, pageSize int) ([]domain.AppUserID, error) {
+	_, span := tracer.Start(ctx, "appUserRepository.FindAppUserByID")
+	defer span.End()
+
+	var entities []appUserEntity
+	if result := r.db.Where(&appUserEntity{
+		OrganizationID: uint(operator.GetOrganizationID()),
+	}).Find(&entities); result.Error != nil {
+		return nil, result.Error
+	}
+
+	ids := make([]domain.AppUserID, len(entities))
+	for i, entity := range entities {
+		ids[i] = domain.AppUserID(entity.ID)
+	}
+
+	return ids, nil
+}

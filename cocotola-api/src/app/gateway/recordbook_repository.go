@@ -9,6 +9,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -24,7 +25,7 @@ type recordbookEntity struct {
 	ResultPrev2    *bool
 	ResultPrev3    *bool
 	Level          int
-	Memorized      bool
+	Mastered       bool
 	LastAnsweredAt time.Time
 }
 
@@ -111,7 +112,7 @@ func (r *recordbookRepository) FindStudyRecords(ctx context.Context, operator do
 		results[domain.ProblemID(e.ProblemID)] = domain.StudyRecord{
 			Level:          e.Level,
 			ResultPrev1:    *e.ResultPrev1,
-			Memorized:      e.Memorized,
+			Mastered:       e.Mastered,
 			LastAnsweredAt: &e.LastAnsweredAt,
 		}
 	}
@@ -119,7 +120,7 @@ func (r *recordbookRepository) FindStudyRecords(ctx context.Context, operator do
 	return results, nil
 }
 
-func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult, memorized bool) error {
+func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult, mastered bool) error {
 	ctx, span := tracer.Start(ctx, "recordbookRepository.SetResult")
 	defer span.End()
 
@@ -133,7 +134,7 @@ func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.St
 		return liberrors.Errorf("unsupported problemType. problemType: %s, err:%w", problemType, err)
 	}
 
-	if memorized {
+	if mastered {
 		return r.setMemorized(ctx, operator, workbookID, studyTypeID, problemTypeID, problemID)
 	}
 
@@ -230,7 +231,7 @@ func (r *recordbookRepository) setMemorized(ctx context.Context, operator domain
 				ResultPrev2:    nil,
 				ResultPrev3:    nil,
 				Level:          0,
-				Memorized:      true,
+				Mastered:       true,
 				LastAnsweredAt: time.Now(),
 			}
 			if result := r.db.Create(&entity); result.Error != nil {
@@ -241,7 +242,7 @@ func (r *recordbookRepository) setMemorized(ctx context.Context, operator domain
 		return result.Error
 	}
 
-	entity.Memorized = true
+	entity.Mastered = true
 	entity.LastAnsweredAt = time.Now()
 
 	if result := r.db.Where("workbook_id = ?", uint(workbookID)).
@@ -255,8 +256,48 @@ func (r *recordbookRepository) setMemorized(ctx context.Context, operator domain
 	return nil
 }
 
-func (r *recordbookRepository) CountMemorizedProblem(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
-	_, span := tracer.Start(ctx, "recordbookRepository.CountMemorizedProblem")
+func (r *recordbookRepository) CountAnsweredProblems(ctx context.Context, targetUserID userD.AppUserID, targetDate time.Time) (*service.CountAnsweredResults, error) {
+	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
+	defer span.End()
+	log.FromContext(ctx)
+
+	type countEntity struct {
+		WorkbookID    uint
+		ProblemTypeID uint
+		StudyTypeID   uint
+		Answered      int
+		Mastered      int
+	}
+	var entities []countEntity
+
+	if result := r.db.Select("count(*) answered as answered, sum(mastered) as mastered, workbook_id, problem_type_id, study_type_id").
+		Where("app_user_id = ?", uint(targetUserID)).
+		Where("target_date = ?", targetDate).
+		Group("workbook_id").
+		Group("problem_type_id").
+		Group("study_type_id").
+		Find(&entities); result.Error != nil {
+		return nil, result.Error
+	}
+
+	results := make([]service.CountAnsweredResult, len(entities))
+	for i, entity := range entities {
+		results[i] = service.CountAnsweredResult{
+			WorkbookID:    entity.WorkbookID,
+			ProblemTypeID: entity.ProblemTypeID,
+			StudyTypeID:   entity.StudyTypeID,
+			Answered:      entity.Answered,
+			Mastered:      entity.Mastered,
+		}
+	}
+
+	return &service.CountAnsweredResults{
+		Results: results,
+	}, nil
+}
+
+func (r *recordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
+	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
 	defer span.End()
 
 	logger := log.FromContext(ctx)
@@ -271,8 +312,9 @@ func (r *recordbookRepository) CountMemorizedProblem(ctx context.Context, operat
 		Model(&recordbookEntity{}).
 		Where("workbook_id = ?", uint(workbookID)).
 		Where("app_user_id = ?", operator.GetID()).
-		Where("memorized = ?", true).
-		Group("study_type_id").Find(&results); result.Error != nil {
+		Where("mastered = ?", true).
+		Group("study_type_id").
+		Find(&results); result.Error != nil {
 		return nil, result.Error
 	}
 

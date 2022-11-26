@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 )
 
 type QuotaUnit string
@@ -21,7 +21,7 @@ var (
 )
 
 type UserQuotaRepository interface {
-	IsExceeded(ctx context.Context, operator domain.StudentModel, name string, unit QuotaUnit, limit int) (bool, error)
+	IsExceeded(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit QuotaUnit, limit int) (bool, error)
 
-	Increment(ctx context.Context, operator domain.StudentModel, name string, unit QuotaUnit, limit int, count int) (bool, error)
+	Increment(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit QuotaUnit, limit int, count int) (bool, error)
 }
