@@ -39,8 +39,11 @@ func NewStudyStatRepository(ctx context.Context, rf service.RepositoryFactory, d
 }
 
 func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time) error {
-	userRepo := r.userRf.NewAppUserRepository()
-	recordbookRepo := r.rf.NewRecordbookRepository(ctx)
+	userRepo, err := r.userRf.NewAppUserRepository()
+	if err != nil {
+		return err
+	}
+	studyRecordRepo := r.rf.NewStudyRecordRepository(ctx)
 
 	pageNo := 1
 	pageSize := 10
@@ -53,7 +56,7 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 			break
 		}
 		for _, userID := range userIDs {
-			results, err := recordbookRepo.CountAnsweredProblems(ctx, userID, targetDate)
+			results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
 			if err != nil {
 				return err
 			}
@@ -68,7 +71,7 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 					Mastered:      result.Mastered,
 				}
 				// Upsert
-				r.db.Clauses(clause.OnConflict{
+				if result := r.db.Clauses(clause.OnConflict{
 					Columns: []clause.Column{
 						{Name: "app_user_id"},
 						{Name: "record_date"},
@@ -77,7 +80,9 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 						"answered",
 						"mastered",
 					}), // column needed to be updated
-				}).Create(&entity)
+				}).Create(&entity); result.Error != nil {
+					return result.Error
+				}
 			}
 		}
 	}

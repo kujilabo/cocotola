@@ -41,7 +41,7 @@ func NewInitAuthRouterFunc(googleUserUsecase authU.GoogleUserUsecase, guestUserU
 	}
 }
 
-func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook studentU.StudentUsecaseWorkbook, studentUsecaseProblem studentU.StudentUsecaseProblem, studentUsecaseAudio studentU.StudentUsecaseAudio, studentUsecaseStudy studentU.StudentUsecaseStudy, translatorClient pluginCommonService.TranslatorClient, tatoebaClient pluginCommonService.TatoebaClient, newIteratorFunc NewIteratorFunc, authTokenManager service.AuthTokenManager, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) *gin.Engine {
+func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook studentU.StudentUsecaseWorkbook, studentUsecaseProblem studentU.StudentUsecaseProblem, studentUsecaseAudio studentU.StudentUsecaseAudio, studentUsecaseStudy studentU.StudentUsecaseStudy, translatorClient pluginCommonService.TranslatorClient, tatoebaClient pluginCommonService.TatoebaClient, newIteratorFunc NewIteratorFunc, authTokenManager service.AuthTokenManager, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) (*gin.Engine, error) {
 	if !debugConfig.GinMode {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -82,7 +82,10 @@ func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook st
 		v1Workbook.POST("", privateWorkbookHandler.AddWorkbook)
 
 		v1Problem := v1.Group("workbook/:workbookID/problem")
-		problemHandler := NewProblemHandler(studentUsecaseProblem, newIteratorFunc)
+		problemHandler, err := NewProblemHandler(studentUsecaseProblem, newIteratorFunc)
+		if err != nil {
+			return nil, err
+		}
 		v1Problem.Use(authMiddleware)
 		v1Problem.POST("", problemHandler.AddProblem)
 		v1Problem.GET(":problemID", problemHandler.FindProblemByID)
@@ -96,7 +99,10 @@ func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook st
 		v1Problem.POST("import", problemHandler.ImportProblems)
 
 		v1Study := v1.Group("study/workbook/:workbookID")
-		recordbookHandler := NewRecordbookHandler(studentUsecaseStudy)
+		recordbookHandler, err := NewRecordbookHandler(studentUsecaseStudy)
+		if err != nil {
+			return nil, err
+		}
 		v1Study.Use(authMiddleware)
 		v1Study.GET("study_type/:studyType", recordbookHandler.FindRecordbook)
 		v1Study.POST("study_type/:studyType/problem/:problemID/record", recordbookHandler.SetStudyResult)
@@ -123,7 +129,7 @@ func NewRouter(initAuthRouterFunc InitRouterGroupFunc, studentUsecaseWorkbook st
 		InitTatoebaPluginRouter(plugin, tatoebaClient)
 	}
 
-	return router
+	return router, nil
 }
 
 func InitTranslatorPluginRouter(plugin *gin.RouterGroup, translatorClient pluginCommonService.TranslatorClient) {

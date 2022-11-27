@@ -41,16 +41,29 @@ type Student interface {
 
 type student struct {
 	domain.StudentModel
-	rf     RepositoryFactory
-	pf     ProcessorFactory
-	userRf userS.RepositoryFactory
+	rf        RepositoryFactory
+	pf        ProcessorFactory
+	spaceRepo userS.SpaceRepository
+	userRf    userS.RepositoryFactory
 }
 
 func NewStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
+	if pf == nil {
+		return nil, liberrors.Errorf("pf is nil. err: %w", libD.ErrInvalidArgument)
+	}
+	if studentModel == nil {
+		return nil, errors.New("studentModel is nil")
+	}
+	spaceRepo, err := userRf.NewSpaceRepository()
+	if err != nil {
+		return nil, err
+	}
+
 	m := &student{
 		StudentModel: studentModel,
 		pf:           pf,
 		rf:           rf,
+		spaceRepo:    spaceRepo,
 		userRf:       userRf,
 	}
 
@@ -58,28 +71,28 @@ func NewStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.Reposito
 }
 
 func (s *student) GetDefaultSpace(ctx context.Context) (userS.Space, error) {
-	return s.userRf.NewSpaceRepository().FindDefaultSpace(ctx, s)
+	return s.spaceRepo.FindDefaultSpace(ctx, s)
 }
 
 func (s *student) GetPersonalSpace(ctx context.Context) (userS.Space, error) {
-	return s.userRf.NewSpaceRepository().FindPersonalSpace(ctx, s)
+	return s.spaceRepo.FindPersonalSpace(ctx, s)
 }
 
 func (s *student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {
 	space, err := s.GetPersonalSpace(ctx)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to GetPersonalSpace. err: %w", err)
+		return nil, liberrors.Errorf("GetPersonalSpace. err: %w", err)
 	}
 
 	// specify space
 	newCondition, err := NewWorkbookSearchCondition(condition.GetPageNo(), condition.GetPageSize(), []userD.SpaceID{userD.SpaceID(space.GetID())})
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewWorkbookSearchCondition. err: %w", err)
+		return nil, liberrors.Errorf("NewWorkbookSearchCondition. err: %w", err)
 	}
 
 	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
+		return nil, liberrors.Errorf("NewWorkbookRepository. err: %w", err)
 	}
 
 	return workbookRepo.FindPersonalWorkbooks(ctx, s, newCondition)
@@ -152,13 +165,6 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	}
 
 	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
-	if userQuotaRepo == nil {
-		panic(errors.New("userQuotaRepo is nil"))
-	}
-
-	if s == nil {
-		panic(errors.New("s is nil"))
-	}
 
 	switch name {
 	case QuotaNameSize:

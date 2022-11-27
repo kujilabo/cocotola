@@ -3,37 +3,23 @@ package gateway_test
 import (
 	"context"
 	"errors"
-	"log"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
+	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
-	for driverName, db := range testlibeG.ListDB() {
-		log.Printf("%s", driverName)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		orgID, owner := testInitOrganization(t, db)
+	fn := func(ctx context.Context, ts testService) {
+		orgID, owner := testInitOrganization(t, ts)
 
 		type args struct {
 			operator domain.AppUserModel
@@ -60,10 +46,11 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo := gateway.NewSpaceRepository(db)
+		spaceRepo, err := ts.rf.NewSpaceRepository()
+		require.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := spaceRepo.FindDefaultSpace(bg, tt.args.operator)
+				got, err := spaceRepo.FindDefaultSpace(ctx, tt.args.operator)
 				if err != nil && !errors.Is(err, tt.err) {
 					t.Errorf("spaceRepository.FindDefaultSpace() error = %v, err %v", err, tt.err)
 					return
@@ -76,24 +63,14 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 			})
 		}
 	}
+	testDB(t, fn)
 }
 
 func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 	logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
-	for driverName, db := range testlibeG.ListDB() {
-		log.Printf("%s", driverName)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		orgID, owner := testInitOrganization(t, db)
+	fn := func(ctx context.Context, ts testService) {
+		orgID, owner := testInitOrganization(t, ts)
 
 		type args struct {
 			operator domain.AppUserModel
@@ -120,10 +97,11 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo := gateway.NewSpaceRepository(db)
+		spaceRepo, err := ts.rf.NewSpaceRepository()
+		require.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := spaceRepo.FindPersonalSpace(bg, tt.args.operator)
+				got, err := spaceRepo.FindPersonalSpace(ctx, tt.args.operator)
 				if err != nil && !errors.Is(err, tt.err) {
 					t.Errorf("spaceRepository.FindPersonalSpace() error = %v, err %v", err, tt.err)
 					return
@@ -136,4 +114,5 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 			})
 		}
 	}
+	testDB(t, fn)
 }

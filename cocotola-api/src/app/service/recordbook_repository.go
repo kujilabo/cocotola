@@ -4,10 +4,8 @@ package service
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 )
 
 var ErrStudyResultNotFound = errors.New("StudyResult not found")
@@ -27,8 +25,6 @@ type RecordbookRepository interface {
 	FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string) (map[domain.ProblemID]domain.StudyRecord, error)
 
 	SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult, mastered bool) error
-
-	CountAnsweredProblems(ctx context.Context, targetUserID userD.AppUserID, targetDate time.Time) (*CountAnsweredResults, error)
 
 	CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error)
 }

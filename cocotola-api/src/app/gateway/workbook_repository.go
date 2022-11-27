@@ -297,7 +297,11 @@ func (r *workbookRepository) FindWorkbookByName(ctx context.Context, operator us
 }
 
 func (r *workbookRepository) getPrivileges(ctx context.Context, operator userD.AppUserModel, workbookID domain.WorkbookID) (userD.Privileges, error) {
-	rbacRepo := r.userRf.NewRBACRepository()
+	rbacRepo, err := r.userRf.NewRBACRepository()
+	if err != nil {
+		return nil, err
+	}
+
 	workbookRoles := r.getAllWorkbookRoles(workbookID)
 	userObject := userD.NewUserObject(userD.AppUserID(operator.GetID()))
 	e, err := rbacRepo.NewEnforcerWithRolesAndUsers(workbookRoles, []userD.RBACUser{userObject})
@@ -340,7 +344,10 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.App
 
 	workbookID := domain.WorkbookID(workbook.ID)
 
-	rbacRepo := r.userRf.NewRBACRepository()
+	rbacRepo, err := r.userRf.NewRBACRepository()
+	if err != nil {
+		return 0, err
+	}
 	userObject := userD.NewUserObject(userD.AppUserID(operator.GetID()))
 	workbookObject := domain.NewWorkbookObject(workbookID)
 	workbookWriter := domain.NewWorkbookWriter(workbookID)

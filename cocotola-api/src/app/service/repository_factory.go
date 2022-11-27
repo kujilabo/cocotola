@@ -14,6 +14,8 @@ type RepositoryFactory interface {
 
 	NewStudyTypeRepository(ctx context.Context) StudyTypeRepository
 
+	NewStudyRecordRepository(ctx context.Context) StudyRecordRepository
+
 	NewRecordbookRepository(ctx context.Context) RecordbookRepository
 
 	NewUserQuotaRepository(ctx context.Context) UserQuotaRepository

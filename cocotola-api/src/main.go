@@ -226,7 +226,10 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 
 	authRouterGroupFunc := controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager)
 
-	router := controller.NewRouter(authRouterGroupFunc, studentUsecaseWorkbook, studentUsecaseProblem, studentUsecaseAudio, studentUseCaseStudy, translatorClient, tatoebaClient, newIteratorFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	router, err := controller.NewRouter(authRouterGroupFunc, studentUsecaseWorkbook, studentUsecaseProblem, studentUsecaseAudio, studentUseCaseStudy, translatorClient, tatoebaClient, newIteratorFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	if err != nil {
+		panic(err)
+	}
 
 	if cfg.Swagger.Enabled {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
