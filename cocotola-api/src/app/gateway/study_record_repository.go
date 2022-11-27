@@ -7,6 +7,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -107,6 +108,7 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targe
 		Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
+	logrus.Debugf("entities: %+v", entities)
 
 	results := make([]service.CountAnsweredResult, len(entities))
 	for i, entity := range entities {
