@@ -5,7 +5,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -14,7 +13,7 @@ import (
 )
 
 func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
 		_, sysOwner, owner := testInitOrganization(t, ts)
@@ -102,7 +101,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 }
 
 func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
 		_, sysOwner, owner := testInitOrganization(t, ts)
@@ -165,7 +164,7 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 }
 
 func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
 		_, sysOwner, owner := testInitOrganization(t, ts)

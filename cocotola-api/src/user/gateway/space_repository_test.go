@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -16,7 +15,7 @@ import (
 )
 
 func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
 		orgID, owner := testInitOrganization(t, ts)
@@ -67,7 +66,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 }
 
 func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
 		orgID, owner := testInitOrganization(t, ts)
