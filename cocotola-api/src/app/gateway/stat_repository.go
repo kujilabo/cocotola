@@ -33,6 +33,8 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	dateFormat := "2006-01-02"
+
 	startDate := today.AddDate(0, 0, -hisotrySize)
 	endDate := today.AddDate(0, 0, -1)
 	var entities []statEntity
@@ -51,7 +53,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 	m := map[string]statEntity{}
 	for i := 0; i < hisotrySize; i++ {
 		t := startDate.AddDate(0, 0, i)
-		s := t.Format(time.RFC3339)
+		s := t.Format(dateFormat)
 		m[s] = statEntity{
 			AppUserID: uint(operatorID),
 			Answered:  0,
@@ -60,7 +62,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 	}
 
 	for _, entity := range entities {
-		m[entity.RecordDate.Format(time.RFC3339)] = statEntity{
+		m[entity.RecordDate.Format(dateFormat)] = statEntity{
 			AppUserID: entity.AppUserID,
 			Answered:  entity.Answered,
 			Mastered:  entity.Mastered,
@@ -70,7 +72,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 	results := make([]domain.StatHistoryResult, hisotrySize)
 	for i := 0; i < hisotrySize; i++ {
 		t := startDate.AddDate(0, 0, i)
-		s := t.Format(time.RFC3339)
+		s := t.Format(dateFormat)
 		results[i] = domain.StatHistoryResult{
 			Date:     t,
 			Mastered: m[s].Mastered,
