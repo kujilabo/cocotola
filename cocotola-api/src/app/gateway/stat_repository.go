@@ -35,7 +35,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 	startDate := today.AddDate(0, 0, -hisotrySize)
 	endDate := today.AddDate(0, 0, -1)
 	var entities []statEntity
-	if result := r.db.Select("app_user_id, record_date, sum(answered) as answered, sum(mastered) as mastered").
+	if result := r.db.Debug().Select("app_user_id, record_date, sum(answered) as answered, sum(mastered) as mastered").
 		Table("study_stat").
 		Where("app_user_id = ?", uint(operatorID)).
 		Where("? <= record_date", startDate).
