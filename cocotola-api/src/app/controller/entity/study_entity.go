@@ -3,15 +3,15 @@ package entity
 import "time"
 
 type StudyResultParameter struct {
-	Result    bool `json:"result"`
-	Memorized bool `json:"memorized"`
+	Result   bool `json:"result"`
+	Mastered bool `json:"mastered"`
 }
 
 type StudyRecord struct {
 	ProblemID      uint       `json:"problemId"`
 	Level          int        `json:"level"`
 	ResultPrev1    bool       `json:"resultPrev1"`
-	Memorized      bool       `json:"memorized"`
+	Mastered       bool       `json:"mastered"`
 	LastAnsweredAt *time.Time `json:"lastAnsweredAt"`
 }
 

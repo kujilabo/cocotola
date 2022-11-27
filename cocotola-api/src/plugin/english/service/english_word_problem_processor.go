@@ -187,7 +187,7 @@ func NewEnglishWordProblemProcessor(synthesizerClient appS.SynthesizerClient, tr
 	}
 }
 
-func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, error) {
+func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	ctx, span := tracer.Start(ctx, "englishWordProblemProcessor.AddProblem")
 	defer span.End()
 
@@ -196,14 +196,14 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 
 	extractedParam, err := NewEnglishWordProblemAddParemeter(param)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to toNewEnglishWordProblemParemeter. param: %+v, err: %w", param, err)
+		return nil, nil, nil, liberrors.Errorf("failed to toNewEnglishWordProblemParemeter. param: %+v, err: %w", param, err)
 	}
 
 	audioID := appD.AudioID(0)
 	if workbook.GetProperties()["audioEnabled"] == "true" {
 		audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 		if err != nil {
-			return nil, err
+			return nil, nil, nil, err
 		}
 
 		audioID = appD.AudioID(audio.GetAudioModel().GetID())
@@ -222,96 +222,104 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 	if err != nil {
 		if errors.Is(err, pluginS.ErrTranslationNotFound) {
 			message := "Translation not found"
-			return nil, appD.NewPluginError("client", message, []string{message}, err)
+			return nil, nil, nil, appD.NewPluginError("client", message, []string{message}, err)
 		}
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 	}
 
 	idsOfAddedProblem := make([]appD.ProblemID, len(toAddParams))
 	for i, toAddParam := range toAddParams {
 		problemID, err := problemRepo.AddProblem(ctx, operator, toAddParam)
 		if err != nil {
-			return nil, liberrors.Errorf("failed to problemRepo.AddProblem. param: %+v, err: %w", param, err)
+			return nil, nil, nil, liberrors.Errorf("failed to problemRepo.AddProblem. param: %+v, err: %w", param, err)
 		}
 		idsOfAddedProblem[i] = problemID
 	}
 
-	return idsOfAddedProblem, nil
+	return idsOfAddedProblem, nil, nil, nil
 }
 
-func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) (appS.Added, appS.Updated, error) {
+func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishWordProblemProcessor.UpdateProblem, param: %+v", param)
 
 	extractedParam, err := NewEnglishWordProblemUpdateParemeter(param)
-	if err != nil {
-		logger.Warnf("err: %+v", err)
-		message := "Invalid parameter"
-		return 0, 0, liberrors.Errorf("failed to toNewEnglishWordProblemParemeter. param: %+v, err: %w", param, appD.NewPluginError(appD.ErrorType(appD.ErrorTypeClient), message, []string{message, err.Error()}, err))
-	}
-
-	audioID := appD.AudioID(0)
-	if workbook.GetProperties()["audioEnabled"] == "true" {
-		audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
+	fn := func() error {
 		if err != nil {
-			return 0, 0, err
+			logger.Warnf("err: %+v", err)
+			message := "Invalid parameter"
+			return liberrors.Errorf("failed to toNewEnglishWordProblemParemeter. param: %+v, err: %w", param, appD.NewPluginError(appD.ErrorType(appD.ErrorTypeClient), message, []string{message, err.Error()}, err))
 		}
 
-		audioID = appD.AudioID(audio.GetAudioModel().GetID())
-	}
+		audioID := appD.AudioID(0)
+		if workbook.GetProperties()["audioEnabled"] == "true" {
+			audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
+			if err != nil {
+				return err
+			}
 
-	sentenceID := appD.ProblemID(0)
-	if extractedParam.SentenceProvider == "tatoeba" {
-		sentenceIDtmp, err := p.findOrAddSentenceFromTatoeba(ctx, rf, operator, extractedParam.TatoebaSentenceNumberFrom, extractedParam.TatoebaSentenceNumberTo, extractedParam.Lang2)
+			audioID = appD.AudioID(audio.GetAudioModel().GetID())
+		}
+
+		sentenceID := appD.ProblemID(0)
+		if extractedParam.SentenceProvider == "tatoeba" {
+			sentenceIDtmp, err := p.findOrAddSentenceFromTatoeba(ctx, rf, operator, extractedParam.TatoebaSentenceNumberFrom, extractedParam.TatoebaSentenceNumberTo, extractedParam.Lang2)
+			if err != nil {
+				return liberrors.Errorf("failed to findOrAddSentenceFromTatoeba. err: %w", err)
+			}
+			sentenceID = sentenceIDtmp
+		}
+
+		converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, extractedParam.Number, extractedParam, audioID, sentenceID)
+		toUpdateParams, err := converter.Run(ctx)
 		if err != nil {
-			return 0, 0, liberrors.Errorf("failed to findOrAddSentenceFromTatoeba. err: %w", err)
+			return err
 		}
-		sentenceID = sentenceIDtmp
-	}
 
-	converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, extractedParam.Number, extractedParam, audioID, sentenceID)
-	toUpdateParams, err := converter.Run(ctx)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
-	if err != nil {
-		return 0, 0, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
-	}
-
-	for _, toUpdateParam := range toUpdateParams {
-		if err := problemRepo.UpdateProblem(ctx, operator, id, toUpdateParam); err != nil {
-			return 0, 0, liberrors.Errorf("failed to problemRepo.UpdateProblem. param: %+v, err: %w", param, err)
+		problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
+		if err != nil {
+			return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 		}
+
+		for _, toUpdateParam := range toUpdateParams {
+			if err := problemRepo.UpdateProblem(ctx, operator, id, toUpdateParam); err != nil {
+				return liberrors.Errorf("failed to problemRepo.UpdateProblem. param: %+v, err: %w", param, err)
+			}
+		}
+
+		return nil
 	}
 
-	return 1, 1, nil
+	if err := fn(); err != nil {
+		return nil, nil, nil, err
+	}
+
+	return nil, []appD.ProblemID{id.GetProblemID()}, nil, nil
 }
 
-func (p *englishWordProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) (appS.Added, appS.Updated, error) {
+func (p *englishWordProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishWordProblemProcessor.UpdateProblem, param: %+v", param)
 
-	return 0, 0, errors.New("not implemented")
+	return nil, nil, nil, errors.New("not implemented")
 }
 
-func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
+func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
 	if err != nil {
-		return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
+		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 	}
 
 	if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
-		return err
+		return nil, nil, nil, err
 	}
 
-	return nil
+	return nil, nil, nil, nil
 }
 
 func (p *englishWordProblemProcessor) CreateCSVReader(ctx context.Context, workbookID appD.WorkbookID, reader io.Reader) (appS.ProblemAddParameterIterator, error) {

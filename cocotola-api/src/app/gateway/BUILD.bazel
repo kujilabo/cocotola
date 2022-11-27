@@ -5,10 +5,14 @@ go_library(
     srcs = [
         "csv_reader.go",
         "init.go",
+        "problem_quota_handler.go",
         "problem_type_repository.go",
         "recordbook_repository.go",
         "repository.go",
         "repository_factory.go",
+        "stat_repository.go",
+        "study_record_repository.go",
+        "study_stat_repository.go",
         "study_type_repository.go",
         "synthesizer_client.go",
         "user_quota_repository.go",
@@ -28,6 +32,7 @@ go_library(
         "//lib/log",
         "@com_github_casbin_casbin_v2//:casbin",
         "@io_gorm_gorm//:gorm",
+        "@io_gorm_gorm//clause",
         "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
         "@io_opentelemetry_go_otel//:otel",
     ],
@@ -38,6 +43,8 @@ go_test(
     srcs = [
         "db_test.go",
         "gateway_test.go",
+        "stat_repository_test.go",
+        "study_record_repository_test.go",
         "workbook_repository_test.go",
     ],
     deps = [
@@ -51,6 +58,7 @@ go_test(
         "//test-lib/gateway",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
         "@io_gorm_gorm//:gorm",
     ],
 )

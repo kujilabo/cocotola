@@ -16,30 +16,30 @@ func NewRepositoryFactory(db *gorm.DB) (service.RepositoryFactory, error) {
 	}, nil
 }
 
-func (f *repositoryFactory) NewOrganizationRepository() service.OrganizationRepository {
+func (f *repositoryFactory) NewOrganizationRepository() (service.OrganizationRepository, error) {
 	return NewOrganizationRepository(f.db)
 }
 
-func (f *repositoryFactory) NewSpaceRepository() service.SpaceRepository {
+func (f *repositoryFactory) NewSpaceRepository() (service.SpaceRepository, error) {
 	return NewSpaceRepository(f.db)
 }
 
-func (f *repositoryFactory) NewAppUserRepository() service.AppUserRepository {
+func (f *repositoryFactory) NewAppUserRepository() (service.AppUserRepository, error) {
 	return NewAppUserRepository(f, f.db)
 }
 
-func (f *repositoryFactory) NewAppUserGroupRepository() service.AppUserGroupRepository {
+func (f *repositoryFactory) NewAppUserGroupRepository() (service.AppUserGroupRepository, error) {
 	return NewAppUserGroupRepository(f.db)
 }
 
-func (f *repositoryFactory) NewGroupUserRepository() service.GroupUserRepository {
+func (f *repositoryFactory) NewGroupUserRepository() (service.GroupUserRepository, error) {
 	return NewGroupUserRepository(f.db)
 }
 
-func (f *repositoryFactory) NewUserSpaceRepository() service.UserSpaceRepository {
+func (f *repositoryFactory) NewUserSpaceRepository() (service.UserSpaceRepository, error) {
 	return NewUserSpaceRepository(f, f.db)
 }
 
-func (f *repositoryFactory) NewRBACRepository() service.RBACRepository {
+func (f *repositoryFactory) NewRBACRepository() (service.RBACRepository, error) {
 	return NewRBACRepository(f.db)
 }

@@ -9,6 +9,8 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 const conf = `[request_definition]
@@ -31,10 +33,14 @@ type rbacRepository struct {
 	db *gorm.DB
 }
 
-func NewRBACRepository(db *gorm.DB) service.RBACRepository {
+func NewRBACRepository(db *gorm.DB) (service.RBACRepository, error) {
+	if db == nil {
+		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+	}
+
 	return &rbacRepository{
 		db: db,
-	}
+	}, nil
 }
 
 func (r *rbacRepository) Init() error {

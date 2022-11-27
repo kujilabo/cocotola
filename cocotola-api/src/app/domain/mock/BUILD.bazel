@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "AudioModel.go",
         "ProblemModel.go",
+        "StatModel.go",
         "StudentModel.go",
         "StudyType.go",
         "SystemStudentModel.go",

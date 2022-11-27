@@ -3,6 +3,7 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
@@ -31,27 +32,38 @@ type Student interface {
 
 	CheckQuota(ctx context.Context, problemType string, name QuotaName) error
 
-	IncrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error
-
-	DecrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error
-
 	FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error)
 
 	FindRecordbookSummary(ctx context.Context, workbookID domain.WorkbookID) (RecordbookSummary, error)
+
+	GetStat(ctx context.Context) (Stat, error)
 }
 
 type student struct {
 	domain.StudentModel
-	rf     RepositoryFactory
-	pf     ProcessorFactory
-	userRf userS.RepositoryFactory
+	rf        RepositoryFactory
+	pf        ProcessorFactory
+	spaceRepo userS.SpaceRepository
+	userRf    userS.RepositoryFactory
 }
 
 func NewStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
+	if pf == nil {
+		return nil, liberrors.Errorf("pf is nil. err: %w", libD.ErrInvalidArgument)
+	}
+	if studentModel == nil {
+		return nil, errors.New("studentModel is nil")
+	}
+	spaceRepo, err := userRf.NewSpaceRepository()
+	if err != nil {
+		return nil, err
+	}
+
 	m := &student{
 		StudentModel: studentModel,
 		pf:           pf,
 		rf:           rf,
+		spaceRepo:    spaceRepo,
 		userRf:       userRf,
 	}
 
@@ -59,28 +71,28 @@ func NewStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.Reposito
 }
 
 func (s *student) GetDefaultSpace(ctx context.Context) (userS.Space, error) {
-	return s.userRf.NewSpaceRepository().FindDefaultSpace(ctx, s)
+	return s.spaceRepo.FindDefaultSpace(ctx, s)
 }
 
 func (s *student) GetPersonalSpace(ctx context.Context) (userS.Space, error) {
-	return s.userRf.NewSpaceRepository().FindPersonalSpace(ctx, s)
+	return s.spaceRepo.FindPersonalSpace(ctx, s)
 }
 
 func (s *student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {
 	space, err := s.GetPersonalSpace(ctx)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to GetPersonalSpace. err: %w", err)
+		return nil, liberrors.Errorf("GetPersonalSpace. err: %w", err)
 	}
 
 	// specify space
 	newCondition, err := NewWorkbookSearchCondition(condition.GetPageNo(), condition.GetPageSize(), []userD.SpaceID{userD.SpaceID(space.GetID())})
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewWorkbookSearchCondition. err: %w", err)
+		return nil, liberrors.Errorf("NewWorkbookSearchCondition. err: %w", err)
 	}
 
 	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
 	if err != nil {
-		return nil, liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
+		return nil, liberrors.Errorf("NewWorkbookRepository. err: %w", err)
 	}
 
 	return workbookRepo.FindPersonalWorkbooks(ctx, s, newCondition)
@@ -158,7 +170,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameSize:
 		unit := processor.GetUnitForSizeQuota()
 		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s, problemType+"_size", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_size", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(size). err: %w", err)
 		}
@@ -171,7 +183,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameUpdate:
 		unit := processor.GetUnitForUpdateQuota()
 		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s, problemType+"_update", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_update", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(update). err: %w", err)
 		}
@@ -186,54 +198,20 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	}
 }
 
-func (s *student) IncrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error {
-	processor, err := s.pf.NewProblemQuotaProcessor(problemType)
-	if err != nil {
-		return err
-	}
-
-	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
-
-	switch name {
-	case QuotaNameSize:
-		unit := processor.GetUnitForSizeQuota()
-		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.Increment(ctx, s, problemType+"_size", unit, limit, value)
-		if err != nil {
-			return err
-		}
-
-		if isExceeded {
-			return ErrQuotaExceeded
-		}
-
-		return nil
-	case QuotaNameUpdate:
-		unit := processor.GetUnitForUpdateQuota()
-		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.Increment(ctx, s, problemType+"_update", unit, limit, value)
-		if err != nil {
-			return err
-		}
-
-		if isExceeded {
-			return ErrQuotaExceeded
-		}
-
-		return nil
-	default:
-		return liberrors.Errorf("invalid name. name: %s", name)
-	}
-}
-
-func (s *student) DecrementQuotaUsage(ctx context.Context, problemType string, name QuotaName, value int) error {
-	return nil
-}
-
 func (s *student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error) {
 	return NewRecordbook(s.rf, s, workbookID, studyType)
 }
 
 func (s *student) FindRecordbookSummary(ctx context.Context, workbookID domain.WorkbookID) (RecordbookSummary, error) {
 	return NewRecordbookSummary(s.rf, s, workbookID)
+}
+
+func (s *student) GetStat(ctx context.Context) (Stat, error) {
+	return nil, errors.New("NotImplemented")
+	// workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
+	// if err != nil {
+	// 	return nil, liberrors.Errorf("s.rf.NewWorkbookRepository. err: %w", err)
+	// }
+
+	// return workbookRepo.FindWorkbookByID(ctx, s, id)
 }

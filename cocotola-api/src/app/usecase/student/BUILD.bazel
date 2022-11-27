@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "student_usecase_audio.go",
         "student_usecase_problem.go",
+        "student_usecase_statistics.go",
         "student_usecase_study.go",
         "student_usecase_workbook.go",
     ],

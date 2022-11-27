@@ -5661,7 +5661,7 @@ load(
 
 container_repositories()
 
-_go_image_repos()
+# _go_image_repos()
 
 load("@io_bazel_rules_go//extras:embed_data_deps.bzl", "go_embed_data_dependencies")
 

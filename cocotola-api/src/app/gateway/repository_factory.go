@@ -66,6 +66,10 @@ func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) service.
 	return NewStudyTypeRepository(f.db)
 }
 
+func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) service.StudyRecordRepository {
+	return NewStudyRecordRepository(ctx, f, f.db)
+}
+
 func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) service.RecordbookRepository {
 	return NewRecordbookRepository(ctx, f, f.db, f.problemTypes, f.studyTypes)
 }

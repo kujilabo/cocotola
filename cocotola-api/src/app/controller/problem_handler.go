@@ -49,11 +49,15 @@ type problemHandler struct {
 	newIterator           func(ctx context.Context, workbookID domain.WorkbookID, problemType string, reader io.Reader) (service.ProblemAddParameterIterator, error)
 }
 
-func NewProblemHandler(studentUsecaseProblem studentU.StudentUsecaseProblem, newIterator func(ctx context.Context, workbookID domain.WorkbookID, problemType string, reader io.Reader) (service.ProblemAddParameterIterator, error)) ProblemHandler {
+func NewProblemHandler(studentUsecaseProblem studentU.StudentUsecaseProblem, newIterator func(ctx context.Context, workbookID domain.WorkbookID, problemType string, reader io.Reader) (service.ProblemAddParameterIterator, error)) (ProblemHandler, error) {
+	if studentUsecaseProblem == nil {
+		return nil, liberrors.Errorf("studentUsecaseProblem is nil. err: %w", libD.ErrInvalidArgument)
+	}
+
 	return &problemHandler{
 		studentUsecaseProblem: studentUsecaseProblem,
 		newIterator:           newIterator,
-	}
+	}, nil
 }
 
 func (h *problemHandler) FindProblems(c *gin.Context) {

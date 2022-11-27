@@ -21,7 +21,7 @@ type StudentUsecaseStudy interface {
 	GetCompletionRate(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (map[string]int, error)
 
 	// FindAllProblemsByWorkbookID(ctx context.Context, organizationID, operatorID, workbookID uint, studyTypeID domain.StudyTypeID) (domain.WorkbookWithProblems, error)
-	SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, memorized bool) error
+	SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, mastered bool) error
 }
 
 type studentUsecaseStudy struct {
@@ -88,7 +88,7 @@ func (s *studentUsecaseStudy) GetCompletionRate(ctx context.Context, organizatio
 	return results, nil
 }
 
-func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, memorized bool) error {
+func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, mastered bool) error {
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		student, err := s.findStudent(ctx, tx, organizationID, operatorID)
 		if err != nil {
@@ -102,7 +102,7 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 		if err != nil {
 			return liberrors.Errorf("failed to FindRecordbook. err: %w", err)
 		}
-		if err := recordbook.SetResult(ctx, workbook.GetProblemType(), problemID, result, memorized); err != nil {
+		if err := recordbook.SetResult(ctx, workbook.GetProblemType(), problemID, result, mastered); err != nil {
 			return liberrors.Errorf("failed to SetResult. err: %w", err)
 		}
 		return nil
@@ -111,6 +111,7 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 	}
 	return nil
 }
+
 func (s *studentUsecaseStudy) findStudent(ctx context.Context, db *gorm.DB, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
 	rf, err := s.rfFunc(ctx, db)
 	if err != nil {

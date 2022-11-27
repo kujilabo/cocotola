@@ -8,6 +8,7 @@ go_library(
         "private_workbook_handler.go",
         "problem_handler.go",
         "recordbook_handler.go",
+        "statistics_handler.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/controller",
     visibility = ["//visibility:public"],

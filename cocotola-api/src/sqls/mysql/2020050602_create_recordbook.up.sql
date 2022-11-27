@@ -8,7 +8,7 @@ create table `recordbook` (
 ,`result_prev2` tinyint
 ,`result_prev1` tinyint
 ,`level` int not null
-,`memorized` tinyint
+,`mastered` tinyint
 ,`last_answered_at` datetime not null default current_timestamp on update current_timestamp
 ,primary key(`app_user_id`, `problem_id`, `study_type_id`, `problem_type_id`)
 ,foreign key(`app_user_id`) references `app_user`(`id`) on delete cascade

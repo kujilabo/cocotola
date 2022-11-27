@@ -8,6 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
@@ -41,7 +42,8 @@ func TestGetOrganization(t *testing.T) {
 		// delete all organizations
 		db.Exec("delete from organization")
 
-		orgRepo := gateway.NewOrganizationRepository(db)
+		orgRepo, err := gateway.NewOrganizationRepository(db)
+		require.NoError(t, err)
 
 		// register new organization
 		orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
@@ -96,7 +98,8 @@ func TestFindOrganizationByName(t *testing.T) {
 		db.Exec("delete from organization")
 		// db.Where("true").Delete(&organizationEntity{})
 
-		orgRepo := gateway.NewOrganizationRepository(db)
+		orgRepo, err := gateway.NewOrganizationRepository(db)
+		require.NoError(t, err)
 
 		// register new organization
 		orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
@@ -145,7 +148,8 @@ func TestAddOrganization(t *testing.T) {
 		db.Exec("delete from organization")
 		// db.Where("true").Delete(&organizationEntity{})
 
-		orgRepo := gateway.NewOrganizationRepository(db)
+		orgRepo, err := gateway.NewOrganizationRepository(db)
+		require.NoError(t, err)
 
 		// register new organization
 		{

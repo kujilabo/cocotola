@@ -1,12 +1,13 @@
+//go:generate mockery --output mock --name RepositoryFactory
 package service
 
 type RepositoryFactory interface {
-	NewOrganizationRepository() OrganizationRepository
-	NewSpaceRepository() SpaceRepository
-	NewAppUserRepository() AppUserRepository
-	NewAppUserGroupRepository() AppUserGroupRepository
+	NewOrganizationRepository() (OrganizationRepository, error)
+	NewSpaceRepository() (SpaceRepository, error)
+	NewAppUserRepository() (AppUserRepository, error)
+	NewAppUserGroupRepository() (AppUserGroupRepository, error)
 
-	NewGroupUserRepository() GroupUserRepository
-	NewUserSpaceRepository() UserSpaceRepository
-	NewRBACRepository() RBACRepository
+	NewGroupUserRepository() (GroupUserRepository, error)
+	NewUserSpaceRepository() (UserSpaceRepository, error)
+	NewRBACRepository() (RBACRepository, error)
 }

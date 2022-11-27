@@ -10,6 +10,8 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -53,10 +55,14 @@ type spaceRepository struct {
 	db *gorm.DB
 }
 
-func NewSpaceRepository(db *gorm.DB) service.SpaceRepository {
+func NewSpaceRepository(db *gorm.DB) (service.SpaceRepository, error) {
+	if db == nil {
+		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+	}
+
 	return &spaceRepository{
 		db: db,
-	}
+	}, nil
 }
 
 func (r *spaceRepository) FindDefaultSpace(ctx context.Context, operator domain.AppUserModel) (service.Space, error) {

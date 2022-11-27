@@ -3,7 +3,6 @@ package gateway_test
 import (
 	"context"
 	"errors"
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +11,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
 // func TestAddUser(t *testing.T) {
@@ -83,13 +81,8 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 	}
 
 	service.InitSystemAdmin(userRfFunc)
-	for i, db := range testlibeG.ListDB() {
-		log.Printf("%s", i)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		_, owner := testInitOrganization(t, db)
+	fn := func(ctx context.Context, ts testService) {
+		_, owner := testInitOrganization(t, ts)
 
 		type args struct {
 			operator domain.OwnerModel
@@ -117,7 +110,8 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 				err: service.ErrAppUserAlreadyExists,
 			},
 		}
-		appUserRepo := gateway.NewAppUserRepository(nil, db)
+		appUserRepo, err := gateway.NewAppUserRepository(ts.rf, ts.db)
+		assert.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := appUserRepo.AddAppUser(bg, tt.args.operator, tt.args.param)
@@ -131,4 +125,6 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 			})
 		}
 	}
+
+	testDB(t, fn)
 }

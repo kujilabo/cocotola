@@ -18,6 +18,7 @@ go_library(
     deps = [
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
+        "//lib/domain",
         "//lib/errors",
         "//lib/gateway",
         "//lib/passwordhelper",
@@ -47,6 +48,7 @@ go_test(
         "//test-lib/gateway",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
         "@io_gorm_gorm//:gorm",
     ],
 )

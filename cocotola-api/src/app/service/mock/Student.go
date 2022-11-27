@@ -57,20 +57,6 @@ func (_m *Student) CheckQuota(ctx context.Context, problemType string, name serv
 	return r0
 }
 
-// DecrementQuotaUsage provides a mock function with given fields: ctx, problemType, name, value
-func (_m *Student) DecrementQuotaUsage(ctx context.Context, problemType string, name service.QuotaName, value int) error {
-	ret := _m.Called(ctx, problemType, name, value)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, service.QuotaName, int) error); ok {
-		r0 = rf(ctx, problemType, name, value)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 // FindRecordbook provides a mock function with given fields: ctx, workbookID, studyType
 func (_m *Student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (service.Recordbook, error) {
 	ret := _m.Called(ctx, workbookID, studyType)
@@ -306,6 +292,29 @@ func (_m *Student) GetRoles() []string {
 	return r0
 }
 
+// GetStat provides a mock function with given fields: ctx
+func (_m *Student) GetStat(ctx context.Context) (service.Stat, error) {
+	ret := _m.Called(ctx)
+
+	var r0 service.Stat
+	if rf, ok := ret.Get(0).(func(context.Context) service.Stat); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(service.Stat)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetUsername provides a mock function with given fields:
 func (_m *Student) GetUsername() string {
 	ret := _m.Called()
@@ -315,20 +324,6 @@ func (_m *Student) GetUsername() string {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(string)
-	}
-
-	return r0
-}
-
-// IncrementQuotaUsage provides a mock function with given fields: ctx, problemType, name, value
-func (_m *Student) IncrementQuotaUsage(ctx context.Context, problemType string, name service.QuotaName, value int) error {
-	ret := _m.Called(ctx, problemType, name, value)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, service.QuotaName, int) error); ok {
-		r0 = rf(ctx, problemType, name, value)
-	} else {
-		r0 = ret.Error(0)
 	}
 
 	return r0

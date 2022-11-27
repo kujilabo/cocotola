@@ -9,6 +9,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/passwordhelper"
@@ -150,11 +151,14 @@ func (e *appUserEntity) toOwner(rf service.RepositoryFactory, roles []string, pr
 	return service.NewOwner(rf, appUser), nil
 }
 
-func NewAppUserRepository(rf service.RepositoryFactory, db *gorm.DB) service.AppUserRepository {
+func NewAppUserRepository(rf service.RepositoryFactory, db *gorm.DB) (service.AppUserRepository, error) {
+	if rf == nil {
+		return nil, liberrors.Errorf("rf is nil. err: %w", libD.ErrInvalidArgument)
+	}
 	return &appUserRepository{
 		rf: rf,
 		db: db,
-	}
+	}, nil
 }
 
 func (r *appUserRepository) FindSystemOwnerByOrganizationID(ctx context.Context, operator domain.SystemAdminModel, organizationID domain.OrganizationID) (service.SystemOwner, error) {
@@ -332,4 +336,23 @@ func (r *appUserRepository) AddFirstOwner(ctx context.Context, operator domain.S
 		Role:           OwnerRole,
 	}
 	return r.addAppUser(ctx, &appUserEntity)
+}
+
+func (r *appUserRepository) FindAppUserIDs(ctx context.Context, operator domain.SystemOwnerModel, pageNo, pageSize int) ([]domain.AppUserID, error) {
+	_, span := tracer.Start(ctx, "appUserRepository.FindAppUserByID")
+	defer span.End()
+
+	var entities []appUserEntity
+	if result := r.db.Where(&appUserEntity{
+		OrganizationID: uint(operator.GetOrganizationID()),
+	}).Find(&entities); result.Error != nil {
+		return nil, result.Error
+	}
+
+	ids := make([]domain.AppUserID, len(entities))
+	for i, entity := range entities {
+		ids[i] = domain.AppUserID(entity.ID)
+	}
+
+	return ids, nil
 }

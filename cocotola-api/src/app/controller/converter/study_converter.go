@@ -38,7 +38,7 @@ func ToProblemWithLevelList(ctx context.Context, problems []domain.StudyRecordWi
 			ProblemID:      uint(p.ProblemID),
 			Level:          p.StudyRecord.Level,
 			ResultPrev1:    p.StudyRecord.ResultPrev1,
-			Memorized:      p.StudyRecord.Memorized,
+			Mastered:       p.StudyRecord.Mastered,
 			LastAnsweredAt: p.StudyRecord.LastAnsweredAt,
 		}
 	}

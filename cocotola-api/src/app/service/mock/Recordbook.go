@@ -94,13 +94,13 @@ func (_m *Recordbook) GetWorkbookID() domain.WorkbookID {
 	return r0
 }
 
-// SetResult provides a mock function with given fields: ctx, problemType, problemID, result, memorized
-func (_m *Recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result bool, memorized bool) error {
-	ret := _m.Called(ctx, problemType, problemID, result, memorized)
+// SetResult provides a mock function with given fields: ctx, problemType, problemID, result, mastered
+func (_m *Recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result bool, mastered bool) error {
+	ret := _m.Called(ctx, problemType, problemID, result, mastered)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, domain.ProblemID, bool, bool) error); ok {
-		r0 = rf(ctx, problemType, problemID, result, memorized)
+		r0 = rf(ctx, problemType, problemID, result, mastered)
 	} else {
 		r0 = ret.Error(0)
 	}

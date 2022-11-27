@@ -63,32 +63,52 @@ func (s *systemAdmin) GetID() uint {
 }
 
 func (s *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {
-	return s.rf.NewAppUserRepository().FindSystemOwnerByOrganizationID(ctx, s, organizationID)
+	appUserRepo, err := s.rf.NewAppUserRepository()
+	if err != nil {
+		return nil, err
+	}
+	return appUserRepo.FindSystemOwnerByOrganizationID(ctx, s, organizationID)
 }
 
 func (s *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, organizationName string) (SystemOwner, error) {
-	return s.rf.NewAppUserRepository().FindSystemOwnerByOrganizationName(ctx, s, organizationName)
+	appUserRepo, err := s.rf.NewAppUserRepository()
+	if err != nil {
+		return nil, err
+	}
+	return appUserRepo.FindSystemOwnerByOrganizationName(ctx, s, organizationName)
 }
 
 func (s *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (Organization, error) {
-	return s.rf.NewOrganizationRepository().FindOrganizationByName(ctx, s, name)
+	orgRepo, err := s.rf.NewOrganizationRepository()
+	if err != nil {
+		return nil, err
+	}
+	return orgRepo.FindOrganizationByName(ctx, s, name)
 }
 
 func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAddParameter) (domain.OrganizationID, error) {
 	logger := log.FromContext(ctx)
+	orgRepo, err := s.rf.NewOrganizationRepository()
+	if err != nil {
+		return 0, err
+	}
 	// add organization
-	organizationID, err := s.rf.NewOrganizationRepository().AddOrganization(ctx, s, param)
+	organizationID, err := orgRepo.AddOrganization(ctx, s, param)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddOrganization. error: %w", err)
 	}
+	appUserRepo, err := s.rf.NewAppUserRepository()
+	if err != nil {
+		return 0, err
+	}
 
 	// add system owner
-	systemOwnerID, err := s.rf.NewAppUserRepository().AddSystemOwner(ctx, s, organizationID)
+	systemOwnerID, err := appUserRepo.AddSystemOwner(ctx, s, organizationID)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddSystemOwner. error: %w", err)
 	}
 
-	systemOwner, err := s.rf.NewAppUserRepository().FindSystemOwnerByOrganizationName(ctx, s, param.GetName())
+	systemOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, s, param.GetName())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. error: %w", err)
 	}
@@ -100,29 +120,42 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 	// }
 
 	// add owner
-	ownerID, err := s.rf.NewAppUserRepository().AddFirstOwner(ctx, systemOwner, param.GetFirstOwner())
+	ownerID, err := appUserRepo.AddFirstOwner(ctx, systemOwner, param.GetFirstOwner())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddFirstOwner. error: %w", err)
 	}
 
-	owner, err := s.rf.NewAppUserRepository().FindOwnerByLoginID(ctx, systemOwner, param.GetFirstOwner().GetLoginID())
+	owner, err := appUserRepo.FindOwnerByLoginID(ctx, systemOwner, param.GetFirstOwner().GetLoginID())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to FindOwnerByLoginID. error: %w", err)
 	}
 
+	appUserGroupRepo, err := s.rf.NewAppUserGroupRepository()
+	if err != nil {
+		return 0, err
+	}
+
 	// add public group
-	publicGroupID, err := s.rf.NewAppUserGroupRepository().AddPublicGroup(ctx, systemOwner)
+	publicGroupID, err := appUserGroupRepo.AddPublicGroup(ctx, systemOwner)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddPublicGroup. error: %w", err)
 	}
 
+	groupUserRepo, err := s.rf.NewGroupUserRepository()
+	if err != nil {
+		return 0, err
+	}
 	// public-group <-> owner
-	if err := s.rf.NewGroupUserRepository().AddGroupUser(ctx, systemOwner, publicGroupID, ownerID); err != nil {
+	if err := groupUserRepo.AddGroupUser(ctx, systemOwner, publicGroupID, ownerID); err != nil {
 		return 0, liberrors.Errorf("failed to AddGroupUser. error: %w", err)
 	}
 
+	spaceRepo, err := s.rf.NewSpaceRepository()
+	if err != nil {
+		return 0, err
+	}
 	// add default space
-	spaceID, err := s.rf.NewSpaceRepository().AddDefaultSpace(ctx, systemOwner)
+	spaceID, err := spaceRepo.AddDefaultSpace(ctx, systemOwner)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddDefaultSpace. error: %w", err)
 	}

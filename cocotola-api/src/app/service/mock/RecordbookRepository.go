@@ -16,8 +16,8 @@ type RecordbookRepository struct {
 	mock.Mock
 }
 
-// CountMemorizedProblem provides a mock function with given fields: ctx, operator, workbookID
-func (_m *RecordbookRepository) CountMemorizedProblem(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
+// CountMasteredProblems provides a mock function with given fields: ctx, operator, workbookID
+func (_m *RecordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
 	ret := _m.Called(ctx, operator, workbookID)
 
 	var r0 map[string]int
@@ -62,13 +62,13 @@ func (_m *RecordbookRepository) FindStudyRecords(ctx context.Context, operator d
 	return r0, r1
 }
 
-// SetResult provides a mock function with given fields: ctx, operator, workbookID, studyType, problemType, problemID, studyResult, memorized
-func (_m *RecordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult bool, memorized bool) error {
-	ret := _m.Called(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, memorized)
+// SetResult provides a mock function with given fields: ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered
+func (_m *RecordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult bool, mastered bool) error {
+	ret := _m.Called(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID, string, string, domain.ProblemID, bool, bool) error); ok {
-		r0 = rf(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, memorized)
+		r0 = rf(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered)
 	} else {
 		r0 = ret.Error(0)
 	}

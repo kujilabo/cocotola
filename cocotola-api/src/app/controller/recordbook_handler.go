@@ -14,6 +14,7 @@ import (
 	controllerhelper "github.com/kujilabo/cocotola/cocotola-api/src/user/controller/helper"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/lib/controller/helper"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
@@ -30,10 +31,14 @@ type recordbookHandler struct {
 	studentUsecaseStudy studentU.StudentUsecaseStudy
 }
 
-func NewRecordbookHandler(studentUsecaseStudy studentU.StudentUsecaseStudy) RecordbookHandler {
+func NewRecordbookHandler(studentUsecaseStudy studentU.StudentUsecaseStudy) (RecordbookHandler, error) {
+	if studentUsecaseStudy == nil {
+		return nil, liberrors.Errorf("studentUsecaseStudy is nil. err: %w", libD.ErrInvalidArgument)
+	}
+
 	return &recordbookHandler{
 		studentUsecaseStudy: studentUsecaseStudy,
-	}
+	}, nil
 }
 
 // FindRecordbook godoc
@@ -100,7 +105,7 @@ func (h *recordbookHandler) SetStudyResult(c *gin.Context) {
 		// 	return err
 		// }
 
-		if err := h.studentUsecaseStudy.SetResult(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType, domain.ProblemID(problemID), param.Result, param.Memorized); err != nil {
+		if err := h.studentUsecaseStudy.SetResult(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType, domain.ProblemID(problemID), param.Result, param.Mastered); err != nil {
 			return liberrors.Errorf("failed to SetResult. err: %w", err)
 		}
 

@@ -7,8 +7,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 )
 
 var jst *time.Location
@@ -40,7 +40,7 @@ func NewUserQuotaRepository(db *gorm.DB) service.UserQuotaRepository {
 	}
 }
 
-func (r *userQuotaRepository) IsExceeded(ctx context.Context, operator domain.StudentModel, name string, unit service.QuotaUnit, limit int) (bool, error) {
+func (r *userQuotaRepository) IsExceeded(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit service.QuotaUnit, limit int) (bool, error) {
 	now := time.Now()
 	var date time.Time
 	if unit == "month" {
@@ -52,8 +52,8 @@ func (r *userQuotaRepository) IsExceeded(ctx context.Context, operator domain.St
 	}
 	entity := userQuotaEntity{}
 	if result := r.db.Where(&userQuotaEntity{
-		OrganizationID: uint(operator.GetOrganizationID()),
-		AppUserID:      operator.GetID(),
+		OrganizationID: uint(organizationID),
+		AppUserID:      uint(appUserID),
 		Date:           date,
 		Unit:           string(unit),
 		Name:           name,
@@ -69,7 +69,7 @@ func (r *userQuotaRepository) IsExceeded(ctx context.Context, operator domain.St
 	return false, nil
 }
 
-func (r *userQuotaRepository) Increment(ctx context.Context, operator domain.StudentModel, name string, unit service.QuotaUnit, limit int, count int) (bool, error) {
+func (r *userQuotaRepository) Increment(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit service.QuotaUnit, limit int, count int) (bool, error) {
 	now := time.Now()
 	var date time.Time
 	if unit == "month" {
@@ -81,15 +81,15 @@ func (r *userQuotaRepository) Increment(ctx context.Context, operator domain.Stu
 	}
 	entity := userQuotaEntity{}
 	if result := r.db.Where(&userQuotaEntity{
-		OrganizationID: uint(operator.GetOrganizationID()),
-		AppUserID:      operator.GetID(),
+		OrganizationID: uint(organizationID),
+		AppUserID:      uint(appUserID),
 		Date:           date,
 		Unit:           string(unit),
 		Name:           name,
 	}).First(&entity); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-			entity.OrganizationID = uint(operator.GetOrganizationID())
-			entity.AppUserID = operator.GetID()
+			entity.OrganizationID = uint(organizationID)
+			entity.AppUserID = uint(appUserID)
 			entity.Date = date
 			entity.Name = name
 			entity.Unit = string(unit)
@@ -106,8 +106,8 @@ func (r *userQuotaRepository) Increment(ctx context.Context, operator domain.Stu
 	}
 
 	if result := r.db.Model(&userQuotaEntity{}).Where(&userQuotaEntity{
-		OrganizationID: uint(operator.GetOrganizationID()),
-		AppUserID:      operator.GetID(),
+		OrganizationID: uint(organizationID),
+		AppUserID:      uint(appUserID),
 		Date:           date,
 		Unit:           string(unit),
 		Name:           name,

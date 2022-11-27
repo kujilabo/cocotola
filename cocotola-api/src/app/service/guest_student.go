@@ -20,16 +20,22 @@ type GuestStudent interface {
 
 type guestStudent struct {
 	domain.StudentModel
-	rf     RepositoryFactory
-	pf     ProcessorFactory
-	userRf userS.RepositoryFactory
+	rf        RepositoryFactory
+	pf        ProcessorFactory
+	spaceRepo userS.SpaceRepository
+	userRf    userS.RepositoryFactory
 }
 
 func NewGuestStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
+	spaceRepo, err := userRf.NewSpaceRepository()
+	if err != nil {
+		return nil, err
+	}
 	m := &guestStudent{
 		StudentModel: studentModel,
 		pf:           pf,
 		rf:           rf,
+		spaceRepo:    spaceRepo,
 		userRf:       userRf,
 	}
 
@@ -37,7 +43,7 @@ func NewGuestStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.Rep
 }
 
 func (s *guestStudent) GetDefaultSpace(ctx context.Context) (userS.Space, error) {
-	return s.userRf.NewSpaceRepository().FindDefaultSpace(ctx, s)
+	return s.spaceRepo.FindDefaultSpace(ctx, s)
 }
 
 func (s *guestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {
