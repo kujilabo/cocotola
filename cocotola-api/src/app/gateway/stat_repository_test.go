@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	// "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -63,6 +64,7 @@ func Test_statRepository_FindStat(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	logrus.Warnf("today: %v", today)
 
 	fn := func(ctx context.Context, ts testService) {
 		_, sysOwner, owner := testInitOrganization(t, ts)
