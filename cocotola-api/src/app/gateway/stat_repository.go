@@ -7,6 +7,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -44,6 +45,8 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 		Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
+
+	logrus.Warnf("entities: %+v", entities)
 
 	m := map[string]statEntity{}
 	for i := 0; i < hisotrySize; i++ {
