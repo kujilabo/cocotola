@@ -81,8 +81,11 @@ func testInitOrganization(t *testing.T, ts testService) (userD.OrganizationID, u
 	sysAd, err := userS.NewSystemAdminFromDB(bg, ts.db)
 	assert.NoError(t, err)
 
+	result := ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from study_record")
+	assert.NoError(t, result.Error)
+
 	// delete all organizations
-	result := ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from workbook")
+	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from workbook")
 	assert.NoError(t, result.Error)
 	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from space")
 	assert.NoError(t, result.Error)

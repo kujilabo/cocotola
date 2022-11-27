@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_recordbookRepository_CountAnsweredProblems(t *testing.T) {
+func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 

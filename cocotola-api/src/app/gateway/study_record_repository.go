@@ -98,6 +98,15 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targe
 	}
 	var entities []countEntity
 
+	{
+		var entities []studyRecordEntity
+		if result := r.db.Debug().Find(&entities); result.Error != nil {
+			return nil, result.Error
+		}
+		logrus.Debugf("entities1: %+v", entities)
+
+	}
+
 	if result := r.db.Select("count(*) as answered, sum(mastered) as mastered, workbook_id, problem_type_id, study_type_id").
 		Model(&studyRecordEntity{}).
 		Where("app_user_id = ?", uint(targetUserID)).
