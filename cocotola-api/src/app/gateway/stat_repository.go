@@ -7,7 +7,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +29,6 @@ func NewStatRepository(ctx context.Context, db *gorm.DB) service.StatRepository 
 	}
 }
 func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserID) (service.Stat, error) {
-
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	dateFormat := "2006-01-02"
@@ -47,8 +45,6 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 		Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
-
-	logrus.Warnf("entities: %+v", entities)
 
 	m := map[string]statEntity{}
 	for i := 0; i < hisotrySize; i++ {

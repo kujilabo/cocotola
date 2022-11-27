@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	// "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -61,10 +60,10 @@ import (
 // }
 
 func Test_statRepository_FindStat(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	logrus.Warnf("today: %v", today)
+	// logrus.Warnf("today: %v", today)
 
 	fn := func(ctx context.Context, ts testService) {
 		_, sysOwner, owner := testInitOrganization(t, ts)
@@ -94,9 +93,9 @@ func Test_statRepository_FindStat(t *testing.T) {
 		stat, err := statRepo.FindStat(ctx, userD.AppUserID(user1.GetID()))
 		assert.NoError(t, err)
 
-		for _, s := range stat.GetHistory().Results {
-			logrus.Infof("stat: %+v", s)
-		}
+		// for _, s := range stat.GetHistory().Results {
+		// 	logrus.Debugf("stat: %+v", s)
+		// }
 		assert.Equal(t, stat.GetUserID(), userD.AppUserID(user1.GetID()))
 		// yesterday
 		assert.Equal(t, stat.GetHistory().Results[6].Date.Format(time.RFC3339), today.AddDate(0, 0, -1).Format(time.RFC3339))
