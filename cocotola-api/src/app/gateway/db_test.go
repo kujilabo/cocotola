@@ -34,7 +34,7 @@ type testService struct {
 }
 
 func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
-
+	logrus.SetLevel(logrus.WarnLevel)
 	englishWord := testNewProblemType(t, englishWordID, englishWordName)
 	memorization := testNewStudyType(t, memorizationID, memorizationName)
 	dictation := testNewStudyType(t, dictationID, dictationName)

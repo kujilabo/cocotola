@@ -13,11 +13,11 @@ import (
 )
 
 func Test_recordbookRepository_CountAnsweredProblems(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 
 	fn := func(ctx context.Context, ts testService) {
+		logrus.SetLevel(logrus.DebugLevel)
 		_, sysOwner, owner := testInitOrganization(t, ts)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 		studyRecordRepo := ts.rf.NewStudyRecordRepository(ctx)

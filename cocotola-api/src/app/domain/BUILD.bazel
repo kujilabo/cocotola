@@ -11,7 +11,7 @@ go_library(
         "problem_model.go",
         "problem_type.go",
         "rbac.go",
-        "statictics_model.go",
+        "stat_model.go",
         "student_model.go",
         "study_result.go",
         "study_type.go",
