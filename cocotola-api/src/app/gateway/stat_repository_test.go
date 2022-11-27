@@ -93,6 +93,10 @@ func Test_statRepository_FindStat(t *testing.T) {
 		statRepo := gateway.NewStatRepository(ctx, ts.db)
 		stat, err := statRepo.FindStat(ctx, userD.AppUserID(user1.GetID()))
 		assert.NoError(t, err)
+
+		for _, s := range stat.GetHistory().Results {
+			logrus.Infof("stat: %+v", s)
+		}
 		assert.Equal(t, stat.GetUserID(), userD.AppUserID(user1.GetID()))
 		// yesterday
 		assert.Equal(t, stat.GetHistory().Results[6].Date.Format(time.RFC3339), today.AddDate(0, 0, -1).Format(time.RFC3339))
