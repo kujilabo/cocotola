@@ -78,6 +78,7 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 }
 
 func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targetUserID userD.AppUserID, targetDate time.Time) (*service.CountAnsweredResults, error) {
+	dateFormat := "2006-01-02"
 	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
 	defer span.End()
 	// logger := log.FromContext(ctx)
@@ -110,7 +111,7 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targe
 	if result := r.db.Select("count(*) as answered, sum(mastered) as mastered, workbook_id, problem_type_id, study_type_id").
 		Model(&studyRecordEntity{}).
 		Where("app_user_id = ?", uint(targetUserID)).
-		Where("record_date = ?", targetDate).
+		Where("record_date = ?", targetDate.Format(dateFormat)).
 		Group("workbook_id").
 		Group("problem_type_id").
 		Group("study_type_id").
