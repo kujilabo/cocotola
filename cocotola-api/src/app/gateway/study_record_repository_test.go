@@ -31,6 +31,7 @@ func Test_recordbookRepository_CountAnsweredProblems(t *testing.T) {
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		workbook12 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
 
+		logrus.Debug("Test_recordbookRepository_CountAnsweredProblems. A")
 		// workbok11, english-word, memorization
 		for _, problemID := range []int{111, 112, 113, 114} {
 			problemID := domain.ProblemID(problemID)

@@ -57,19 +57,20 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	}
 
 	// Upsert
-	if result := r.db.Clauses(clause.OnConflict{
-		Columns: []clause.Column{
-			{Name: "app_user_id"},
-			{Name: "workbook_id"},
-			{Name: "study_type_id"},
-			{Name: "problem_type_id"},
-			{Name: "problem_id"},
-			{Name: "record_date"},
-		}, // key colume
-		DoUpdates: clause.AssignmentColumns([]string{
-			"mastered",
-		}), // column needed to be updated
-	}).Create(&entity); result.Error != nil {
+	if result := r.db.Debug().
+		Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "app_user_id"},
+				{Name: "workbook_id"},
+				{Name: "study_type_id"},
+				{Name: "problem_type_id"},
+				{Name: "problem_id"},
+				{Name: "record_date"},
+			}, // key colume
+			DoUpdates: clause.AssignmentColumns([]string{
+				"mastered",
+			}), // column needed to be updated
+		}).Create(&entity); result.Error != nil {
 		return result.Error
 	}
 	return nil
