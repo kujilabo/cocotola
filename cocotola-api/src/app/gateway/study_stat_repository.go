@@ -11,6 +11,8 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const userFetchSize = 10
+
 type studyStatEntity struct {
 	AppUserID     uint
 	WorkbookID    uint
@@ -31,11 +33,12 @@ type studyStatRepository struct {
 	userRf userS.RepositoryFactory
 }
 
-func NewStudyStatRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.StudyStatRepository {
+func NewStudyStatRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB, userRf userS.RepositoryFactory) (service.StudyStatRepository, error) {
 	return &studyStatRepository{
-		rf: rf,
-		db: db,
-	}
+		rf:     rf,
+		db:     db,
+		userRf: userRf,
+	}, nil
 }
 
 func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time) error {
@@ -43,10 +46,13 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 	if err != nil {
 		return err
 	}
-	studyRecordRepo := r.rf.NewStudyRecordRepository(ctx)
+	studyRecordRepo, err := r.rf.NewStudyRecordRepository(ctx)
+	if err != nil {
+		return err
+	}
 
 	pageNo := 1
-	pageSize := 10
+	pageSize := userFetchSize
 	for {
 		userIDs, err := userRepo.FindAppUserIDs(ctx, operator, pageNo, pageSize)
 		if err != nil {
@@ -85,6 +91,8 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 				}
 			}
 		}
+
+		pageNo++
 	}
 
 	return nil

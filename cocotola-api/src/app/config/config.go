@@ -15,6 +15,7 @@ import (
 type AppConfig struct {
 	Name          string `yaml:"name" validate:"required"`
 	HTTPPort      int    `yaml:"httpPort" validate:"required"`
+	JobPort       int    `yaml:"jobPort" validate:"required"`
 	MetricsPort   int    `yaml:"metricsPort" validate:"required"`
 	OwnerPassword string `yaml:"ownerPassword" validate:"required"`
 	TestUserEmail string `yaml:"testUserEmail" validate:"required"`

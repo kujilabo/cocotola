@@ -89,7 +89,7 @@ func Test_statRepository_FindStat(t *testing.T) {
 		// two days ago
 		ts.db.Debug().Exec("INSERT INTO study_stat (app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?)", user1.GetID(), workbook11.GetID(), 1, 2, 12, 22, today.AddDate(0, 0, -2))
 
-		statRepo := gateway.NewStatRepository(ctx, ts.db)
+		statRepo, _ := gateway.NewStatRepository(ctx, ts.db)
 		stat, err := statRepo.FindStat(ctx, userD.AppUserID(user1.GetID()))
 		assert.NoError(t, err)
 

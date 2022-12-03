@@ -17,10 +17,10 @@ func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 
 	fn := func(ctx context.Context, ts testService) {
-		logrus.SetLevel(logrus.DebugLevel)
+		// logrus.SetLevel(logrus.DebugLevel)
 		_, sysOwner, owner := testInitOrganization(t, ts)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
-		studyRecordRepo := ts.rf.NewStudyRecordRepository(ctx)
+		studyRecordRepo, _ := ts.rf.NewStudyRecordRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")

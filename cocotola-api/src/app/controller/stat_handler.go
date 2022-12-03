@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	studentU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student"
 	controllerhelper "github.com/kujilabo/cocotola/cocotola-api/src/user/controller/helper"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -16,10 +17,13 @@ type StatHandler interface {
 }
 
 type statHandler struct {
+	studentUsecaseStat studentU.StudentUsecaseStat
 }
 
-func NewStatHandler() StatHandler {
-	return &statHandler{}
+func NewStatHandler(studentUsecaseStat studentU.StudentUsecaseStat) StatHandler {
+	return &statHandler{
+		studentUsecaseStat: studentUsecaseStat,
+	}
 }
 
 type Result struct {
@@ -42,20 +46,22 @@ func (h *statHandler) GetStat(c *gin.Context) {
 	logger.Info("GetStat")
 
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
+		stat, err := h.studentUsecaseStat.GetStat(ctx, organizationID, operatorID)
+		if err != nil {
+			return err
+		}
+
+		results := make([]Result, 0)
+		for _, result := range stat.GetHistory().Results {
+			results = append(results, Result{
+				Date:     result.Date.Format("2006-01-02"),
+				Mastered: result.Mastered,
+				Answered: result.Answered,
+			})
+		}
 		response := Stat{
 			History: History{
-				Results: []Result{
-					{
-						Date:     "2022-11-01",
-						Mastered: 10,
-						Answered: 20,
-					},
-					{
-						Date:     "2022-11-02",
-						Mastered: 10,
-						Answered: 20,
-					},
-				},
+				Results: results,
 			},
 		}
 		c.JSON(http.StatusOK, response)

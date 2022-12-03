@@ -58,22 +58,34 @@ func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemTyp
 	return problemRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewProblemTypeRepository(ctx context.Context) service.ProblemTypeRepository {
+func (f *repositoryFactory) NewProblemTypeRepository(ctx context.Context) (service.ProblemTypeRepository, error) {
 	return NewProblemTypeRepository(f.db)
 }
 
-func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) service.StudyTypeRepository {
+func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) (service.StudyTypeRepository, error) {
 	return NewStudyTypeRepository(f.db)
 }
 
-func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) service.StudyRecordRepository {
+func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) (service.StudyRecordRepository, error) {
 	return NewStudyRecordRepository(ctx, f, f.db)
 }
 
-func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) service.RecordbookRepository {
+func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) (service.RecordbookRepository, error) {
 	return NewRecordbookRepository(ctx, f, f.db, f.problemTypes, f.studyTypes)
 }
 
-func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) service.UserQuotaRepository {
+func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) (service.UserQuotaRepository, error) {
 	return NewUserQuotaRepository(f.db)
+}
+
+func (f *repositoryFactory) NewStatRepository(ctx context.Context) (service.StatRepository, error) {
+	return NewStatRepository(ctx, f.db)
+}
+
+func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service.StudyStatRepository, error) {
+	userRf, err := f.userRfFunc(ctx, f.db)
+	if err != nil {
+		return nil, err
+	}
+	return NewStudyStatRepository(ctx, f, f.db, userRf)
 }

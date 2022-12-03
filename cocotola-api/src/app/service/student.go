@@ -164,7 +164,10 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 		return liberrors.Errorf("s.pf.NewProblemQuotaProcessor. err: %w", err)
 	}
 
-	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
+	userQuotaRepo, err := s.rf.NewUserQuotaRepository(ctx)
+	if err != nil {
+		return liberrors.Errorf("s.rf.NewUserQuotaRepository. err: %w", err)
+	}
 
 	switch name {
 	case QuotaNameSize:
@@ -207,11 +210,15 @@ func (s *student) FindRecordbookSummary(ctx context.Context, workbookID domain.W
 }
 
 func (s *student) GetStat(ctx context.Context) (Stat, error) {
-	return nil, errors.New("NotImplemented")
-	// workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
-	// if err != nil {
-	// 	return nil, liberrors.Errorf("s.rf.NewWorkbookRepository. err: %w", err)
-	// }
+	statRepo, err := s.rf.NewStatRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-	// return workbookRepo.FindWorkbookByID(ctx, s, id)
+	stat, err := statRepo.FindStat(ctx, userD.AppUserID(s.GetID()))
+	if err != nil {
+		return nil, err
+	}
+
+	return stat, nil
 }

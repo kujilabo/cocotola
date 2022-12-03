@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
+
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type studyRecordEntity struct {
@@ -35,11 +35,11 @@ type studyRecordRepository struct {
 	db *gorm.DB
 }
 
-func NewStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.StudyRecordRepository {
+func NewStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.StudyRecordRepository, error) {
 	return &studyRecordRepository{
 		rf: rf,
 		db: db,
-	}
+	}, nil
 }
 
 func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.SystemOwnerModel, appUserID userD.AppUserID, workbookID domain.WorkbookID, problemTypeID uint, studyTypeID uint, problemID domain.ProblemID, mastered bool) error {
@@ -58,20 +58,19 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	}
 
 	// Upsert
-	if result := r.db.Debug().
-		Clauses(clause.OnConflict{
-			Columns: []clause.Column{
-				{Name: "app_user_id"},
-				{Name: "workbook_id"},
-				{Name: "study_type_id"},
-				{Name: "problem_type_id"},
-				{Name: "problem_id"},
-				{Name: "record_date"},
-			}, // key colume
-			DoUpdates: clause.AssignmentColumns([]string{
-				"mastered",
-			}), // column needed to be updated
-		}).Create(&entity); result.Error != nil {
+	if result := r.db.Clauses(clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "app_user_id"},
+			{Name: "workbook_id"},
+			{Name: "study_type_id"},
+			{Name: "problem_type_id"},
+			{Name: "problem_id"},
+			{Name: "record_date"},
+		}, // key colume
+		DoUpdates: clause.AssignmentColumns([]string{
+			"mastered",
+		}), // column needed to be updated
+	}).Create(&entity); result.Error != nil {
 		return result.Error
 	}
 	return nil
@@ -99,15 +98,6 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targe
 	}
 	var entities []countEntity
 
-	{
-		var entities []studyRecordEntity
-		if result := r.db.Debug().Find(&entities); result.Error != nil {
-			return nil, result.Error
-		}
-		logrus.Debugf("entities1: %+v", entities)
-
-	}
-
 	if result := r.db.Select("count(*) as answered, sum(mastered) as mastered, workbook_id, problem_type_id, study_type_id").
 		Model(&studyRecordEntity{}).
 		Where("app_user_id = ?", uint(targetUserID)).
@@ -118,7 +108,6 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targe
 		Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
-	logrus.Debugf("entities: %+v", entities)
 
 	results := make([]service.CountAnsweredResult, len(entities))
 	for i, entity := range entities {

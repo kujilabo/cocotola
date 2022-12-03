@@ -33,6 +33,9 @@ func NewStudentUsecaseStat(db *gorm.DB, pf service.ProcessorFactory, rfFunc serv
 }
 
 func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Stat, error) {
+	_, span := tracer.Start(ctx, "studentUsecaseStat.GetStat")
+	defer span.End()
+
 	var result service.Stat
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		student, err := s.findStudent(ctx, tx, organizationID, operatorID)

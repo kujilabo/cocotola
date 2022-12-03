@@ -58,7 +58,11 @@ func initTatoebaRouter(tatoebaClient service.TatoebaClient) *gin.Engine {
 	router.Use(gin.Recovery())
 	v1 := router.Group("v1")
 	plugin := v1.Group("plugin")
-	controller.InitTatoebaPluginRouter(plugin, tatoebaClient)
+	fn := controller.NewInitTatoebaRouterFunc(tatoebaClient)
+	err := fn(plugin)
+	if err != nil {
+		panic(err)
+	}
 	return router
 }
 

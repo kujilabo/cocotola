@@ -23,11 +23,12 @@ type statRepository struct {
 	db *gorm.DB
 }
 
-func NewStatRepository(ctx context.Context, db *gorm.DB) service.StatRepository {
+func NewStatRepository(ctx context.Context, db *gorm.DB) (service.StatRepository, error) {
 	return &statRepository{
 		db: db,
-	}
+	}, nil
 }
+
 func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserID) (service.Stat, error) {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)

@@ -105,12 +105,17 @@ func (e *appUserEntity) toSystemOwner(rf service.RepositoryFactory) (service.Sys
 		return nil, err
 	}
 
-	appUser, err := service.NewAppUser(rf, appUserModel)
+	systemOwnerModel, err := domain.NewSystemOwnerModel(appUserModel)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.NewSystemOwner(rf, appUser)
+	systemOwner, err := service.NewSystemOwner(rf, systemOwnerModel)
+	if err != nil {
+		return nil, err
+	}
+
+	return systemOwner, nil
 }
 
 func (e *appUserEntity) toAppUser(rf service.RepositoryFactory, roles []string, properties map[string]string) (service.AppUser, error) {
@@ -129,7 +134,7 @@ func (e *appUserEntity) toAppUser(rf service.RepositoryFactory, roles []string, 
 		return nil, err
 	}
 
-	return service.NewSystemOwner(rf, appUser)
+	return appUser, nil
 }
 
 func (e *appUserEntity) toOwner(rf service.RepositoryFactory, roles []string, properties map[string]string) (service.Owner, error) {
@@ -342,10 +347,13 @@ func (r *appUserRepository) FindAppUserIDs(ctx context.Context, operator domain.
 	_, span := tracer.Start(ctx, "appUserRepository.FindAppUserByID")
 	defer span.End()
 
+	limit := pageSize
+	offset := (pageNo - 1) * pageSize
+
 	var entities []appUserEntity
 	if result := r.db.Where(&appUserEntity{
 		OrganizationID: uint(operator.GetOrganizationID()),
-	}).Find(&entities); result.Error != nil {
+	}).Limit(limit).Offset(offset).Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
 

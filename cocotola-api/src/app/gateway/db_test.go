@@ -70,6 +70,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 		problemRepositories := map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error){}
 		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, userRfFunc, pf, problemTypes, studyTypes, problemRepositories)
+		require.NoError(t, err)
 		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf, userRf: userRf}
 
 		fn(ctx, testService)
@@ -189,6 +190,7 @@ func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner 
 	assert.NoError(t, err)
 
 	space, err := user1.GetPersonalSpace(ctx)
+	require.NoError(t, err)
 	assert.Equal(t, spaceID1, userD.SpaceID(space.GetID()))
 
 	return user1

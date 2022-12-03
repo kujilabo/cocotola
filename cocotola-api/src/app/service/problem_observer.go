@@ -15,6 +15,7 @@ type ProblemEventType int
 const ProblemEventTypeAdd ProblemEventType = 1
 const ProblemEventTypeUpdate ProblemEventType = 2
 const ProblemEventTypeRemove ProblemEventType = 3
+const observerTimeoutSec = 2
 
 type ProblemEvent interface {
 	GetOrganizationID() userD.OrganizationID
@@ -101,7 +102,7 @@ func (p *problemMonitor) Detach(observer ProblemObserver) error {
 func (p *problemMonitor) NotifyObservers(ctx context.Context, event ProblemEvent) error {
 	for _, o := range p.observers {
 		go func(ctx context.Context, o ProblemObserver) {
-			ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+			ctx, cancel := context.WithTimeout(ctx, observerTimeoutSec*time.Second)
 			logger := log.FromContext(ctx)
 			defer cancel()
 			if err := o.Update(ctx, event); err != nil {

@@ -131,13 +131,19 @@ func main() {
 		return nil, liberrors.Errorf("processor not found. problemType: %s", problemType)
 	}
 
-	problemTypeRepo := appG.NewProblemTypeRepository(db)
+	problemTypeRepo, err := appG.NewProblemTypeRepository(db)
+	if err != nil {
+		panic(err)
+	}
 	problemTypes, err := problemTypeRepo.FindAllProblemTypes(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	studyTypeRepo := appG.NewStudyTypeRepository(db)
+	studyTypeRepo, err := appG.NewStudyTypeRepository(db)
+	if err != nil {
+		panic(err)
+	}
 	studyTypes, err := studyTypeRepo.FindAllStudyTypes(ctx)
 	if err != nil {
 		panic(err)
@@ -165,8 +171,15 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
+	if !cfg.Debug.GinMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	eg.Go(func() error {
-		return httpServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return appServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+	})
+	eg.Go(func() error {
+		return jobServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
@@ -186,17 +199,13 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 	return 0
 }
 
-func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
 
 	if err := corsConfig.Validate(); err != nil {
 		return liberrors.Errorf("corsConfig.Validate. err: %w", err)
-	}
-
-	if !cfg.Debug.GinMode {
-		gin.SetMode(gin.ReleaseMode)
 	}
 
 	signingKey := []byte(cfg.Auth.SigningKey)
@@ -223,10 +232,24 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(db, pf, rfFunc, userRfFunc)
 	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(db, pf, rfFunc, userRfFunc)
 	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(db, pf, rfFunc, userRfFunc, synthesizerClient)
+	studentUsecaseStat := studentU.NewStudentUsecaseStat(db, pf, rfFunc, userRfFunc)
 
-	authRouterGroupFunc := controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager)
+	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager),
+	}
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitWorkbookRouterFunc(studentUsecaseWorkbook),
+		controller.NewInitProblemRouterFunc(studentUsecaseProblem, newIteratorFunc),
+		controller.NewInitStudyRouterFunc(studentUseCaseStudy),
+		controller.NewInitAudioRouterFunc(studentUsecaseAudio),
+		controller.NewInitStatRouterFunc(studentUsecaseStat),
+	}
+	pluginRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitTranslationRouterFunc(translatorClient),
+		controller.NewInitTatoebaRouterFunc(tatoebaClient),
+	}
 
-	router, err := controller.NewRouter(authRouterGroupFunc, studentUsecaseWorkbook, studentUsecaseProblem, studentUsecaseAudio, studentUseCaseStudy, translatorClient, tatoebaClient, newIteratorFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	router, err := controller.NewAppRouter(publicRouterGroupFunc, privateRouterGroupFunc, pluginRouterGroupFunc, authTokenManager, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
 	if err != nil {
 		panic(err)
 	}
@@ -241,6 +264,44 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pr
 
 	httpServer := http.Server{
 		Addr:              ":" + strconv.Itoa(cfg.App.HTTPPort),
+		Handler:           router,
+		ReadHeaderTimeout: readHeaderTimeout,
+	}
+
+	logrus.Printf("http server listening at %v", httpServer.Addr)
+
+	errCh := make(chan error)
+	go func() {
+		defer close(errCh)
+		if err := httpServer.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			logrus.Infof("failed to ListenAndServe. err: %v", err)
+			errCh <- err
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		gracefulShutdownTime1 := time.Duration(cfg.Shutdown.TimeSec1) * time.Second
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), gracefulShutdownTime1)
+		defer shutdownCancel()
+		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+			logrus.Infof("Server forced to shutdown. err: %v", err)
+			return err
+		}
+		return nil
+	case err := <-errCh:
+		return err
+	}
+}
+
+func jobServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+	router, err := controller.NewJobRouter(db, rfFunc, userRfFunc, cfg.Debug)
+	if err != nil {
+		panic(err)
+	}
+
+	httpServer := http.Server{
+		Addr:              ":" + strconv.Itoa(cfg.App.JobPort),
 		Handler:           router,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}

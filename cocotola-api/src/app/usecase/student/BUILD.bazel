@@ -3,9 +3,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "student",
     srcs = [
+        "init.go",
         "student_usecase_audio.go",
         "student_usecase_problem.go",
-        "student_usecase_statistics.go",
+        "student_usecase_stat.go",
         "student_usecase_study.go",
         "student_usecase_workbook.go",
     ],
@@ -21,5 +22,6 @@ go_library(
         "//lib/errors",
         "//lib/log",
         "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
     ],
 )
