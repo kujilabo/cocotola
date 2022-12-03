@@ -28,7 +28,11 @@ func (p *problemQuotaHandler) Update(ctx context.Context, event service.ProblemE
 	switch problemEventType {
 	case service.ProblemEventTypeAdd:
 		processor, err := p.pf.NewProblemQuotaProcessor(problemType)
-		userQuotaRepo := p.rf.NewUserQuotaRepository(ctx)
+		if err != nil {
+			return err
+		}
+
+		userQuotaRepo, err := p.rf.NewUserQuotaRepository(ctx)
 		if err != nil {
 			return err
 		}

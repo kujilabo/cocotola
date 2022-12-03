@@ -11,7 +11,8 @@ import (
 const SystemOwnerID = 2
 
 type SystemOwner interface {
-	AppUser
+	// AppUser
+	domain.SystemOwnerModel
 
 	GetOrganization(ctxc context.Context) (Organization, error)
 
@@ -27,7 +28,7 @@ type SystemOwner interface {
 }
 
 type systemOwner struct {
-	AppUser
+	domain.SystemOwnerModel
 	rf               RepositoryFactory
 	orgRepo          OrganizationRepository
 	spaceRepo        SpaceRepository
@@ -37,7 +38,7 @@ type systemOwner struct {
 	rbacRepo         RBACRepository
 }
 
-func NewSystemOwner(rf RepositoryFactory, appUser AppUser) (SystemOwner, error) {
+func NewSystemOwner(rf RepositoryFactory, systemOwnerModel domain.SystemOwnerModel) (SystemOwner, error) {
 
 	orgRepo, err := rf.NewOrganizationRepository()
 	if err != nil {
@@ -65,7 +66,7 @@ func NewSystemOwner(rf RepositoryFactory, appUser AppUser) (SystemOwner, error) 
 	}
 
 	m := &systemOwner{
-		AppUser:          appUser,
+		SystemOwnerModel: systemOwnerModel,
 		rf:               rf,
 		orgRepo:          orgRepo,
 		spaceRepo:        spaceRepo,

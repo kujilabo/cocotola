@@ -101,6 +101,7 @@ work-init:
 	@go work use -r .
 
 gazelle:
+	sudo chmod 777 -R docker/development
 	@bazel run //:gazelle -- update-repos -from_file ./go.work
 	@bazel run //:gazelle
 
@@ -126,6 +127,14 @@ dev-docker-up:
 	@docker-compose -f docker/development/docker-compose.yml up -d
 	sleep 10
 	@chmod -R 777 docker/test
+
+dev-docker-down:
+	@docker-compose -f docker/development/docker-compose.yml down
+	sleep 10
+	@chmod -R 777 docker/test
+
+dev-docker-clean:
+	# @rm -rf docker/development/
 
 test-docker-up:
 	@docker-compose -f docker/test/docker-compose.yml up -d

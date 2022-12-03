@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "job",
+    srcs = [
+        "init.go",
+        "job_usecase_stat.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/job",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/service",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)

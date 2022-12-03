@@ -24,7 +24,7 @@ func InitSystemAdmin(rfFuncArg func(ctx context.Context, db *gorm.DB) (Repositor
 }
 
 type SystemAdmin interface {
-	GetID() uint
+	domain.SystemAdminModel
 
 	FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error)
 
@@ -36,6 +36,7 @@ type SystemAdmin interface {
 }
 
 type systemAdmin struct {
+	domain.SystemAdminModel
 	rf RepositoryFactory
 }
 
@@ -45,7 +46,8 @@ type systemAdmin struct {
 
 func NewSystemAdmin(rf RepositoryFactory) SystemAdmin {
 	return &systemAdmin{
-		rf: rf,
+		SystemAdminModel: domain.NewSystemAdminModel(),
+		rf:               rf,
 	}
 }
 func NewSystemAdminFromDB(ctx context.Context, db *gorm.DB) (SystemAdmin, error) {

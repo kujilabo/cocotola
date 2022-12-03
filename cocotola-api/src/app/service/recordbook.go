@@ -48,7 +48,10 @@ func (m *recordbook) GetWorkbookID() domain.WorkbookID {
 }
 
 func (m *recordbook) GetResults(ctx context.Context) (map[domain.ProblemID]domain.StudyRecord, error) {
-	repo := m.rf.NewRecordbookRepository(ctx)
+	repo, err := m.rf.NewRecordbookRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	studyResults, err := repo.FindStudyRecords(ctx, m.GetStudent(), m.workbookID, m.studyType)
 	if err != nil {
@@ -107,7 +110,10 @@ func (m *recordbook) GetResultsSortedLevel(ctx context.Context) ([]domain.StudyR
 }
 
 func (m *recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, mastered bool) error {
-	repo := m.rf.NewRecordbookRepository(ctx)
+	repo, err := m.rf.NewRecordbookRepository(ctx)
+	if err != nil {
+		return liberrors.Errorf("NewRecordbookRepository. err: %w", err)
+	}
 
 	if err := repo.SetResult(ctx, m.GetStudent(), m.workbookID, m.studyType, problemType, problemID, result, mastered); err != nil {
 		return liberrors.Errorf("failed to SetResult. err: %w", err)
@@ -145,7 +151,10 @@ func NewRecordbookSummary(rf RepositoryFactory, student Student, workbookID doma
 }
 func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[string]int, error) {
 	rateMax := 100
-	repo := m.rf.NewRecordbookRepository(ctx)
+	repo, err := m.rf.NewRecordbookRepository(ctx)
+	if err != nil {
+		return nil, liberrors.Errorf("NewRecordbookRepository. err: %w", err)
+	}
 
 	numberOfMasteredProblemsMap, err := repo.CountMasteredProblems(ctx, m.GetStudent(), m.workbookID)
 	if err != nil {

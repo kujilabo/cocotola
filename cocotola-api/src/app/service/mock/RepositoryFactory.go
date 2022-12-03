@@ -40,7 +40,7 @@ func (_m *RepositoryFactory) NewProblemRepository(ctx context.Context, problemTy
 }
 
 // NewProblemTypeRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) service.ProblemTypeRepository {
+func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) (service.ProblemTypeRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.ProblemTypeRepository
@@ -52,11 +52,18 @@ func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) servi
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewRecordbookRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) service.RecordbookRepository {
+func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) (service.RecordbookRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.RecordbookRepository
@@ -68,11 +75,41 @@ func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) servic
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// NewStatRepository provides a mock function with given fields: ctx
+func (_m *RepositoryFactory) NewStatRepository(ctx context.Context) (service.StatRepository, error) {
+	ret := _m.Called(ctx)
+
+	var r0 service.StatRepository
+	if rf, ok := ret.Get(0).(func(context.Context) service.StatRepository); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(service.StatRepository)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewStudyRecordRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) service.StudyRecordRepository {
+func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) (service.StudyRecordRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.StudyRecordRepository
@@ -84,11 +121,41 @@ func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) servi
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// NewStudyStatRepository provides a mock function with given fields: ctx
+func (_m *RepositoryFactory) NewStudyStatRepository(ctx context.Context) (service.StudyStatRepository, error) {
+	ret := _m.Called(ctx)
+
+	var r0 service.StudyStatRepository
+	if rf, ok := ret.Get(0).(func(context.Context) service.StudyStatRepository); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(service.StudyStatRepository)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewStudyTypeRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) service.StudyTypeRepository {
+func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) (service.StudyTypeRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.StudyTypeRepository
@@ -100,11 +167,18 @@ func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) service
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewUserQuotaRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) service.UserQuotaRepository {
+func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) (service.UserQuotaRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.UserQuotaRepository
@@ -116,7 +190,14 @@ func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) service
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewWorkbookRepository provides a mock function with given fields: ctx

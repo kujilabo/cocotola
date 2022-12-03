@@ -10,13 +10,17 @@ type RepositoryFactory interface {
 
 	NewProblemRepository(ctx context.Context, problemType string) (ProblemRepository, error)
 
-	NewProblemTypeRepository(ctx context.Context) ProblemTypeRepository
+	NewProblemTypeRepository(ctx context.Context) (ProblemTypeRepository, error)
 
-	NewStudyTypeRepository(ctx context.Context) StudyTypeRepository
+	NewStudyTypeRepository(ctx context.Context) (StudyTypeRepository, error)
 
-	NewStudyRecordRepository(ctx context.Context) StudyRecordRepository
+	NewStudyRecordRepository(ctx context.Context) (StudyRecordRepository, error)
 
-	NewRecordbookRepository(ctx context.Context) RecordbookRepository
+	NewRecordbookRepository(ctx context.Context) (RecordbookRepository, error)
 
-	NewUserQuotaRepository(ctx context.Context) UserQuotaRepository
+	NewUserQuotaRepository(ctx context.Context) (UserQuotaRepository, error)
+
+	NewStatRepository(ctx context.Context) (StatRepository, error)
+
+	NewStudyStatRepository(ctx context.Context) (StudyStatRepository, error)
 }
