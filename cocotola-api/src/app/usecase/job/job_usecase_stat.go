@@ -54,6 +54,10 @@ func (j *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 		}
 
 		studyStatRepo, err := rf.NewStudyStatRepository(ctx)
+		if err != nil {
+			return err
+		}
+
 		if err := studyStatRepo.AggregateResultsOfAllUsers(ctx, systemOwner, targetDate); err != nil {
 			return err
 		}
