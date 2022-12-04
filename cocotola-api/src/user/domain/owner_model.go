@@ -5,15 +5,11 @@ type OwnerModel interface {
 }
 
 type ownerModel struct {
-	// rf RepositoryFactory
 	AppUserModel
 }
 
-func NewOwner(
-	// rf RepositoryFactory,
-	appUser AppUserModel) OwnerModel {
+func NewOwner(appUser AppUserModel) OwnerModel {
 	return &ownerModel{
-		// rf:      rf,
 		AppUserModel: appUser,
 	}
 }

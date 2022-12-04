@@ -152,6 +152,20 @@ func (_m *SystemStudent) GetUsername() string {
 	return r0
 }
 
+// IsSystemStudentModel provides a mock function with given fields:
+func (_m *SystemStudent) IsSystemStudentModel() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // NewSystemStudent creates a new instance of SystemStudent. It also registers a cleanup function to assert the mocks expectations.
 func NewSystemStudent(t testing.TB) *SystemStudent {
 	mock := &SystemStudent{}

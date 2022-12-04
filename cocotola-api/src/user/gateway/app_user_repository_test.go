@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
@@ -73,16 +72,10 @@ import (
 // }
 
 func Test_appUserRepository_AddAppUser(t *testing.T) {
-	// logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
-
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
 	fn := func(ctx context.Context, ts testService) {
-		_, owner := testInitOrganization(t, ts)
+		// logrus.SetLevel(logrus.DebugLevel)
+		orgID, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
 			operator domain.OwnerModel
@@ -114,7 +107,7 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 		assert.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
-				got, err := appUserRepo.AddAppUser(bg, tt.args.operator, tt.args.param)
+				got, err := appUserRepo.AddAppUser(ctx, tt.args.operator, tt.args.param)
 				if err != nil && !errors.Is(err, tt.err) {
 					t.Errorf("AddAppUser() error = %v, err %v", err, tt.err)
 					return

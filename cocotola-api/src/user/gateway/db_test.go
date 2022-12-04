@@ -15,6 +15,8 @@ import (
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
+const orgNameLength = 8
+
 type testService struct {
 	driverName string
 	db         *gorm.DB
@@ -38,23 +40,16 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	}
 }
 
-func testInitOrganization(t *testing.T, ts testService) (domain.OrganizationID, service.Owner) {
+func setupOrganization(t *testing.T, ts testService) (domain.OrganizationID, service.Owner) {
 	bg := context.Background()
+	orgName := RandString(orgNameLength)
 	sysAd, err := service.NewSystemAdminFromDB(bg, ts.db)
 	assert.NoError(t, err)
 
 	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	assert.NoError(t, err)
-	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
+	orgAddParam, err := service.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	assert.NoError(t, err)
-
-	// delete all organizations
-	ts.db.Exec("delete from space")
-	ts.db.Exec("delete from app_user")
-	ts.db.Exec("delete from organization")
-	// db.Where("true").Delete(&spaceEntity{})
-	// db.Where("true").Delete(&appUserEntity{})
-	// db.Where("true").Delete(&organizationEntity{})
 
 	orgRepo, err := gateway.NewOrganizationRepository(ts.db)
 	require.NoError(t, err)
@@ -70,7 +65,7 @@ func testInitOrganization(t *testing.T, ts testService) (domain.OrganizationID, 
 	assert.NoError(t, err)
 	assert.Greater(t, int(uint(sysOwnerID)), 0)
 
-	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, "ORG_NAME")
+	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, orgName)
 	assert.NoError(t, err)
 	assert.Greater(t, int(uint(sysOwnerID)), 0)
 
@@ -89,6 +84,16 @@ func testInitOrganization(t *testing.T, ts testService) (domain.OrganizationID, 
 	assert.NoError(t, err)
 
 	return orgID, firstOwner
+}
+
+func teardownOrganization(t *testing.T, ts testService, orgID domain.OrganizationID) {
+	// delete all organizations
+	ts.db.Exec("delete from space where organization_id = ?", uint(orgID))
+	ts.db.Exec("delete from app_user where organization_id = ?", uint(orgID))
+	ts.db.Exec("delete from organization where id = ?", uint(orgID))
+	// db.Where("true").Delete(&spaceEntity{})
+	// db.Where("true").Delete(&appUserEntity{})
+	// db.Where("true").Delete(&organizationEntity{})
 }
 
 func testNewAppUserAddParameter(t *testing.T, loginID, username string) service.AppUserAddParameter {

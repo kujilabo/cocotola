@@ -2,53 +2,27 @@ package gateway_test
 
 import (
 	"context"
-	"log"
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	testlibeG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
+const invalidOrgID = 99999
+
 func TestGetOrganization(t *testing.T) {
-	// logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
+	fn := func(ctx context.Context, ts testService) {
+		// logrus.SetLevel(logrus.DebugLevel)
+		orgID, _ := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
-	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("LOGIN_ID", "USERNAME", "")
-	assert.NoError(t, err)
-	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
-	assert.NoError(t, err)
-	for driverName, db := range testlibeG.ListDB() {
-		sysAd, err := service.NewSystemAdminFromDB(bg, db)
-		assert.NoError(t, err)
-
-		log.Printf("%s", driverName)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		// delete all organizations
-		db.Exec("delete from organization")
-
-		orgRepo, err := gateway.NewOrganizationRepository(db)
+		orgRepo, err := gateway.NewOrganizationRepository(ts.db)
 		require.NoError(t, err)
-
-		// register new organization
-		orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
-		assert.NoError(t, err)
-		assert.Greater(t, int(uint(orgID)), 0)
 
 		// get organization registered
 		model, err := domain.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
@@ -56,113 +30,58 @@ func TestGetOrganization(t *testing.T) {
 		userModel, err := domain.NewAppUserModel(model, orgID, "login_id", "username", []string{}, map[string]string{})
 		assert.NoError(t, err)
 		{
-			org, err := orgRepo.GetOrganization(bg, userModel)
+			org, err := orgRepo.GetOrganization(ctx, userModel)
 			assert.NoError(t, err)
-			assert.Equal(t, "ORG_NAME", org.GetName())
+			assert.Equal(t, orgNameLength, len(org.GetName()))
 		}
 
 		// get organization unregistered
-		otherUserModel, err := domain.NewAppUserModel(model, orgID+1, "login_id", "username", []string{}, map[string]string{})
+		otherUserModel, err := domain.NewAppUserModel(model, invalidOrgID, "login_id", "username", []string{}, map[string]string{})
 		assert.NoError(t, err)
 		{
-			_, err := orgRepo.GetOrganization(bg, otherUserModel)
+			_, err := orgRepo.GetOrganization(ctx, otherUserModel)
 			assert.Equal(t, service.ErrOrganizationNotFound, err)
 		}
 	}
+	testDB(t, fn)
 }
 
 func TestFindOrganizationByName(t *testing.T) {
-	// logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
+	fn := func(ctx context.Context, ts testService) {
+		// logrus.SetLevel(logrus.DebugLevel)
+		orgID, _ := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
+		systemAdminModel := domain.NewSystemAdminModel()
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
-
-	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("LOGIN_ID", "USERNAME", "")
-	assert.NoError(t, err)
-	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
-	assert.NoError(t, err)
-	for driverName, db := range testlibeG.ListDB() {
-		sysAd, err := service.NewSystemAdminFromDB(bg, db)
-		assert.NoError(t, err)
-
-		log.Printf("%s", driverName)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		// delete all organizations
-		db.Exec("delete from organization")
-		// db.Where("true").Delete(&organizationEntity{})
-
-		orgRepo, err := gateway.NewOrganizationRepository(db)
+		orgRepo, err := gateway.NewOrganizationRepository(ts.db)
 		require.NoError(t, err)
 
-		// register new organization
-		orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
+		var orgName string
+
+		// get organization registered
+		model, err := domain.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
 		assert.NoError(t, err)
-		assert.Greater(t, int(uint(orgID)), 0)
+		userModel, err := domain.NewAppUserModel(model, orgID, "login_id", "username", []string{}, map[string]string{})
+		assert.NoError(t, err)
+		{
+			org, err := orgRepo.GetOrganization(ctx, userModel)
+			assert.NoError(t, err)
+			assert.Equal(t, orgNameLength, len(org.GetName()))
+			orgName = org.GetName()
+		}
 
 		// find organization registered by name
 		{
-			org, err := orgRepo.FindOrganizationByName(bg, sysAd, "ORG_NAME")
+			org, err := orgRepo.FindOrganizationByName(ctx, systemAdminModel, orgName)
 			assert.NoError(t, err)
-			assert.Equal(t, "ORG_NAME", org.GetName())
+			assert.Equal(t, orgName, org.GetName())
 		}
 
 		// find organization unregistered by name
 		{
-			_, err := orgRepo.FindOrganizationByName(bg, sysAd, "NOT_FOUND")
+			_, err := orgRepo.FindOrganizationByName(ctx, systemAdminModel, "NOT_FOUND")
 			assert.Equal(t, service.ErrOrganizationNotFound, err)
 		}
 	}
-}
-
-func TestAddOrganization(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
-	bg := context.Background()
-
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
-
-	service.InitSystemAdmin(userRfFunc)
-
-	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("LOGIN_ID", "USERNAME", "")
-	assert.NoError(t, err)
-	orgAddParam, err := service.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
-	assert.NoError(t, err)
-	for driverName, db := range testlibeG.ListDB() {
-		sysAd, err := service.NewSystemAdminFromDB(bg, db)
-		assert.NoError(t, err)
-
-		log.Printf("%s", driverName)
-		sqlDB, err := db.DB()
-		assert.NoError(t, err)
-		defer sqlDB.Close()
-
-		// delete all organizations
-		db.Exec("delete from organization")
-		// db.Where("true").Delete(&organizationEntity{})
-
-		orgRepo, err := gateway.NewOrganizationRepository(db)
-		require.NoError(t, err)
-
-		// register new organization
-		{
-			orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
-			assert.NoError(t, err)
-			assert.Greater(t, int(uint(orgID)), 0)
-		}
-
-		// register new organization
-		{
-			_, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
-			assert.Equal(t, service.ErrOrganizationAlreadyExists, err)
-		}
-
-	}
+	testDB(t, fn)
 }

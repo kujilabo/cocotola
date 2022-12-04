@@ -25,14 +25,14 @@ import (
 var anythingOfContext = mock.MatchedBy(func(_ context.Context) bool { return true })
 
 func englishWordProblemProcessor_Init(t *testing.T) (
-	synthesizerClient *appSM.SynthesizerClient,
-	translatorClient *pluginSM.TranslatorClient,
-	tatoebaClient *pluginSM.TatoebaClient,
 	operator *appDM.StudentModel,
 	workbookModel *appDM.WorkbookModel,
 	rf *appSM.RepositoryFactory,
 	problemRepo *appSM.ProblemRepository,
-	englishWordProblemProcessor service.EnglishWordProblemProcessor) {
+	englishWordProblemProcessor service.EnglishWordProblemProcessor,
+	synthesizerClient *appSM.SynthesizerClient,
+	translatorClient *pluginSM.TranslatorClient,
+	tatoebaClient *pluginSM.TatoebaClient) {
 
 	synthesizerClient = new(appSM.SynthesizerClient)
 	translatorClient = new(pluginSM.TranslatorClient)
@@ -55,7 +55,7 @@ func testNewTranslation(pos pluginD.WordPos, translated string) *pluginDM.Transl
 
 func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *testing.T) {
 	ctx := context.Background()
-	_, _, _, operator, workbookModel, rf, problemRepo, processor := englishWordProblemProcessor_Init(t)
+	operator, workbookModel, rf, problemRepo, processor, _, _, _ := englishWordProblemProcessor_Init(t)
 
 	// given
 	// - workbook
@@ -98,7 +98,7 @@ func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *
 
 func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t *testing.T) {
 	ctx := context.Background()
-	_, translatorClient, _, operator, workbookModel, rf, problemRepo, processor := englishWordProblemProcessor_Init(t)
+	operator, workbookModel, rf, problemRepo, processor, _, translatorClient, _ := englishWordProblemProcessor_Init(t)
 
 	// given
 	// - workbook
@@ -153,7 +153,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 
 func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	ctx := context.Background()
-	_, _, _, operator, workbookModel, rf, problemRepo, processor := englishWordProblemProcessor_Init(t)
+	operator, workbookModel, rf, problemRepo, processor, _, _, _ := englishWordProblemProcessor_Init(t)
 
 	// given
 	// - workbook
@@ -163,10 +163,10 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	// - problemRepo
 	problemRepo.On("UpdateProblem", anythingOfContext, operator, mock.Anything, mock.Anything).Return(nil)
 	// when
+	// - idParam
+	idParam := new(appSM.ProblemSelectParameter2)
+	idParam.On("GetProblemID").Return(appD.ProblemID(1))
 	// - param
-	paramSelect := new(appSM.ProblemSelectParameter2)
-	paramSelect.On("GetProblemID").Return(appD.ProblemID(1))
-
 	param := new(appSM.ProblemUpdateParameter)
 	param.On("GetWorkbookID").Return(appD.WorkbookID(1))
 	param.On("GetIntProperty", "number").Return(2, nil)
@@ -176,7 +176,7 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 		"translated": "ペン",
 		"lang2":      "ja",
 	})
-	added, updated, removed, err := processor.UpdateProblem(ctx, rf, operator, workbookModel, paramSelect, param)
+	added, updated, removed, err := processor.UpdateProblem(ctx, rf, operator, workbookModel, idParam, param)
 	require.NoError(t, err)
 	// then
 	require.Equal(t, 0, len(added))
@@ -290,9 +290,8 @@ func TestNewEnglishWordProblemAddParemeter(t *testing.T) {
 			if tt.wantErr == nil {
 				assert.NoError(t, err)
 			} else if !errors.Is(err, tt.wantErr) {
-				t.Errorf("NewEnglishWordProblemAddParemeter()Err = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewEnglishWordProblemAddParemeter() err = %v, wantErr %v", err, tt.wantErr)
 			}
-
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewEnglishWordProblemAddParemeter() = %v, want %v", got, tt.want)
 			}

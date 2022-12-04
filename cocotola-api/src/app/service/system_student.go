@@ -6,13 +6,12 @@ import (
 	"errors"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type SystemStudent interface {
-	userD.AppUserModel
+	domain.SystemStudentModel
 
 	FindWorkbookFromSystemSpace(ctx context.Context, name string) (Workbook, error)
 
@@ -20,14 +19,14 @@ type SystemStudent interface {
 }
 
 type systemStudent struct {
-	userD.AppUserModel
+	domain.SystemStudentModel
 	rf RepositoryFactory
 }
 
-func NewSystemStudent(rf RepositoryFactory, appUser userD.AppUserModel) (SystemStudent, error) {
+func NewSystemStudent(rf RepositoryFactory, systemStudentModel domain.SystemStudentModel) (SystemStudent, error) {
 	m := &systemStudent{
-		AppUserModel: appUser,
-		rf:           rf,
+		SystemStudentModel: systemStudentModel,
+		rf:                 rf,
 	}
 
 	return m, libD.Validator.Struct(m)

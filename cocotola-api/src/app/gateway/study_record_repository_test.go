@@ -18,7 +18,8 @@ func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
-		_, sysOwner, owner := testInitOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 		studyRecordRepo, _ := ts.rf.NewStudyRecordRepository(ctx)
 

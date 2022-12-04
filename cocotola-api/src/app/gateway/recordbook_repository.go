@@ -15,6 +15,7 @@ import (
 )
 
 type recordbookEntity struct {
+	OrganizationID uint
 	AppUserID      uint
 	WorkbookID     uint
 	ProblemTypeID  uint
@@ -158,6 +159,7 @@ func (r *recordbookRepository) setResult(ctx context.Context, operator domain.St
 				level = 1
 			}
 			entity = recordbookEntity{
+				OrganizationID: uint(operator.GetOrganizationID()),
 				AppUserID:      operator.GetID(),
 				WorkbookID:     uint(workbookID),
 				ProblemTypeID:  problemTypeID,

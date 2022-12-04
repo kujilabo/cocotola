@@ -30,18 +30,18 @@ func NewAudioModel(id uint, lang2 Lang2, text, content string) (AudioModel, erro
 	return m, libD.Validator.Struct(m)
 }
 
-func (a *audioModel) GetID() uint {
-	return a.ID
+func (m *audioModel) GetID() uint {
+	return m.ID
 }
 
-func (a *audioModel) GetLang2() Lang2 {
-	return a.Lang2
+func (m *audioModel) GetLang2() Lang2 {
+	return m.Lang2
 }
 
-func (a *audioModel) GetText() string {
-	return a.Text
+func (m *audioModel) GetText() string {
+	return m.Text
 }
 
-func (a *audioModel) GetContent() string {
-	return a.Content
+func (m *audioModel) GetContent() string {
+	return m.Content
 }
