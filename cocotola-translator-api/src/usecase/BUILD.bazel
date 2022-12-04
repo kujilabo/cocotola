@@ -30,5 +30,6 @@ go_test(
         "//cocotola-translator-api/src/service/mock",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
     ],
 )

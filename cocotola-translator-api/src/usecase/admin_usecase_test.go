@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
@@ -25,16 +26,16 @@ func matchErrorFunc(expected error) assert.ErrorAssertionFunc {
 }
 
 func Test_adminUsecase_RemoveTranslation(t *testing.T) {
-	bg := context.Background()
+	ctx := context.Background()
 
 	// given
 	customRepo := new(service_mock.CustomTranslationRepository)
 	customRepo.On("Remove", anythingOfContext, domain.Lang2JA, "apple", domain.PosNoun).Return(nil)
 	customRepo.On("Remove", anythingOfContext, domain.Lang2JA, "orange", domain.PosNoun).Return(service.ErrTranslationNotFound)
 	rf := new(service_mock.RepositoryFactory)
-	rf.On("NewCustomTranslationRepository", anythingOfContext).Return(customRepo)
-	adminUsecase := usecase.NewAdminUsecase(rf)
-
+	rf.On("NewCustomTranslationRepository", anythingOfContext).Return(customRepo, nil)
+	adminUsecase, err := usecase.NewAdminUsecase(ctx, rf)
+	require.NoError(t, err)
 	type args struct {
 		lang2 domain.Lang2
 		text  string
@@ -51,7 +52,7 @@ func Test_adminUsecase_RemoveTranslation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// when
-			err := adminUsecase.RemoveTranslation(bg, tt.args.lang2, tt.args.text, tt.args.pos)
+			err := adminUsecase.RemoveTranslation(ctx, tt.args.lang2, tt.args.text, tt.args.pos)
 
 			// then
 			tt.assertion(t, err)

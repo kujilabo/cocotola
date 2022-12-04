@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
@@ -21,7 +22,8 @@ func test_userUsecase_DictionaryLookup_init(t *testing.T, ctx context.Context) (
 	rf.On("NewAzureTranslationRepository", ctx).Return(azureTranslationRepo, nil)
 	rf.On("NewCustomTranslationRepository", ctx).Return(customTranslationRepo, nil)
 	azureTranslationClient := new(service_mock.AzureTranslationClient)
-	userUsecase := usecase.NewUserUsecase(rf, azureTranslationClient)
+	userUsecase, err := usecase.NewUserUsecase(ctx, rf, azureTranslationClient)
+	require.NoError(t, err)
 
 	return azureTranslationClient, azureTranslationRepo, customTranslationRepo, userUsecase
 }

@@ -21,6 +21,7 @@ type UserUsecase interface {
 
 type userUsecase struct {
 	rf                     service.RepositoryFactory
+	customRepo             service.CustomTranslationRepository
 	azureTranslationClient service.AzureTranslationClient
 }
 
@@ -29,11 +30,16 @@ type UserPresenter interface {
 	WriteTranslation(ctx context.Context, translation domain.Translation) error
 }
 
-func NewUserUsecase(rf service.RepositoryFactory, azureTranslationClient service.AzureTranslationClient) UserUsecase {
+func NewUserUsecase(ctx context.Context, rf service.RepositoryFactory, azureTranslationClient service.AzureTranslationClient) (UserUsecase, error) {
+	customRepo, err := rf.NewCustomTranslationRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
 	return &userUsecase{
 		rf:                     rf,
+		customRepo:             customRepo,
 		azureTranslationClient: azureTranslationClient,
-	}
+	}, nil
 }
 
 func (u *userUsecase) selectMaxConfidenceTranslations(ctx context.Context, in []service.AzureTranslation) (map[domain.WordPos]service.AzureTranslation, error) {
@@ -53,9 +59,7 @@ func (u *userUsecase) customDictionaryLookup(ctx context.Context, text string, f
 	// if err != nil {
 	// 	return nil, err
 	// }
-	customRepo := u.rf.NewCustomTranslationRepository(ctx)
-
-	customContained, err := customRepo.Contain(ctx, toLang, text)
+	customContained, err := u.customRepo.Contain(ctx, toLang, text)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +67,7 @@ func (u *userUsecase) customDictionaryLookup(ctx context.Context, text string, f
 		return nil, service.ErrTranslationNotFound
 	}
 
-	customResults, err := customRepo.FindByText(ctx, toLang, text)
+	customResults, err := u.customRepo.FindByText(ctx, toLang, text)
 	if err != nil {
 		return nil, err
 	}

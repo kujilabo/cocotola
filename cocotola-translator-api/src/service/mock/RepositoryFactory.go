@@ -33,7 +33,7 @@ func (_m *RepositoryFactory) NewAzureTranslationRepository(ctx context.Context) 
 }
 
 // NewCustomTranslationRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewCustomTranslationRepository(ctx context.Context) service.CustomTranslationRepository {
+func (_m *RepositoryFactory) NewCustomTranslationRepository(ctx context.Context) (service.CustomTranslationRepository, error) {
 	ret := _m.Called(ctx)
 
 	var r0 service.CustomTranslationRepository
@@ -45,7 +45,14 @@ func (_m *RepositoryFactory) NewCustomTranslationRepository(ctx context.Context)
 		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewRepositoryFactory creates a new instance of RepositoryFactory. It also registers a cleanup function to assert the mocks expectations.
