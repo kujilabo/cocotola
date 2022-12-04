@@ -2,8 +2,8 @@ package gateway_test
 
 import (
 	"context"
-	"math/rand"
-	"time"
+	"crypto/rand"
+	"math/big"
 
 	"gorm.io/gorm"
 
@@ -19,7 +19,6 @@ var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 func init() {
 	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
-	rand.Seed(time.Now().UnixNano())
 
 	userRfFunc = func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
 		return userG.NewRepositoryFactory(db)
@@ -31,7 +30,11 @@ func init() {
 func RandString(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+		val, err := rand.Int(rand.Reader, big.NewInt(int64(len(letterRunes))))
+		if err != nil {
+			panic(err)
+		}
+		b[i] = letterRunes[val.Int64()]
 	}
 	return string(b)
 }

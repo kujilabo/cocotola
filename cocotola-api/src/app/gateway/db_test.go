@@ -77,47 +77,47 @@ func setupOrganization(t *testing.T, ts testService) (userD.OrganizationID, user
 	bg := context.Background()
 	orgName := RandString(orgNameLength)
 	sysAd, err := userS.NewSystemAdminFromDB(bg, ts.db)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	orgAddParam, err := userS.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	orgRepo, err := userG.NewOrganizationRepository(ts.db)
 	require.NoError(t, err)
 
 	// register new organization
 	orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
-	assert.NoError(t, err)
-	assert.Greater(t, int(uint(orgID)), 0)
+	require.NoError(t, err)
+	require.Greater(t, int(uint(orgID)), 0)
 	logrus.Debugf("OrgID: %d \n", uint(orgID))
 	org, err := orgRepo.FindOrganizationByID(bg, sysAd, orgID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	logrus.Debugf("OrgID: %d \n", org.GetID())
 
 	appUserRepo, err := userG.NewAppUserRepository(ts.userRf, ts.db)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	sysOwnerID, err := appUserRepo.AddSystemOwner(bg, sysAd, orgID)
-	assert.NoError(t, err)
-	assert.Greater(t, int(uint(sysOwnerID)), 0)
+	require.NoError(t, err)
+	require.Greater(t, int(uint(sysOwnerID)), 0)
 
 	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, orgName)
-	assert.NoError(t, err)
-	assert.Greater(t, int(uint(sysOwnerID)), 0)
+	require.NoError(t, err)
+	require.Greater(t, int(uint(sysOwnerID)), 0)
 
 	firstOwnerID, err := appUserRepo.AddFirstOwner(bg, sysOwner, firstOwnerAddParam)
-	assert.NoError(t, err)
-	assert.Greater(t, int(uint(firstOwnerID)), 0)
+	require.NoError(t, err)
+	require.Greater(t, int(uint(firstOwnerID)), 0)
 
 	firstOwner, err := appUserRepo.FindOwnerByLoginID(bg, sysOwner, "OWNER_ID")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	spaceRepo, err := userG.NewSpaceRepository(ts.db)
 	require.NoError(t, err)
 	_, err = spaceRepo.AddDefaultSpace(bg, sysOwner)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = spaceRepo.AddPersonalSpace(bg, sysOwner, firstOwner)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	return orgID, sysOwner, firstOwner
 }
@@ -138,74 +138,74 @@ func teardownOrganization(t *testing.T, ts testService, orgID userD.Organization
 
 func testNewAppUserAddParameter(t *testing.T, loginID, username string) userS.AppUserAddParameter {
 	p, err := userS.NewAppUserAddParameter(loginID, username, []string{}, map[string]string{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return p
 }
 
 func testNewProblemType(t *testing.T, id uint, name string) domain.ProblemType {
 	p, err := domain.NewProblemType(id, name)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return p
 }
 
 func testNewStudyType(t *testing.T, id uint, name string) domain.StudyType {
 	p, err := domain.NewStudyType(id, name)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return p
 }
 
 func testNewWorkbookSearchCondition(t *testing.T) service.WorkbookSearchCondition {
 	p, err := service.NewWorkbookSearchCondition(1, 10, []userD.SpaceID{})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return p
 }
 
 func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddParameter {
 	p, err := service.NewWorkbookAddParameter("english_word_problem", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return p
 }
 
 func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner userS.SystemOwner, owner userS.Owner, loginID, username string) userS.AppUser {
 	appUserRepo, err := userG.NewAppUserRepository(ts.userRf, ts.db)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	userID1, err := appUserRepo.AddAppUser(ctx, owner, testNewAppUserAddParameter(t, loginID, username))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	user1, err := appUserRepo.FindAppUserByID(ctx, owner, userID1)
-	assert.NoError(t, err)
-	assert.Equal(t, loginID, user1.GetLoginID())
+	require.NoError(t, err)
+	require.Equal(t, loginID, user1.GetLoginID())
 
 	spaceRepo, err := userG.NewSpaceRepository(ts.db)
 	require.NoError(t, err)
 
 	spaceID1, err := spaceRepo.AddPersonalSpace(ctx, sysOwner, user1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	space, err := user1.GetPersonalSpace(ctx)
 	require.NoError(t, err)
-	assert.Equal(t, spaceID1, userD.SpaceID(space.GetID()))
+	require.Equal(t, spaceID1, userD.SpaceID(space.GetID()))
 
 	return user1
 }
 
 func testNewStudentModel(t *testing.T, appUserModel userD.AppUserModel) domain.StudentModel {
 	s, err := domain.NewStudentModel(appUserModel)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return s
 }
 
 func testNewStudent(t *testing.T, testService testService, appUserModel userD.AppUserModel) service.Student {
 	studentModel := testNewStudentModel(t, appUserModel)
 	s, err := service.NewStudent(testService.pf, testService.rf, testService.userRf, studentModel)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return s
 }
 
 func testNewWorkbook(t *testing.T, ctx context.Context, db *gorm.DB, workbookRepo service.WorkbookRepository, student service.Student, spaceID userD.SpaceID, workbookName string) service.Workbook {
 	workbookID11, err := workbookRepo.AddWorkbook(ctx, student, spaceID, testNewWorkbookAddParameter(t, workbookName))
-	assert.NoError(t, err)
-	assert.Greater(t, int(workbookID11), 0)
+	require.NoError(t, err)
+	require.Greater(t, int(workbookID11), 0)
 	workbook, err := workbookRepo.FindWorkbookByID(ctx, student, workbookID11)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return workbook
 }
