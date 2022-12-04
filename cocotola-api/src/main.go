@@ -562,9 +562,13 @@ func initApp2_2(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 }
 
 func initApp2_3(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) error {
-
 	var propertiesTatoebaWorkbookID appD.WorkbookID
 	if err := db.Transaction(func(tx *gorm.DB) error {
+		rf, err := rfFunc(ctx, tx)
+		if err != nil {
+			return err
+		}
+
 		userRf, err := userRfFunc(ctx, tx)
 		if err != nil {
 			return err
@@ -574,22 +578,22 @@ func initApp2_3(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
 		if err != nil {
-			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
+			return liberrors.Errorf("FindSystemOwnerByOrganizationName. err: %w", err)
 		}
 
 		systemStudentAppUser, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
 		if err != nil {
-			return liberrors.Errorf("failed to FindAppUserByLoginID. err: %w", err)
+			return liberrors.Errorf("FindAppUserByLoginID. err: %w", err)
 		}
 
-		rf, err := rfFunc(ctx, tx)
+		systemStudentModel, err := appD.NewSystemStudentModel(systemStudentAppUser)
 		if err != nil {
-			return err
+			return liberrors.Errorf("NewSystemStudentModel. err: %w", err)
 		}
 
-		systemStudent, err := appS.NewSystemStudent(rf, systemStudentAppUser)
+		systemStudent, err := appS.NewSystemStudent(rf, systemStudentModel)
 		if err != nil {
-			return err
+			return liberrors.Errorf("NewSystemStudent. err: %w", err)
 		}
 
 		tatoebaWorkbook, err := systemStudent.FindWorkbookFromSystemSpace(ctx, appS.TatoebaWorkbookName)
@@ -600,12 +604,12 @@ func initApp2_3(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 
 			paramToAddWorkbook, err := appS.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, appS.TatoebaWorkbookName, appD.Lang2JA, "", map[string]string{})
 			if err != nil {
-				return err
+				return liberrors.Errorf("NewWorkbookAddParameter. err: %w", err)
 			}
 
 			tatoebaWorkbookID, err := systemStudent.AddWorkbookToSystemSpace(ctx, paramToAddWorkbook)
 			if err != nil {
-				return err
+				return liberrors.Errorf("AddWorkbookToSystemSpace. err: %w", err)
 			}
 
 			propertiesTatoebaWorkbookID = tatoebaWorkbookID
@@ -628,17 +632,22 @@ func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactor
 	logger.Infof("callback. loginID: %s", appUser.GetLoginID())
 
 	if appUser.GetLoginID() == testUserEmail {
-		student, err := appS.NewStudent(pf, repo, userRepo, appUser)
+		studentModel, err := appD.NewStudentModel(appUser)
 		if err != nil {
-			return liberrors.Errorf("failed to NewStudent. err: %w", err)
+			return liberrors.Errorf("NewStudentModel. err: %w", err)
+		}
+
+		student, err := appS.NewStudent(pf, repo, userRepo, studentModel)
+		if err != nil {
+			return liberrors.Errorf("NewStudent. err: %w", err)
 		}
 
 		if err := english_word.CreateDemoWorkbook(ctx, student); err != nil {
-			return liberrors.Errorf("failed to CreateDemoWorkbook. err: %w", err)
+			return liberrors.Errorf("english_word.CreateDemoWorkbook. err: %w", err)
 		}
 
 		if err := english_word.Create20NGSLWorkbook(ctx, student); err != nil {
-			return liberrors.Errorf("failed to Create20NGSLWorkbook. err: %w", err)
+			return liberrors.Errorf("english_word.Create20NGSLWorkbook. err: %w", err)
 		}
 
 		if err := english_sentence.CreateFlushWorkbook(ctx, student); err != nil {

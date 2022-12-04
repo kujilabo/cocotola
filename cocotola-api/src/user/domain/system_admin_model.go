@@ -7,9 +7,6 @@ type SystemAdminModel interface {
 	IsSystemAdminModel() bool
 }
 
-// type systemAdminModel struct {
-// }
-
 type systemAdminModel struct {
 }
 

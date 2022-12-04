@@ -1,16 +1,21 @@
 package domain
 
 import (
+	"errors"
 	"reflect"
 	"testing"
+
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewLang2(t *testing.T) {
 	tests := []struct {
-		name    string
-		args    string
-		want    Lang2
-		wantErr bool
+		name          string
+		args          string
+		want          Lang2
+		wantErr       bool
+		wantErrDetail error
 	}{
 		{
 			name:    "en",
@@ -25,17 +30,22 @@ func TestNewLang2(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "empty string",
-			args:    "",
-			wantErr: true,
+			name:          "empty string",
+			args:          "",
+			wantErr:       true,
+			wantErrDetail: libD.ErrInvalidArgument,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewLang2(tt.args)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NewLang2() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if !tt.wantErr {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				if tt.wantErrDetail != nil && !errors.Is(err, tt.wantErrDetail) {
+					t.Errorf("NewAudioModel() err = %v, wantErrDetail %v", err, tt.wantErrDetail)
+				}
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewLang2() = %v, want %v", got, tt.want)

@@ -11,9 +11,6 @@ import (
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
-const SystemAdminID = 1
-
-// var systemAdminInstance SystemAdmin
 var rfFunc func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)
 
 func InitSystemAdmin(rfFuncArg func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)) {
@@ -40,10 +37,6 @@ type systemAdmin struct {
 	rf RepositoryFactory
 }
 
-// func SystemAdminInstance() SystemAdmin {
-// 	return systemAdminInstance
-// }
-
 func NewSystemAdmin(rf RepositoryFactory) SystemAdmin {
 	return &systemAdmin{
 		SystemAdminModel: domain.NewSystemAdminModel(),
@@ -55,13 +48,7 @@ func NewSystemAdminFromDB(ctx context.Context, db *gorm.DB) (SystemAdmin, error)
 	if err != nil {
 		return nil, err
 	}
-	return &systemAdmin{
-		rf: rf,
-	}, nil
-}
-
-func (s *systemAdmin) GetID() uint {
-	return SystemAdminID
+	return NewSystemAdmin(rf), nil
 }
 
 func (s *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {

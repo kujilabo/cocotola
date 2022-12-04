@@ -18,18 +18,31 @@ import (
 )
 
 const (
-	problemType1 = "PROBLEM_TYPE_1"
-	problemType2 = "PROBLEM_TYPE_2"
+	problemType1          = "PROBLEM_TYPE_1"
+	problemType2          = "PROBLEM_TYPE_2"
+	studentLoginIDLength  = 20
+	studentUsernameLength = 20
 )
 
+func newRandStudent(t *testing.T, orgID userD.OrganizationID) domain.StudentModel {
+
+	model, err := userD.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
+	require.NoError(t, err)
+	userModel, err := userD.NewAppUserModel(model, orgID, RandString(studentLoginIDLength), RandString(studentUsernameLength), []string{}, map[string]string{})
+	require.NoError(t, err)
+	studentModel, err := domain.NewStudentModel(userModel)
+	require.NoError(t, err)
+	return studentModel
+}
+
 func student_Init(t *testing.T, ctx context.Context) (
-	spaceRepo *userS_mock.SpaceRepository,
+	pf *service_mock.ProcessorFactory,
+	rf *service_mock.RepositoryFactory,
 	userRf *userS_mock.RepositoryFactory,
+	spaceRepo *userS_mock.SpaceRepository,
 	workbookRepo *service_mock.WorkbookRepository,
 	userQuotaRepo *service_mock.UserQuotaRepository,
-	rf *service_mock.RepositoryFactory,
-	problemQuotaProcessor *service_mock.ProblemQuotaProcessor,
-	pf *service_mock.ProcessorFactory) {
+	problemQuotaProcessor *service_mock.ProblemQuotaProcessor) {
 
 	workbookRepo = new(service_mock.WorkbookRepository)
 	userQuotaRepo = new(service_mock.UserQuotaRepository)
@@ -45,20 +58,16 @@ func student_Init(t *testing.T, ctx context.Context) (
 	userRf = new(userS_mock.RepositoryFactory)
 	spaceRepo = new(userS_mock.SpaceRepository)
 	userRf.On("NewSpaceRepository").Return(spaceRepo, nil)
-
-	// return spaceRepo, userRf, workbookRepo, userQuotaRepo, rf, problemQuotaProcessor, pf
 	return
 }
 
 func Test_student_GetDefaultSpace(t *testing.T) {
 	ctx := context.Background()
-	spaceRepo, userRf, _, _, rf, _, pf := student_Init(t, ctx)
+	pf, rf, userRf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
-	userRf.On("NewSpaceRepository").Return(spaceRepo, nil)
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindDefaultSpace", ctx, mock.Anything).Return(expected, nil)
-	studentModel, err := domain.NewStudentModel(nil)
-	require.NoError(t, err)
+	studentModel := newRandStudent(t, userD.OrganizationID(1))
 	student, err := service.NewStudent(pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
@@ -74,13 +83,11 @@ func Test_student_GetDefaultSpace(t *testing.T) {
 
 func Test_student_GetPersonalSpace(t *testing.T) {
 	ctx := context.Background()
-	spaceRepo, userRf, _, _, rf, _, pf := student_Init(t, ctx)
+	pf, rf, userRf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(expected, nil)
-	studentModel, err := domain.NewStudentModel(nil)
-	require.NoError(t, err)
-
+	studentModel := newRandStudent(t, userD.OrganizationID(1))
 	student, err := service.NewStudent(pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
@@ -96,14 +103,13 @@ func Test_student_GetPersonalSpace(t *testing.T) {
 
 func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 	ctx := context.Background()
-	spaceRepo, userRf, workbookRepo, _, rf, _, pf := student_Init(t, ctx)
+	pf, rf, userRf, spaceRepo, workbookRepo, _, _ := student_Init(t, ctx)
 
 	space := new(userD_mock.SpaceModel)
 	space.On("GetID").Return(uint(100))
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(space, nil)
 
-	studentModel, err := domain.NewStudentModel(nil)
-	require.NoError(t, err)
+	studentModel := newRandStudent(t, userD.OrganizationID(1))
 	student, err := service.NewStudent(pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
@@ -123,13 +129,12 @@ func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 
 func Test_student_FindWorkbookByID(t *testing.T) {
 	ctx := context.Background()
-	_, userRf, workbookRepo, _, rf, _, pf := student_Init(t, ctx)
+	pf, rf, userRf, _, workbookRepo, _, _ := student_Init(t, ctx)
 
 	expected := new(service_mock.Workbook)
 	workbookRepo.On("FindWorkbookByID", ctx, mock.Anything, mock.Anything).Return(expected, nil)
 
-	studentModel, err := domain.NewStudentModel(nil)
-	require.NoError(t, err)
+	studentModel := newRandStudent(t, userD.OrganizationID(1))
 	student, err := service.NewStudent(pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
@@ -208,25 +213,19 @@ func Test_student_CheckQuota(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, userRf, _, userQuotaRepo, rf, problemQuotaProcessor, pf := student_Init(t, ctx)
+			pf, rf, userRf, _, _, userQuotaRepo, problemQuotaProcessor := student_Init(t, ctx)
 			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
 			problemQuotaProcessor.On("GetUnitForSizeQuota").Return(service.QuotaUnitPersitance)
 			problemQuotaProcessor.On("GetLimitForSizeQuota").Return(tt.quotaLimit)
 			problemQuotaProcessor.On("GetUnitForUpdateQuota").Return(service.QuotaUnitDay)
 			problemQuotaProcessor.On("GetLimitForUpdateQuota").Return(tt.quotaLimit)
 
-			orgID := userD.OrganizationID(1)
-			model, err := userD.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
-			require.NoError(t, err)
-			userModel, err := userD.NewAppUserModel(model, orgID, "login_id", "username", []string{}, map[string]string{})
-			require.NoError(t, err)
-			sm, err := domain.NewStudentModel(userModel)
-			require.NoError(t, err)
+			studentModel := newRandStudent(t, userD.OrganizationID(1))
 
-			s, err := service.NewStudent(pf, rf, userRf, sm)
+			student, err := service.NewStudent(pf, rf, userRf, studentModel)
 			require.NoError(t, err)
-			require.NotNil(t, s)
-			err = s.CheckQuota(ctx, tt.args.problemType, tt.args.name)
+			require.NotNil(t, student)
+			err = student.CheckQuota(ctx, tt.args.problemType, tt.args.name)
 			if err == nil && tt.err != nil {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			} else if err != nil && tt.err == nil {

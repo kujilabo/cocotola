@@ -14,13 +14,14 @@ import (
 const userFetchSize = 10
 
 type studyStatEntity struct {
-	AppUserID     uint
-	WorkbookID    uint
-	ProblemTypeID uint
-	StudyTypeID   uint
-	Answered      int
-	Mastered      int
-	RecordDate    time.Time
+	OrganizationID uint
+	AppUserID      uint
+	WorkbookID     uint
+	ProblemTypeID  uint
+	StudyTypeID    uint
+	Answered       int
+	Mastered       int
+	RecordDate     time.Time
 }
 
 func (e *studyStatEntity) TableName() string {
@@ -33,10 +34,10 @@ type studyStatRepository struct {
 	userRf userS.RepositoryFactory
 }
 
-func NewStudyStatRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB, userRf userS.RepositoryFactory) (service.StudyStatRepository, error) {
+func NewStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory, userRf userS.RepositoryFactory) (service.StudyStatRepository, error) {
 	return &studyStatRepository{
-		rf:     rf,
 		db:     db,
+		rf:     rf,
 		userRf: userRf,
 	}, nil
 }
@@ -69,12 +70,13 @@ func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, op
 
 			for _, result := range results.Results {
 				entity := studyStatEntity{
-					AppUserID:     uint(userID),
-					WorkbookID:    result.WorkbookID,
-					ProblemTypeID: result.ProblemTypeID,
-					StudyTypeID:   result.StudyTypeID,
-					Answered:      result.Answered,
-					Mastered:      result.Mastered,
+					OrganizationID: uint(operator.GetOrganizationID()),
+					AppUserID:      uint(userID),
+					WorkbookID:     result.WorkbookID,
+					ProblemTypeID:  result.ProblemTypeID,
+					StudyTypeID:    result.StudyTypeID,
+					Answered:       result.Answered,
+					Mastered:       result.Mastered,
 				}
 				// Upsert
 				if result := r.db.Clauses(clause.OnConflict{

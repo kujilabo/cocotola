@@ -18,7 +18,8 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, owner := testInitOrganization(t, ts)
+		orgID, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
 			operator domain.AppUserModel
@@ -66,10 +67,11 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 }
 
 func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
-	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, owner := testInitOrganization(t, ts)
+		// logrus.SetLevel(logrus.DebugLevel)
+		orgID, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
 			operator domain.AppUserModel

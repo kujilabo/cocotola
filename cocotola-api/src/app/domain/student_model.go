@@ -8,6 +8,7 @@ import (
 
 type StudentModel interface {
 	userD.AppUserModel
+	IsStudentModel() bool
 }
 
 type studentModel struct {
@@ -20,4 +21,8 @@ func NewStudentModel(appUserModel userD.AppUserModel) (StudentModel, error) {
 	}
 
 	return m, libD.Validator.Struct(m)
+}
+
+func (m *studentModel) IsStudentModel() bool {
+	return true
 }

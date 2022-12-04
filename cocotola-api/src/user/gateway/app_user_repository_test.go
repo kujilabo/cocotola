@@ -82,7 +82,8 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 
 	service.InitSystemAdmin(userRfFunc)
 	fn := func(ctx context.Context, ts testService) {
-		_, owner := testInitOrganization(t, ts)
+		orgID, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
 			operator domain.OwnerModel

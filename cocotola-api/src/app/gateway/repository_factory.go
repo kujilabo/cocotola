@@ -87,5 +87,5 @@ func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service
 	if err != nil {
 		return nil, err
 	}
-	return NewStudyStatRepository(ctx, f, f.db, userRf)
+	return NewStudyStatRepository(ctx, f.db, f, userRf)
 }

@@ -329,6 +329,20 @@ func (_m *Student) GetUsername() string {
 	return r0
 }
 
+// IsStudentModel provides a mock function with given fields:
+func (_m *Student) IsStudentModel() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 // RemoveWorkbook provides a mock function with given fields: ctx, id, version
 func (_m *Student) RemoveWorkbook(ctx context.Context, id domain.WorkbookID, version int) error {
 	ret := _m.Called(ctx, id, version)

@@ -13,13 +13,14 @@ import (
 )
 
 type studyRecordEntity struct {
-	AppUserID     uint
-	WorkbookID    uint
-	ProblemTypeID uint
-	StudyTypeID   uint
-	ProblemID     uint
-	Mastered      bool
-	RecordDate    time.Time
+	OrganizationID uint
+	AppUserID      uint
+	WorkbookID     uint
+	ProblemTypeID  uint
+	StudyTypeID    uint
+	ProblemID      uint
+	Mastered       bool
+	RecordDate     time.Time
 }
 
 // type ProblemEntity interface {
@@ -48,13 +49,14 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 
 	entity := studyRecordEntity{
-		AppUserID:     uint(appUserID),
-		WorkbookID:    uint(workbookID),
-		ProblemTypeID: problemTypeID,
-		StudyTypeID:   studyTypeID,
-		ProblemID:     uint(problemID),
-		Mastered:      mastered,
-		RecordDate:    today,
+		OrganizationID: uint(operator.GetOrganizationID()),
+		AppUserID:      uint(appUserID),
+		WorkbookID:     uint(workbookID),
+		ProblemTypeID:  problemTypeID,
+		StudyTypeID:    studyTypeID,
+		ProblemID:      uint(problemID),
+		Mastered:       mastered,
+		RecordDate:     today,
 	}
 
 	// Upsert

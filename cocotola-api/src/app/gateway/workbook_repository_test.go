@@ -16,7 +16,8 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		_, sysOwner, owner := testInitOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		// user1 has two workbooks
@@ -104,7 +105,8 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		_, sysOwner, owner := testInitOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
@@ -167,7 +169,8 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		_, sysOwner, owner := testInitOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(t, ts)
+		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")

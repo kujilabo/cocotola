@@ -7,6 +7,7 @@ import (
 
 type GuestModel interface {
 	userD.AppUserModel
+	IsGuestModel() bool
 }
 
 type guestModel struct {
@@ -19,4 +20,8 @@ func NewGuestModel(appUser userD.AppUserModel) (GuestModel, error) {
 	}
 
 	return m, libD.Validator.Struct(m)
+}
+
+func (m *guestModel) IsGuestModel() bool {
+	return true
 }

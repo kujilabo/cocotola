@@ -8,10 +8,7 @@ import (
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
-const SystemOwnerID = 2
-
 type SystemOwner interface {
-	// AppUser
 	domain.SystemOwnerModel
 
 	GetOrganization(ctxc context.Context) (Organization, error)
@@ -29,7 +26,6 @@ type SystemOwner interface {
 
 type systemOwner struct {
 	domain.SystemOwnerModel
-	rf               RepositoryFactory
 	orgRepo          OrganizationRepository
 	spaceRepo        SpaceRepository
 	appUserGroupRepo AppUserGroupRepository
@@ -67,7 +63,6 @@ func NewSystemOwner(rf RepositoryFactory, systemOwnerModel domain.SystemOwnerMod
 
 	m := &systemOwner{
 		SystemOwnerModel: systemOwnerModel,
-		rf:               rf,
 		orgRepo:          orgRepo,
 		spaceRepo:        spaceRepo,
 		appUserGroupRepo: appUserGroupRepo,

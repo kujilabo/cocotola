@@ -24,6 +24,7 @@ const memorizationName = "memorization"
 const memorizationID = 1
 const dictationName = "dictation"
 const dictationID = 2
+const orgNameLength = 8
 
 type testService struct {
 	driverName string
@@ -49,12 +50,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 
 	pf := service.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
-		return userG.NewRepositoryFactory(db)
-	}
-
 	ctx := context.Background()
-	userS.InitSystemAdmin(userRfFunc)
 	for driverName, db := range testlibG.ListDB() {
 		logrus.Debugf("%s\n", driverName)
 		sqlDB, err := db.DB()
@@ -77,27 +73,15 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	}
 }
 
-func testInitOrganization(t *testing.T, ts testService) (userD.OrganizationID, userS.SystemOwner, userS.Owner) {
+func setupOrganization(t *testing.T, ts testService) (userD.OrganizationID, userS.SystemOwner, userS.Owner) {
 	bg := context.Background()
+	orgName := RandString(orgNameLength)
 	sysAd, err := userS.NewSystemAdminFromDB(bg, ts.db)
 	assert.NoError(t, err)
 
-	result := ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from study_record")
-	assert.NoError(t, result.Error)
-
-	// delete all organizations
-	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from workbook")
-	assert.NoError(t, result.Error)
-	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from space")
-	assert.NoError(t, result.Error)
-	result = ts.db.Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from app_user")
-	assert.NoError(t, result.Error)
-	result = ts.db.Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from organization")
-	assert.NoError(t, result.Error)
-
 	firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	assert.NoError(t, err)
-	orgAddParam, err := userS.NewOrganizationAddParameter("ORG_NAME", firstOwnerAddParam)
+	orgAddParam, err := userS.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	assert.NoError(t, err)
 	orgRepo, err := userG.NewOrganizationRepository(ts.db)
 	require.NoError(t, err)
@@ -117,7 +101,7 @@ func testInitOrganization(t *testing.T, ts testService) (userD.OrganizationID, u
 	assert.NoError(t, err)
 	assert.Greater(t, int(uint(sysOwnerID)), 0)
 
-	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, "ORG_NAME")
+	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, orgName)
 	assert.NoError(t, err)
 	assert.Greater(t, int(uint(sysOwnerID)), 0)
 
@@ -138,6 +122,20 @@ func testInitOrganization(t *testing.T, ts testService) (userD.OrganizationID, u
 	return orgID, sysOwner, firstOwner
 }
 
+func teardownOrganization(t *testing.T, ts testService, orgID userD.OrganizationID) {
+	// delete all organizations
+	result := ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from study_record where organization_id = ?", uint(orgID))
+	assert.NoError(t, result.Error)
+	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from workbook where organization_id = ?", uint(orgID))
+	assert.NoError(t, result.Error)
+	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from space where organization_id = ?", uint(orgID))
+	assert.NoError(t, result.Error)
+	result = ts.db.Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from app_user where organization_id = ?", uint(orgID))
+	assert.NoError(t, result.Error)
+	result = ts.db.Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from organization where id = ?", uint(orgID))
+	assert.NoError(t, result.Error)
+}
+
 func testNewAppUserAddParameter(t *testing.T, loginID, username string) userS.AppUserAddParameter {
 	p, err := userS.NewAppUserAddParameter(loginID, username, []string{}, map[string]string{})
 	assert.NoError(t, err)
@@ -154,12 +152,6 @@ func testNewStudyType(t *testing.T, id uint, name string) domain.StudyType {
 	p, err := domain.NewStudyType(id, name)
 	assert.NoError(t, err)
 	return p
-}
-
-func testNewStudent(t *testing.T, testService testService, appUser userS.AppUser) service.Student {
-	s, err := service.NewStudent(testService.pf, testService.rf, testService.userRf, appUser)
-	assert.NoError(t, err)
-	return s
 }
 
 func testNewWorkbookSearchCondition(t *testing.T) service.WorkbookSearchCondition {
@@ -194,6 +186,19 @@ func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner 
 	assert.Equal(t, spaceID1, userD.SpaceID(space.GetID()))
 
 	return user1
+}
+
+func testNewStudentModel(t *testing.T, appUserModel userD.AppUserModel) domain.StudentModel {
+	s, err := domain.NewStudentModel(appUserModel)
+	assert.NoError(t, err)
+	return s
+}
+
+func testNewStudent(t *testing.T, testService testService, appUserModel userD.AppUserModel) service.Student {
+	studentModel := testNewStudentModel(t, appUserModel)
+	s, err := service.NewStudent(testService.pf, testService.rf, testService.userRf, studentModel)
+	assert.NoError(t, err)
+	return s
 }
 
 func testNewWorkbook(t *testing.T, ctx context.Context, db *gorm.DB, workbookRepo service.WorkbookRepository, student service.Student, spaceID userD.SpaceID, workbookName string) service.Workbook {
