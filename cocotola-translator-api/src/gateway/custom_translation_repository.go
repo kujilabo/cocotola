@@ -47,10 +47,10 @@ func (e *customTranslationDBEntity) toModel() (domain.Translation, error) {
 	return t, nil
 }
 
-func NewCustomTranslationRepository(db *gorm.DB) service.CustomTranslationRepository {
+func NewCustomTranslationRepository(db *gorm.DB) (service.CustomTranslationRepository, error) {
 	return &customTranslationRepository{
 		db: db,
-	}
+	}, nil
 }
 
 func (r *customTranslationRepository) Add(ctx context.Context, param service.TranslationAddParameter) error {

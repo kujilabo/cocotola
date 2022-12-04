@@ -8,5 +8,5 @@ import (
 type RepositoryFactory interface {
 	NewAzureTranslationRepository(ctx context.Context) AzureTranslationRepository
 
-	NewCustomTranslationRepository(ctx context.Context) CustomTranslationRepository
+	NewCustomTranslationRepository(ctx context.Context) (CustomTranslationRepository, error)
 }

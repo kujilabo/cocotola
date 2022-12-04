@@ -79,8 +79,15 @@ func main() {
 		panic(err)
 	}
 
-	adminUsecase := usecase.NewAdminUsecase(rf)
-	userUsecase := usecase.NewUserUsecase(rf, azureTranslationClient)
+	adminUsecase, err := usecase.NewAdminUsecase(ctx, rf)
+	if err != nil {
+		panic(err)
+	}
+
+	userUsecase, err := usecase.NewUserUsecase(ctx, rf, azureTranslationClient)
+	if err != nil {
+		panic(err)
+	}
 
 	result := run(context.Background(), cfg, db, adminUsecase, userUsecase)
 

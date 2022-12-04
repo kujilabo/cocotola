@@ -40,6 +40,7 @@ go_test(
         "//test-lib/gateway",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
         "@io_gorm_gorm//:gorm",
     ],
 )

@@ -24,6 +24,6 @@ func (f *repositoryFactory) NewAzureTranslationRepository(ctx context.Context) s
 	return NewAzureTranslationRepository(f.db)
 }
 
-func (f *repositoryFactory) NewCustomTranslationRepository(ctx context.Context) service.CustomTranslationRepository {
+func (f *repositoryFactory) NewCustomTranslationRepository(ctx context.Context) (service.CustomTranslationRepository, error) {
 	return NewCustomTranslationRepository(f.db)
 }

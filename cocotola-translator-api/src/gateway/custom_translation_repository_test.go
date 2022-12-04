@@ -8,6 +8,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
@@ -62,7 +63,8 @@ func Test_customTranslationRepository_FindByFirstLetter(t *testing.T) {
 				wantErr: false,
 			},
 		}
-		r := gateway.NewCustomTranslationRepository(db)
+		r, err := gateway.NewCustomTranslationRepository(db)
+		require.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := r.FindByFirstLetter(bg, tt.args.lang2, tt.args.firstLetter)
