@@ -41,7 +41,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
   const englishSentenceRecordbook = useAppSelector(
     selectEnglishSentenceRecordbook
   );
-  const [memorized, setMemorized] = useState(false);
+  const [mastered, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   if (englishSentenceRecordbook.records.length === 0) {
@@ -93,7 +93,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
   //   }, [dispatch, workbookId, problemId, problem.version]);
 
   const onNextButtonClick = () => {
-    if (memorized) {
+    if (mastered) {
       const f = async () => {
         await dispatch(
           addRecord({
@@ -102,7 +102,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
               studyType: props.studyType,
               problemId: problemId,
               result: true,
-              memorized: true,
+              mastered: true,
             },
             postSuccessProcess: emptyFunction,
             postFailureProcess: setErrorMessage,
@@ -113,7 +113,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
     }
     dispatch(nextEnglishSentenceProblem());
   };
-  const onMemorizeButtonClick = () => setMemorized(!memorized);
+  const onMemorizeButtonClick = () => setMemorized(!mastered);
 
   const EnglishSentenceProblemEditFormikForm = ProblemPropertyEditFormikForm<
     formValuesTranslated,
@@ -152,7 +152,7 @@ export const EnglishSentenceMemorizationAnswer: FC<
             />
           </div>,
           <Form.Checkbox
-            checked={memorized}
+            checked={mastered}
             label="完璧に覚えた"
             onClick={onMemorizeButtonClick}
           />,

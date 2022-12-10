@@ -53,7 +53,7 @@ export const EnglishWordMemorizationQuestion: FC<
             studyType: props.studyType,
             problemId: problemId,
             result: result,
-            memorized: false,
+            mastered: false,
           },
           postSuccessProcess: () => {
             dispatch(setEnglishWordRecord(result));

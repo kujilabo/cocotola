@@ -27,30 +27,31 @@ const { Media } = AppMedia;
 export const AppBreadcrumb = (props: {
   links: AppBreadcrumbLink[];
   text: string;
+  home?: boolean;
 }): ReactElement => {
-  // onsole.log('links', props.links);
-
-  const breadcrumb = (
-    <Breadcrumb size="large">
-      <Breadcrumb.Section>
-        <Link to={'/'}>Home</Link>
-      </Breadcrumb.Section>
-      <Breadcrumb.Divider />
-      {props.links.map((link: AppBreadcrumbLink) => {
-        return (
-          <Breadcrumb.Section key={link.url}>
-            <Link to={link.url}>{link.text}</Link>
-            <Breadcrumb.Divider />
-          </Breadcrumb.Section>
-        );
-      })}
-      <Breadcrumb.Section active>{props.text}</Breadcrumb.Section>
-    </Breadcrumb>
-  );
-
   return (
     <Segment vertical as={Media} at="computer">
-      {breadcrumb}
+      {props.home ? (
+        <Breadcrumb size="large">
+          <Breadcrumb.Section>Home</Breadcrumb.Section>
+        </Breadcrumb>
+      ) : (
+        <Breadcrumb size="large">
+          <Breadcrumb.Section>
+            <Link to={'/'}>Home</Link>
+          </Breadcrumb.Section>
+          <Breadcrumb.Divider />
+          {props.links.map((link: AppBreadcrumbLink) => {
+            return (
+              <Breadcrumb.Section key={link.url}>
+                <Link to={link.url}>{link.text}</Link>
+                <Breadcrumb.Divider />
+              </Breadcrumb.Section>
+            );
+          })}
+          <Breadcrumb.Section active>{props.text}</Breadcrumb.Section>
+        </Breadcrumb>
+      )}
     </Segment>
   );
 };

@@ -2,7 +2,7 @@ export class RecordModel {
   problemId: number;
   level: number;
   resultPrev1: boolean;
-  memorized: boolean;
+  mastered: boolean;
   lastAnsweredAt: string;
   isReview: boolean;
   reviewLevel: number;
@@ -10,13 +10,13 @@ export class RecordModel {
     problemId: number,
     level: number,
     resultPrev1: boolean,
-    memorized: boolean,
+    mastered: boolean,
     lastAnswererdAt: string
   ) {
     this.problemId = problemId;
     this.level = level;
     this.resultPrev1 = resultPrev1;
-    this.memorized = memorized;
+    this.mastered = mastered;
     this.lastAnsweredAt = lastAnswererdAt;
     this.isReview = false;
     this.reviewLevel = 0;

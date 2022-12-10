@@ -7,6 +7,7 @@ import { Menu, Dropdown } from 'semantic-ui-react';
 import '@/containers/App.css';
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { initI18n } from '@/app/i18n';
+import { Dashboard } from '@/containers/dashboard/Dashboard';
 import { PrivateWorkbookEdit } from '@/containers/private_workbook/PrivateWorkbookEdit';
 import { PrivateWorkbookList } from '@/containers/private_workbook/PrivateWorkbookList';
 import { PrivateWorkbookNew } from '@/containers/private_workbook/PrivateWorkbookNew';
@@ -85,6 +86,7 @@ export const App = (): ReactElement => {
       </Menu>
 
       <Routes>
+        <Route path={`/`} element={<Dashboard />} />
         <Route
           path={`/app/private/workbook`}
           element={<PrivateWorkbookList />}

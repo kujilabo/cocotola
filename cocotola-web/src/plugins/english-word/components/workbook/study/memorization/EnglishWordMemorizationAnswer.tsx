@@ -31,7 +31,7 @@ export const EnglishWordMemorizationAnswer: FC<
   const [t] = useTranslation();
   const problemMap = useAppSelector(selectProblemMap);
   const englishWordRecordbook = useAppSelector(selectEnglishWordRecordbook);
-  const [memorized, setMemorized] = useState(false);
+  const [mastered, setMemorized] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const problemId = englishWordRecordbook.records[0].problemId;
   const problem = EnglishWordProblemModel.of(problemMap[problemId]);
@@ -69,7 +69,7 @@ export const EnglishWordMemorizationAnswer: FC<
   }
 
   const onNextButtonClick = () => {
-    if (memorized) {
+    if (mastered) {
       const f = async () => {
         await dispatch(
           addRecord({
@@ -78,7 +78,7 @@ export const EnglishWordMemorizationAnswer: FC<
               studyType: props.studyType,
               problemId: problemId,
               result: true,
-              memorized: true,
+              mastered: true,
             },
             postSuccessProcess: emptyFunction,
             postFailureProcess: setErrorMessage,
@@ -89,7 +89,7 @@ export const EnglishWordMemorizationAnswer: FC<
     }
     dispatch(nextEnglishWordProblem());
   };
-  const onMemorizeButtonClick = () => setMemorized(!memorized);
+  const onMemorizeButtonClick = () => setMemorized(!mastered);
 
   return (
     <>
@@ -106,7 +106,7 @@ export const EnglishWordMemorizationAnswer: FC<
             <LinkButton to={`${baseUrl}/edit`} value={t('Edit')} />
           </Button.Group>,
           <Form.Checkbox
-            checked={memorized}
+            checked={mastered}
             label="完璧に覚えた"
             onClick={onMemorizeButtonClick}
           />,
