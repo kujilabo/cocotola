@@ -56,7 +56,7 @@ export const EnglishSentenceMemorizationQuestion: FC<
             studyType: props.studyType,
             problemId: problemId,
             result: result,
-            memorized: false,
+            mastered: false,
           },
           postSuccessProcess: () => {
             dispatch(setEnglishSentenceRecord(result));

@@ -25,7 +25,7 @@ const removeProblemFromRecordbook = (
       level: result.level,
       resultPrev1: result.resultPrev1,
       lastAnsweredAt: result.lastAnsweredAt,
-      memorized: result.memorized,
+      mastered: result.mastered,
       isReview: result.isReview,
       reviewLevel: result.reviewLevel,
     });
@@ -67,7 +67,7 @@ export const englishSentenceSlice = createSlice({
       const recordbook = action.payload;
       const records = [];
       for (const record of recordbook.records) {
-        if (record.memorized) {
+        if (record.mastered) {
           continue;
         }
 
@@ -88,7 +88,7 @@ export const englishSentenceSlice = createSlice({
           problemId: record.problemId,
           level: record.level,
           resultPrev1: record.resultPrev1,
-          memorized: false,
+          mastered: false,
           lastAnsweredAt: record.lastAnsweredAt,
           isReview: false,
           reviewLevel: 0,
@@ -140,7 +140,7 @@ export const englishSentenceSlice = createSlice({
             problemId,
             level,
             resultPrev1: state.lastResult,
-            memorized: false,
+            mastered: false,
             lastAnsweredAt: record.lastAnsweredAt,
             isReview: true,
             reviewLevel: record.reviewLevel,
@@ -154,7 +154,7 @@ export const englishSentenceSlice = createSlice({
             problemId,
             level,
             resultPrev1: false,
-            memorized: false,
+            mastered: false,
             lastAnsweredAt: record.lastAnsweredAt,
             isReview: true,
             reviewLevel: 0,

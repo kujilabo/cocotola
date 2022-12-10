@@ -14,7 +14,7 @@ export type RecordAddParameter = {
   studyType: string;
   problemId: number;
   result: boolean;
-  memorized: boolean;
+  mastered: boolean;
 };
 export type RecordAddArg = {
   param: RecordAddParameter;
