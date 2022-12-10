@@ -23,7 +23,7 @@ import problemRemoveReducer from '@/features/problem_remove';
 import problemUpdateReducer from '@/features/problem_update';
 import recordAddReducer from '@/features/record_add';
 import recordbookGetReducer from '@/features/recordbook_get';
-import statReduer from '@/features/stat';
+import statReducer from '@/features/stat';
 import workbookAddReducer from '@/features/workbook_add';
 import workbookFindReducer from '@/features/workbook_find';
 import workbookGetReducer from '@/features/workbook_get';
@@ -61,7 +61,7 @@ export const rootReducer = combineReducers({
   ...reducers,
   auth: authReducer,
   // router: routerReducer,
-  stat: statReduer,
+  stat: statReducer,
 
   workbookFind: workbookFindReducer,
   workbookAdd: workbookAddReducer,
