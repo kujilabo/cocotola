@@ -21,16 +21,17 @@ var testDBPort int
 
 func openMySQLForTest() (*gorm.DB, error) {
 	c := mysql.Config{
-		DBName:          "testdb",
-		User:            "user",
-		Passwd:          "password",
-		Addr:            fmt.Sprintf("%s:%d", testDBHost, testDBPort),
-		Net:             "tcp",
-		ParseTime:       true,
-		MultiStatements: true,
-		Params:          map[string]string{"charset": "utf8"},
-		Collation:       "utf8mb4_unicode_ci",
-		Loc:             jst,
+		DBName:               "testdb",
+		User:                 "user",
+		Passwd:               "password",
+		Addr:                 fmt.Sprintf("%s:%d", testDBHost, testDBPort),
+		Net:                  "tcp",
+		ParseTime:            true,
+		MultiStatements:      true,
+		Params:               map[string]string{"charset": "utf8"},
+		Collation:            "utf8mb4_unicode_ci",
+		Loc:                  jst,
+		AllowNativePasswords: true,
 	}
 	dsn := c.FormatDSN()
 	return gorm.Open(gorm_mysql.Open(dsn), &gorm.Config{
