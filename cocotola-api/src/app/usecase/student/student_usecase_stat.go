@@ -1,9 +1,8 @@
+//go:generate mockery --output mock --name StudentUsecaseStat
 package student
 
 import (
 	"context"
-
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
@@ -17,18 +16,14 @@ type StudentUsecaseStat interface {
 }
 
 type studentUsecaseStat struct {
-	db         *gorm.DB
-	pf         service.ProcessorFactory
-	rfFunc     service.RepositoryFactoryFunc
-	userRfFunc userS.RepositoryFactoryFunc
+	transaction service.Transaction
+	pf          service.ProcessorFactory
 }
 
-func NewStudentUsecaseStat(db *gorm.DB, pf service.ProcessorFactory, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) StudentUsecaseStat {
+func NewStudentUsecaseStat(transaction service.Transaction, pf service.ProcessorFactory) StudentUsecaseStat {
 	return &studentUsecaseStat{
-		db:         db,
-		pf:         pf,
-		rfFunc:     rfFunc,
-		userRfFunc: userRfFunc,
+		transaction: transaction,
+		pf:          pf,
 	}
 }
 
@@ -37,8 +32,8 @@ func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.O
 	defer span.End()
 
 	var result service.Stat
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, err := s.findStudent(ctx, tx, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, err := s.findStudent(ctx, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return err
 		}
@@ -57,16 +52,8 @@ func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.O
 	return result, nil
 }
 
-func (s *studentUsecaseStat) findStudent(ctx context.Context, db *gorm.DB, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
-	rf, err := s.rfFunc(ctx, db)
-	if err != nil {
-		return nil, liberrors.Errorf("failed to rfFunc. err: %w", err)
-	}
-	userRepo, err := s.userRfFunc(ctx, db)
-	if err != nil {
-		return nil, liberrors.Errorf("failed to userRepo. err: %w", err)
-	}
-	student, err := usecase.FindStudent(ctx, s.pf, rf, userRepo, organizationID, operatorID)
+func (s *studentUsecaseStat) findStudent(ctx context.Context, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
+	student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}

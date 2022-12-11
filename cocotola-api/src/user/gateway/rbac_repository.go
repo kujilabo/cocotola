@@ -1,6 +1,8 @@
 package gateway
 
 import (
+	"context"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
@@ -33,7 +35,7 @@ type rbacRepository struct {
 	db *gorm.DB
 }
 
-func NewRBACRepository(db *gorm.DB) (service.RBACRepository, error) {
+func NewRBACRepository(ctx context.Context, db *gorm.DB) (service.RBACRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

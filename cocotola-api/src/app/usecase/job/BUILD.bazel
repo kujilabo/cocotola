@@ -12,7 +12,6 @@ go_library(
         "//cocotola-api/src/app/service",
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
-        "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_otel//:otel",
     ],
 )

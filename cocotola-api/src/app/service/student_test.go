@@ -57,7 +57,7 @@ func student_Init(t *testing.T, ctx context.Context) (
 
 	userRf = new(userS_mock.RepositoryFactory)
 	spaceRepo = new(userS_mock.SpaceRepository)
-	userRf.On("NewSpaceRepository").Return(spaceRepo, nil)
+	userRf.On("NewSpaceRepository", ctx).Return(spaceRepo, nil)
 	return
 }
 
@@ -68,7 +68,7 @@ func Test_student_GetDefaultSpace(t *testing.T) {
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindDefaultSpace", ctx, mock.Anything).Return(expected, nil)
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetKey").Return("KEY")
@@ -88,7 +88,7 @@ func Test_student_GetPersonalSpace(t *testing.T) {
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(expected, nil)
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetKey").Return("KEY")
@@ -110,7 +110,7 @@ func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(space, nil)
 
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected, err := service.NewWorkbookSearchResult(123, nil)
@@ -135,7 +135,7 @@ func Test_student_FindWorkbookByID(t *testing.T) {
 	workbookRepo.On("FindWorkbookByID", ctx, mock.Anything, mock.Anything).Return(expected, nil)
 
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetID").Return(uint(123))
@@ -222,7 +222,7 @@ func Test_student_CheckQuota(t *testing.T) {
 
 			studentModel := newRandStudent(t, userD.OrganizationID(1))
 
-			student, err := service.NewStudent(pf, rf, userRf, studentModel)
+			student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
 			require.NoError(t, err)
 			require.NotNil(t, student)
 			err = student.CheckQuota(ctx, tt.args.problemType, tt.args.name)

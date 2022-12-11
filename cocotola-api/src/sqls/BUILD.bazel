@@ -52,6 +52,8 @@ go_library(
         "sqlite3/2020080109_create_user_workbook.up.sql",
         "mysql/2020050603_create_study_record.up.sql",
         "mysql/2020050604_create_study_stat.up.sql",
+        "mysql/2020030101_create_job_status.up.sql",
+        "mysql/2020030102_create_job_history.up.sql",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/sqls",
     visibility = ["//visibility:public"],

@@ -34,29 +34,29 @@ type systemOwner struct {
 	rbacRepo         RBACRepository
 }
 
-func NewSystemOwner(rf RepositoryFactory, systemOwnerModel domain.SystemOwnerModel) (SystemOwner, error) {
+func NewSystemOwner(ctx context.Context, rf RepositoryFactory, systemOwnerModel domain.SystemOwnerModel) (SystemOwner, error) {
 
-	orgRepo, err := rf.NewOrganizationRepository()
+	orgRepo, err := rf.NewOrganizationRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
-	appUserRepo, err := rf.NewAppUserRepository()
+	appUserRepo, err := rf.NewAppUserRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
-	spaceRepo, err := rf.NewSpaceRepository()
+	spaceRepo, err := rf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
-	appUserGroupRepo, err := rf.NewAppUserGroupRepository()
+	appUserGroupRepo, err := rf.NewAppUserGroupRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
-	groupUserRepo, err := rf.NewGroupUserRepository()
+	groupUserRepo, err := rf.NewGroupUserRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
-	rbacRepo, err := rf.NewRBACRepository()
+	rbacRepo, err := rf.NewRBACRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -40,18 +40,18 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	}
 }
 
-func setupOrganization(t *testing.T, ts testService) (domain.OrganizationID, service.Owner) {
+func setupOrganization(ctx context.Context, t *testing.T, ts testService) (domain.OrganizationID, service.Owner) {
 	bg := context.Background()
 	orgName := RandString(orgNameLength)
-	sysAd, err := service.NewSystemAdminFromDB(bg, ts.db)
-	assert.NoError(t, err)
+	sysAd := service.NewSystemAdmin(ts.rf)
+	// assert.NoError(t, err)
 
 	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	assert.NoError(t, err)
 	orgAddParam, err := service.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	assert.NoError(t, err)
 
-	orgRepo, err := gateway.NewOrganizationRepository(ts.db)
+	orgRepo, err := gateway.NewOrganizationRepository(ctx, ts.db)
 	require.NoError(t, err)
 
 	// register new organization
@@ -59,7 +59,7 @@ func setupOrganization(t *testing.T, ts testService) (domain.OrganizationID, ser
 	assert.NoError(t, err)
 	assert.Greater(t, int(uint(orgID)), 0)
 
-	appUserRepo, err := gateway.NewAppUserRepository(ts.rf, ts.db)
+	appUserRepo, err := gateway.NewAppUserRepository(ctx, ts.rf, ts.db)
 	assert.NoError(t, err)
 	sysOwnerID, err := appUserRepo.AddSystemOwner(bg, sysAd, orgID)
 	assert.NoError(t, err)
@@ -76,7 +76,7 @@ func setupOrganization(t *testing.T, ts testService) (domain.OrganizationID, ser
 	firstOwner, err := appUserRepo.FindOwnerByLoginID(bg, sysOwner, "OWNER_ID")
 	assert.NoError(t, err)
 
-	spaceRepo, err := gateway.NewSpaceRepository(ts.db)
+	spaceRepo, err := gateway.NewSpaceRepository(ctx, ts.db)
 	require.NoError(t, err)
 	_, err = spaceRepo.AddDefaultSpace(bg, sysOwner)
 	assert.NoError(t, err)

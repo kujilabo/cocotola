@@ -1,9 +1,8 @@
+//go:generate mockery --output mock --name StudentUsecaseWorkbook
 package student
 
 import (
 	"context"
-
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -29,32 +28,20 @@ type StudentUsecaseWorkbook interface {
 }
 
 type studentUsecaseWorkbook struct {
-	db         *gorm.DB
-	pf         service.ProcessorFactory
-	rfFunc     service.RepositoryFactoryFunc
-	userRfFunc userS.RepositoryFactoryFunc
+	transaction service.Transaction
+	pf          service.ProcessorFactory
 }
 
-func NewStudentUsecaseWorkbook(db *gorm.DB, pf service.ProcessorFactory, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) StudentUsecaseWorkbook {
+func NewStudentUsecaseWorkbook(transaction service.Transaction, pf service.ProcessorFactory) StudentUsecaseWorkbook {
 	return &studentUsecaseWorkbook{
-		db:         db,
-		pf:         pf,
-		rfFunc:     rfFunc,
-		userRfFunc: userRfFunc,
+		transaction: transaction,
+		pf:          pf,
 	}
 }
 
 func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.WorkbookSearchResult, error) {
 	var result service.WorkbookSearchResult
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := s.rfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
-		userRf, err := s.userRfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
 		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
@@ -80,15 +67,7 @@ func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organization
 
 func (s *studentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workBookID domain.WorkbookID) (domain.WorkbookModel, error) {
 	var result domain.WorkbookModel
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := s.rfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
-		userRf, err := s.userRfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
 		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
@@ -109,15 +88,7 @@ func (s *studentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organizat
 
 func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter service.WorkbookAddParameter) (domain.WorkbookID, error) {
 	var result domain.WorkbookID
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := s.rfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
-		userRf, err := s.userRfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
 		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
@@ -137,15 +108,7 @@ func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID
 }
 
 func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter service.WorkbookUpdateParameter) error {
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := s.rfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
-		userRf, err := s.userRfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
 		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
@@ -159,15 +122,7 @@ func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizatio
 }
 
 func (s *studentUsecaseWorkbook) RemoveWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int) error {
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := s.rfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
-		userRf, err := s.userRfFunc(ctx, tx)
-		if err != nil {
-			return err
-		}
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
 		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)

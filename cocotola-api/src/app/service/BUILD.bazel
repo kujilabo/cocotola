@@ -46,6 +46,7 @@ go_test(
     name = "service_test",
     srcs = [
         "problem_repository_test.go",
+        "service_test.go",
         "student_test.go",
     ],
     embed = [":service"],

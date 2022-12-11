@@ -297,7 +297,7 @@ func (r *workbookRepository) FindWorkbookByName(ctx context.Context, operator us
 }
 
 func (r *workbookRepository) getPrivileges(ctx context.Context, operator userD.AppUserModel, workbookID domain.WorkbookID) (userD.Privileges, error) {
-	rbacRepo, err := r.userRf.NewRBACRepository()
+	rbacRepo, err := r.userRf.NewRBACRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +344,7 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.App
 
 	workbookID := domain.WorkbookID(workbook.ID)
 
-	rbacRepo, err := r.userRf.NewRBACRepository()
+	rbacRepo, err := r.userRf.NewRBACRepository(ctx)
 	if err != nil {
 		return 0, err
 	}

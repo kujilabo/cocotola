@@ -46,7 +46,7 @@ func (e *organizationEntity) toModel() (service.Organization, error) {
 	return service.NewOrganization(organizationModel)
 }
 
-func NewOrganizationRepository(db *gorm.DB) (service.OrganizationRepository, error) {
+func NewOrganizationRepository(ctx context.Context, db *gorm.DB) (service.OrganizationRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

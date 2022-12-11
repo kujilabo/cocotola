@@ -89,3 +89,31 @@ func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service
 	}
 	return NewStudyStatRepository(ctx, f.db, f, userRf)
 }
+
+type transaction struct {
+	db         *gorm.DB
+	rfFunc     service.RepositoryFactoryFunc
+	userRfFunc userS.RepositoryFactoryFunc
+}
+
+func NewTransaction(db *gorm.DB, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) (service.Transaction, error) {
+	return &transaction{
+		db:         db,
+		rfFunc:     rfFunc,
+		userRfFunc: userRfFunc,
+	}, nil
+}
+
+func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error) error {
+	return t.db.Transaction(func(tx *gorm.DB) error {
+		rf, err := t.rfFunc(ctx, tx)
+		if err != nil {
+			return err
+		}
+		userRf, err := t.userRfFunc(ctx, tx)
+		if err != nil {
+			return err
+		}
+		return fn(rf, userRf)
+	})
+}

@@ -57,7 +57,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 		defer sqlDB.Close()
 
-		rbacRepo, err := userG.NewRBACRepository(db)
+		rbacRepo, err := userG.NewRBACRepository(ctx, db)
 		require.NoError(t, err)
 		err = rbacRepo.Init()
 		require.NoError(t, err)
@@ -73,17 +73,16 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	}
 }
 
-func setupOrganization(t *testing.T, ts testService) (userD.OrganizationID, userS.SystemOwner, userS.Owner) {
+func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD.OrganizationID, userS.SystemOwner, userS.Owner) {
 	bg := context.Background()
 	orgName := RandString(orgNameLength)
-	sysAd, err := userS.NewSystemAdminFromDB(bg, ts.db)
-	require.NoError(t, err)
+	sysAd := userS.NewSystemAdmin(ts.userRf)
 
 	firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	require.NoError(t, err)
 	orgAddParam, err := userS.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	require.NoError(t, err)
-	orgRepo, err := userG.NewOrganizationRepository(ts.db)
+	orgRepo, err := userG.NewOrganizationRepository(ctx, ts.db)
 	require.NoError(t, err)
 
 	// register new organization
@@ -95,7 +94,7 @@ func setupOrganization(t *testing.T, ts testService) (userD.OrganizationID, user
 	require.NoError(t, err)
 	logrus.Debugf("OrgID: %d \n", org.GetID())
 
-	appUserRepo, err := userG.NewAppUserRepository(ts.userRf, ts.db)
+	appUserRepo, err := userG.NewAppUserRepository(ctx, ts.userRf, ts.db)
 	require.NoError(t, err)
 	sysOwnerID, err := appUserRepo.AddSystemOwner(bg, sysAd, orgID)
 	require.NoError(t, err)
@@ -112,7 +111,7 @@ func setupOrganization(t *testing.T, ts testService) (userD.OrganizationID, user
 	firstOwner, err := appUserRepo.FindOwnerByLoginID(bg, sysOwner, "OWNER_ID")
 	require.NoError(t, err)
 
-	spaceRepo, err := userG.NewSpaceRepository(ts.db)
+	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
 	require.NoError(t, err)
 	_, err = spaceRepo.AddDefaultSpace(bg, sysOwner)
 	require.NoError(t, err)
@@ -167,7 +166,7 @@ func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddP
 }
 
 func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner userS.SystemOwner, owner userS.Owner, loginID, username string) userS.AppUser {
-	appUserRepo, err := userG.NewAppUserRepository(ts.userRf, ts.db)
+	appUserRepo, err := userG.NewAppUserRepository(ctx, ts.userRf, ts.db)
 	require.NoError(t, err)
 	userID1, err := appUserRepo.AddAppUser(ctx, owner, testNewAppUserAddParameter(t, loginID, username))
 	require.NoError(t, err)
@@ -175,7 +174,7 @@ func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner 
 	require.NoError(t, err)
 	require.Equal(t, loginID, user1.GetLoginID())
 
-	spaceRepo, err := userG.NewSpaceRepository(ts.db)
+	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
 	require.NoError(t, err)
 
 	spaceID1, err := spaceRepo.AddPersonalSpace(ctx, sysOwner, user1)
@@ -194,9 +193,9 @@ func testNewStudentModel(t *testing.T, appUserModel userD.AppUserModel) domain.S
 	return s
 }
 
-func testNewStudent(t *testing.T, testService testService, appUserModel userD.AppUserModel) service.Student {
+func testNewStudent(ctx context.Context, t *testing.T, testService testService, appUserModel userD.AppUserModel) service.Student {
 	studentModel := testNewStudentModel(t, appUserModel)
-	s, err := service.NewStudent(testService.pf, testService.rf, testService.userRf, studentModel)
+	s, err := service.NewStudent(ctx, testService.pf, testService.rf, testService.userRf, studentModel)
 	require.NoError(t, err)
 	return s
 }

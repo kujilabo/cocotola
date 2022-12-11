@@ -52,7 +52,7 @@ func (e *appUserGroupEntity) toAppUserGroup() (service.AppUserGroup, error) {
 	return service.NewAppUserGroup(appUserGroupMdoel)
 }
 
-func NewAppUserGroupRepository(db *gorm.DB) (service.AppUserGroupRepository, error) {
+func NewAppUserGroupRepository(ctx context.Context, db *gorm.DB) (service.AppUserGroupRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

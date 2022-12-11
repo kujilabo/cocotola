@@ -1,3 +1,4 @@
+//go:generate mockery --output mock --name Audio
 package service
 
 import (

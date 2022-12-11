@@ -1,8 +1,11 @@
 //go:generate mockery --output mock --name RepositoryFactory
+//go:generate mockery --output mock --name Transaction
 package service
 
 import (
 	"context"
+
+	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
 type RepositoryFactory interface {
@@ -23,4 +26,8 @@ type RepositoryFactory interface {
 	NewStatRepository(ctx context.Context) (StatRepository, error)
 
 	NewStudyStatRepository(ctx context.Context) (StudyStatRepository, error)
+}
+
+type Transaction interface {
+	Do(ctx context.Context, fn func(rf RepositoryFactory, userRf userS.RepositoryFactory) error) error
 }

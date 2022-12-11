@@ -16,20 +16,20 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		// user1 has two workbooks
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		workbook12 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
 
 		// user2 has one workbook
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
-		student2 := testNewStudent(t, ts, user2)
+		student2 := testNewStudent(ctx, t, ts, user2)
 		space2, _ := student2.GetPersonalSpace(ctx)
 		workbook21 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 
@@ -105,14 +105,14 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
 		// user1 has two workbooks
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
@@ -169,7 +169,7 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
@@ -177,13 +177,13 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
 
 		// user1 has two workbooks(WB11, WB12)
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		workbook12 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
 
 		// user2 has two workbooks(WB11, WB12)
-		student2 := testNewStudent(t, ts, user2)
+		student2 := testNewStudent(ctx, t, ts, user2)
 		space2, _ := student2.GetPersonalSpace(ctx)
 		workbook21 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 		workbook22 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB22")

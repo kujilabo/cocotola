@@ -6,11 +6,13 @@ go_library(
         "db.go",
         "db_mysql.go",
         "db_sqlite.go",
+        "init.go",
     ],
     importpath = "github.com/kujilabo/cocotola/test-lib/gateway",
     visibility = ["//visibility:public"],
     deps = [
         "//lib/errors",
+        "@com_github_go_sql_driver_mysql//:mysql",
         "@com_github_golang_migrate_migrate_v4//:migrate",
         "@com_github_golang_migrate_migrate_v4//database",
         "@com_github_golang_migrate_migrate_v4//database/mysql",
