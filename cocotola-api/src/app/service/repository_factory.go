@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 
+	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
@@ -26,8 +27,12 @@ type RepositoryFactory interface {
 	NewStatRepository(ctx context.Context) (StatRepository, error)
 
 	NewStudyStatRepository(ctx context.Context) (StudyStatRepository, error)
+
+	NewUserRepositoryFactory(ctx context.Context) (userS.RepositoryFactory, error)
+
+	NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error)
 }
 
 type Transaction interface {
-	Do(ctx context.Context, fn func(rf RepositoryFactory, userRf userS.RepositoryFactory) error) error
+	Do(ctx context.Context, fn func(rf RepositoryFactory) error) error
 }

@@ -10,7 +10,12 @@ import (
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
-func FindStudent(ctx context.Context, pf service.ProcessorFactory, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
+func FindStudent(ctx context.Context, pf service.ProcessorFactory, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
+	userRf, err := rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	systemAdmin := userS.NewSystemAdmin(userRf)
 	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationID(ctx, organizationID)
 	if err != nil {

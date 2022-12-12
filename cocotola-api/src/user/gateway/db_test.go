@@ -31,7 +31,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 		defer sqlDB.Close()
 
-		rf, err := gateway.NewRepositoryFactory(db)
+		rf, err := gateway.NewRepositoryFactory(ctx, db)
 		require.NoError(t, err)
 
 		testService := testService{driverName: driverName, db: db, rf: rf}

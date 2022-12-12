@@ -8,7 +8,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
@@ -41,8 +40,8 @@ func NewStudentUsecaseWorkbook(transaction service.Transaction, pf service.Proce
 
 func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.WorkbookSearchResult, error) {
 	var result service.WorkbookSearchResult
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
 		}
@@ -67,8 +66,8 @@ func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organization
 
 func (s *studentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workBookID domain.WorkbookID) (domain.WorkbookModel, error) {
 	var result domain.WorkbookModel
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
 		}
@@ -88,8 +87,8 @@ func (s *studentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organizat
 
 func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter service.WorkbookAddParameter) (domain.WorkbookID, error) {
 	var result domain.WorkbookID
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
 		}
@@ -108,8 +107,8 @@ func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID
 }
 
 func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter service.WorkbookUpdateParameter) error {
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
 		}
@@ -122,8 +121,8 @@ func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizatio
 }
 
 func (s *studentUsecaseWorkbook) RemoveWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int) error {
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 		if err != nil {
 			return liberrors.Errorf("failed to findStudent. err: %w", err)
 		}

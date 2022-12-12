@@ -29,6 +29,8 @@ func MetricsServerProcess(ctx context.Context, port int, gracefulShutdownTimeSec
 	})
 	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
+	logrus.Printf("metrics server listening at %v", httpServer.Addr)
+
 	errCh := make(chan error)
 	go func() {
 		defer close(errCh)

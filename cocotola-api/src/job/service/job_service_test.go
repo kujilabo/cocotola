@@ -1,4 +1,4 @@
-package usecase_test
+package service_test
 
 import (
 	"context"
@@ -10,7 +10,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	service_mock "github.com/kujilabo/cocotola/cocotola-api/src/job/service/mock"
-	"github.com/kujilabo/cocotola/cocotola-api/src/job/usecase"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -66,10 +65,10 @@ func Test_StartJob_timedout(t *testing.T) {
 	rf.On("NewJobStatusRepository", anythingOfContext).Return(jobStatusRepo, nil)
 	rf.On("NewJobHistoryRepository", anythingOfContext).Return(jobHistoryRepo, nil)
 	transaction := newTransaction(rf)
-	jobUsecase, err := usecase.NewJobUsecase(ctx, transaction)
+	jobService, err := service.NewJobService(ctx, transaction)
 	require.NoError(t, err)
 
-	err = jobUsecase.StartJob(ctx, job)
+	err = jobService.StartJob(ctx, job)
 	assert.NoError(t, err)
 	wg.Wait()
 	assert.Equal(t, int32(0), value)
@@ -108,10 +107,10 @@ func Test_StartJob_completed(t *testing.T) {
 	rf.On("NewJobStatusRepository", anythingOfContext).Return(jobStatusRepo, nil)
 	rf.On("NewJobHistoryRepository", anythingOfContext).Return(jobHistoryRepo, nil)
 	transaction := newTransaction(rf)
-	jobUsecase, err := usecase.NewJobUsecase(ctx, transaction)
+	jobService, err := service.NewJobService(ctx, transaction)
 	require.NoError(t, err)
 
-	err = jobUsecase.StartJob(ctx, job)
+	err = jobService.StartJob(ctx, job)
 	assert.NoError(t, err)
 	wg.Wait()
 	assert.Equal(t, int32(1), value)

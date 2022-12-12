@@ -12,6 +12,8 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	jobG "github.com/kujilabo/cocotola/cocotola-api/src/job/gateway"
+	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -48,6 +50,13 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	problemImportProcessor := map[string]service.ProblemImportProcessor{}
 	problemQuotaProcessor := map[string]service.ProblemQuotaProcessor{}
 
+	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
+		return jobG.NewRepositoryFactory(ctx, db)
+	}
+	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
+		return userG.NewRepositoryFactory(ctx, db)
+	}
+
 	pf := service.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
 	ctx := context.Background()
@@ -62,10 +71,10 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		err = rbacRepo.Init()
 		require.NoError(t, err)
 
-		userRf, err := userG.NewRepositoryFactory(db)
+		userRf, err := userG.NewRepositoryFactory(ctx, db)
 		require.NoError(t, err)
 		problemRepositories := map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error){}
-		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, userRfFunc, pf, problemTypes, studyTypes, problemRepositories)
+		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemTypes, studyTypes, problemRepositories)
 		require.NoError(t, err)
 		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf, userRf: userRf}
 

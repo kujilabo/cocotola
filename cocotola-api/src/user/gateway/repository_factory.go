@@ -8,13 +8,11 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
-type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
-
 type repositoryFactory struct {
 	db *gorm.DB
 }
 
-func NewRepositoryFactory(db *gorm.DB) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 	return &repositoryFactory{
 		db: db,
 	}, nil
@@ -47,3 +45,5 @@ func (f *repositoryFactory) NewUserSpaceRepository(ctx context.Context) (service
 func (f *repositoryFactory) NewRBACRepository(ctx context.Context) (service.RBACRepository, error) {
 	return NewRBACRepository(ctx, f.db)
 }
+
+type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

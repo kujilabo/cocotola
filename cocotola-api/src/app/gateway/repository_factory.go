@@ -7,6 +7,8 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	jobG "github.com/kujilabo/cocotola/cocotola-api/src/job/gateway"
+	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
@@ -24,7 +26,7 @@ type repositoryFactory struct {
 	studyTypes          []domain.StudyType
 }
 
-func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemTypes []domain.ProblemType, studyTypes []domain.StudyType, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemTypes []domain.ProblemType, studyTypes []domain.StudyType, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
 	if db == nil {
 		return nil, libD.ErrInvalidArgument
 	}
@@ -91,32 +93,34 @@ func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service
 	return NewStudyStatRepository(ctx, f.db, f, userRf)
 }
 
+func (f *repositoryFactory) NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error) {
+	return jobG.NewRepositoryFactory(ctx, f.db)
+}
+
+func (f *repositoryFactory) NewUserRepositoryFactory(ctx context.Context) (userS.RepositoryFactory, error) {
+	return userG.NewRepositoryFactory(ctx, f.db)
+}
+
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
 
 type transaction struct {
-	db      *gorm.DB
-	rff     RepositoryFactoryFunc
-	userRff userG.RepositoryFactoryFunc
+	db  *gorm.DB
+	rff RepositoryFactoryFunc
 }
 
-func NewTransaction(db *gorm.DB, rff RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) (service.Transaction, error) {
+func NewTransaction(db *gorm.DB, rff RepositoryFactoryFunc) (service.Transaction, error) {
 	return &transaction{
-		db:      db,
-		rff:     rff,
-		userRff: userRff,
+		db:  db,
+		rff: rff,
 	}, nil
 }
 
-func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error) error {
+func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
 	return t.db.Transaction(func(tx *gorm.DB) error {
 		rf, err := t.rff(ctx, tx)
 		if err != nil {
 			return err
 		}
-		userRf, err := t.userRff(ctx, tx)
-		if err != nil {
-			return err
-		}
-		return fn(rf, userRf)
+		return fn(rf)
 	})
 }

@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/sqls"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
@@ -20,9 +19,9 @@ func init() {
 	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
 
-	userRfFunc = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
+	// userRfFunc = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+	// 	return gateway.NewRepositoryFactory(ctx, db)
+	// }
 
 	// service.InitSystemAdmin(userRfFunc)
 }

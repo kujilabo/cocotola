@@ -81,7 +81,7 @@ func (r *jobStatusRepository) RemoveJobStatus(ctx context.Context, jobStatusID d
 	defer span.End()
 
 	result := r.db.
-		Where("expiration_datetime <= ?", time.Now()).
+		Where("id = ?", (string)(jobStatusID)).
 		Delete(&jobStatusEntity{})
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

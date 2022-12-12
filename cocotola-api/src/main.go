@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 	"github.com/golang-jwt/jwt"
 	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -31,16 +32,19 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller"
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	appG "github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	jobU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/job"
 	studentU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student"
 	authG "github.com/kujilabo/cocotola/cocotola-api/src/auth/gateway"
+	authS "github.com/kujilabo/cocotola/cocotola-api/src/auth/service"
 	authU "github.com/kujilabo/cocotola/cocotola-api/src/auth/usecase"
 	english_sentence "github.com/kujilabo/cocotola/cocotola-api/src/data/english_sentence"
 	english_word "github.com/kujilabo/cocotola/cocotola-api/src/data/english_word"
 	"github.com/kujilabo/cocotola/cocotola-api/src/docs"
+	jobG "github.com/kujilabo/cocotola/cocotola-api/src/job/gateway"
+	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	pluginCommonGateway "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/gateway"
 	pluginCommonS "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
 	pluginEnglishDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
@@ -96,10 +100,6 @@ func main() {
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
-	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
-		return userG.NewRepositoryFactory(db)
-	}
-
 	if err := initApp1(ctx, db, cfg.App.OwnerPassword); err != nil {
 		panic(err)
 	}
@@ -150,11 +150,29 @@ func main() {
 		panic(err)
 	}
 
-	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
-		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, userRff, pf, problemTypes, studyTypes, problemRepositories)
+	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
+		return jobG.NewRepositoryFactory(ctx, db)
 	}
 
-	transaction, err := gateway.NewTransaction(db, rff, userRff)
+	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
+		return userG.NewRepositoryFactory(ctx, db)
+	}
+
+	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
+		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemTypes, studyTypes, problemRepositories)
+	}
+
+	jobTransaction, err := jobG.NewTransaction(db, jobRff)
+	if err != nil {
+		panic(err)
+	}
+
+	authTransaction, err := authG.NewTransaction(db, userRff)
+	if err != nil {
+		panic(err)
+	}
+
+	appTransaction, err := appG.NewTransaction(db, rff)
 	if err != nil {
 		panic(err)
 	}
@@ -165,14 +183,30 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(context.Background(), cfg, transaction, db, pf, rff, userRff, synthesizer, translatorClient, tatoebaClient, newIterator)
+	jobService, err := jobS.NewJobService(ctx, jobTransaction)
+	if err != nil {
+		panic(err)
+	}
+
+	if *env == "local" {
+		systemAdminModel := userD.NewSystemAdminModel()
+
+		jobUseCaseStat := jobU.NewJobUsecaseStat(appTransaction, jobService)
+		s := gocron.NewScheduler(time.UTC)
+		s.StartAsync()
+		s.Every(5).Seconds().Do(func() {
+			jobUseCaseStat.AggregateStudyResultsOfAllUsers(context.Background(), systemAdminModel)
+		})
+	}
+
+	result := run(context.Background(), cfg, appTransaction, db, pf, rff, userRff, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
 
 	time.Sleep(gracefulShutdownTime2)
 	logrus.Info("exited")
 	os.Exit(result)
 }
 
-func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
+func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -181,10 +215,10 @@ func run(ctx context.Context, cfg *config.Config, transaction service.Transactio
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg, db, pf, rff, userRff, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return appServer(ctx, cfg, db, pf, rff, userRff, authTransaction, jobTransaction, appTransaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
-		return jobServer(ctx, cfg, pf, transaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return jobServer(ctx, cfg, jobTransaction, appTransaction)
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
@@ -204,7 +238,7 @@ func run(ctx context.Context, cfg *config.Config, transaction service.Transactio
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
@@ -231,22 +265,13 @@ func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pro
 		return callback(ctx, cfg.App.TestUserEmail, pf, rf, userRf, organizationName, appUser)
 	}
 
-	authTransaction, err := authG.NewTransaction(db, userRff)
-	if err != nil {
-		panic(err)
-	}
-
-	transaction, err := gateway.NewTransaction(db, rff, userRff)
-	if err != nil {
-		panic(err)
-	}
 	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback)
 	guestUserUsecase := authU.NewGuestUserUsecase(authTransaction, authTokenManager)
-	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(transaction, pf)
-	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(transaction, pf)
-	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(transaction, pf)
-	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(transaction, pf, synthesizerClient)
-	studentUsecaseStat := studentU.NewStudentUsecaseStat(transaction, pf)
+	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(appTransaction, pf)
+	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(appTransaction, pf)
+	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(appTransaction, pf)
+	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(appTransaction, pf, synthesizerClient)
+	studentUsecaseStat := studentU.NewStudentUsecaseStat(appTransaction, pf)
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager),
@@ -308,10 +333,14 @@ func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pro
 	}
 }
 
-func jobServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory, transaction service.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
-	router, err := controller.NewJobRouter(transaction, cfg.Debug)
+func jobServer(ctx context.Context, cfg *config.Config, jobTransaction jobS.Transaction, appTransaction appS.Transaction) error {
+	jobService, err := jobS.NewJobService(ctx, jobTransaction)
 	if err != nil {
-		panic(err)
+		return err
+	}
+	router, err := controller.NewJobRouter(appTransaction, jobService, cfg.Debug)
+	if err != nil {
+		return err
 	}
 
 	httpServer := http.Server{
@@ -320,7 +349,7 @@ func jobServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
 
-	logrus.Printf("http server listening at %v", httpServer.Addr)
+	logrus.Printf("job server listening at %v", httpServer.Addr)
 
 	errCh := make(chan error)
 	go func() {
@@ -433,7 +462,7 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 	logger := log.FromContext(ctx)
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		userRf, err := userG.NewRepositoryFactory(db)
+		userRf, err := userG.NewRepositoryFactory(ctx, db)
 		if err != nil {
 			return err
 		}
