@@ -194,9 +194,13 @@ func main() {
 		jobUseCaseStat := jobU.NewJobUsecaseStat(appTransaction, jobService)
 		s := gocron.NewScheduler(time.UTC)
 		s.StartAsync()
-		s.Every(5).Seconds().Do(func() {
-			jobUseCaseStat.AggregateStudyResultsOfAllUsers(context.Background(), systemAdminModel)
-		})
+		if _, err := s.Every(5).Seconds().Do(func() {
+			if err := jobUseCaseStat.AggregateStudyResultsOfAllUsers(context.Background(), systemAdminModel); err != nil {
+				logrus.Errorf("AggregateStudyResultsOfAllUsers. err: %v", err)
+			}
+		}); err != nil {
+			panic(err)
+		}
 	}
 
 	result := run(context.Background(), cfg, appTransaction, db, pf, rff, userRff, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
