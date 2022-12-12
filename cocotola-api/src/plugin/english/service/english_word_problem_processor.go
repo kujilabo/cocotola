@@ -394,7 +394,7 @@ func (p *englishWordProblemProcessor) findOrAddSentenceFromTatoeba(ctx context.C
 	}
 	sentenceAddProperties := sentenceAddParam.toProperties(0)
 
-	param, err := appS.NewProblemAddParameter(appD.WorkbookID(tatoebaWorkbook.GetID()), sentenceAddProperties)
+	param, err := appS.NewProblemAddParameter(tatoebaWorkbook.GetWorkbookID(), sentenceAddProperties)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}

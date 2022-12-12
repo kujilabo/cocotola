@@ -3,7 +3,7 @@ create table `job_status` (
 ,`job_name` varchar(40) not null
 ,`job_parameter` text not null
 ,`concurrency_key` varchar(40)
-,`created_at` datetime not null
 ,`expiration_datetime` datetime not null
+,`created_at` datetime not null default current_timestamp
 ,unique(`job_name`, `concurrency_key`)
 );

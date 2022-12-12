@@ -19,8 +19,8 @@ type jobStatusEntity struct {
 	JobName            string
 	JobParameter       string
 	ConcurrencyKey     *string
-	CreatedAt          time.Time
 	ExpirationDatetime *time.Time
+	CreatedAt          time.Time
 }
 
 func (e *jobStatusEntity) TableName() string {
@@ -28,7 +28,7 @@ func (e *jobStatusEntity) TableName() string {
 }
 
 func (e *jobStatusEntity) toJobStatus() (service.JobStatus, error) {
-	return service.NewJobStatus(domain.JobName(e.JobName), e.JobParameter, e.ExpirationDatetime, e.CreatedAt)
+	return service.NewJobStatus(domain.JobStatusID(e.ID), domain.JobName(e.JobName), e.JobParameter, e.ExpirationDatetime, e.CreatedAt)
 }
 
 type jobStatusRepository struct {

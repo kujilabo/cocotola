@@ -13,18 +13,18 @@ import (
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
-var userRfFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
+var userRff func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func init() {
 	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
 
-	userRfFunc = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+	userRff = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
 		return gateway.NewRepositoryFactory(db)
 	}
 
-	// service.InitSystemAdmin(userRfFunc)
+	// service.InitSystemAdmin(userRff)
 }
 
 func RandString(n int) string {

@@ -25,6 +25,7 @@ go_library(
         "//cocotola-api/src/app/gateway/casbinquery",
         "//cocotola-api/src/app/service",
         "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/gateway",
         "//cocotola-api/src/user/service",
         "//lib/domain",
         "//lib/errors",

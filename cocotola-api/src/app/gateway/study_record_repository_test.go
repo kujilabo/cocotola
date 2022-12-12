@@ -36,25 +36,25 @@ func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 		// workbok11, english-word, memorization
 		for _, problemID := range []int{111, 112, 113, 114} {
 			problemID := domain.ProblemID(problemID)
-			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), domain.WorkbookID(workbook11.GetID()), englishWordID, memorizationID, problemID, false)
+			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), workbook11.GetWorkbookID(), englishWordID, memorizationID, problemID, false)
 			require.NoError(t, err)
 		}
 		// workbok11, english-word, memorization, mastered
 		for _, problemID := range []int{115, 116, 117} {
 			problemID := domain.ProblemID(problemID)
-			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), domain.WorkbookID(workbook11.GetID()), englishWordID, memorizationID, problemID, true)
+			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), workbook11.GetWorkbookID(), englishWordID, memorizationID, problemID, true)
 			require.NoError(t, err)
 		}
 		// workbok11, english-word, dictation
 		for _, problemID := range []int{111, 112, 113} {
 			problemID := domain.ProblemID(problemID)
-			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), domain.WorkbookID(workbook11.GetID()), englishWordID, dictationID, problemID, false)
+			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), workbook11.GetWorkbookID(), englishWordID, dictationID, problemID, false)
 			require.NoError(t, err)
 		}
 		// workbok12, english-word, memorization
 		for _, problemID := range []int{121, 122} {
 			problemID := domain.ProblemID(problemID)
-			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), domain.WorkbookID(workbook12.GetID()), englishWordID, memorizationID, problemID, false)
+			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student1.GetID()), workbook12.GetWorkbookID(), englishWordID, memorizationID, problemID, false)
 			require.NoError(t, err)
 		}
 
@@ -64,7 +64,7 @@ func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 		workbook21 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 		for _, problemID := range []int{211} {
 			problemID := domain.ProblemID(problemID)
-			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student2.GetID()), domain.WorkbookID(workbook21.GetID()), englishWordID, memorizationID, problemID, false)
+			err := studyRecordRepo.AddRecord(ctx, sysOwner, userD.AppUserID(student2.GetID()), workbook21.GetWorkbookID(), englishWordID, memorizationID, problemID, false)
 			require.NoError(t, err)
 		}
 

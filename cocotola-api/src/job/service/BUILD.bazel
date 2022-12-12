@@ -15,6 +15,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-api/src/job/domain",
+        "//lib/domain",
         "@io_gorm_gorm//:gorm",
     ],
 )

@@ -1,16 +1,11 @@
 package service
 
 import (
-	"context"
-
-	"gorm.io/gorm"
-
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
-type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)
+// type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)
 
 var (
 	appPropertiesSystemSpaceID     = userD.SpaceID(0)
@@ -19,8 +14,8 @@ var (
 	SystemStudentLoginID           = "system-student"
 	TatoebaWorkbookName            = "tatoeba"
 	OrganizationName               = "cocotola"
-	UserRfFunc                     userS.RepositoryFactoryFunc
-	RfFunc                         RepositoryFactoryFunc
+	// UserRfFunc                     userS.RepositoryFactoryFunc
+	// RfFunc                         RepositoryFactoryFunc
 )
 
 func InitAppProperties(systemSpaceID userD.SpaceID, systemStudentID userD.AppUserID, tatoebaWorkbookID domain.WorkbookID) {

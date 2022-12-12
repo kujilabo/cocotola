@@ -24,6 +24,7 @@ go_library(
         "StudyTypeRepository.go",
         "SynthesizerClient.go",
         "SystemStudent.go",
+        "Transaction.go",
         "UserQuotaRepository.go",
         "Workbook.go",
         "WorkbookAddParameter.go",

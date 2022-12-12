@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
@@ -16,14 +17,14 @@ import (
 type repositoryFactory struct {
 	db                  *gorm.DB
 	driverName          string
-	userRfFunc          userS.RepositoryFactoryFunc
+	userRff             userG.RepositoryFactoryFunc
 	pf                  service.ProcessorFactory
 	problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)
 	problemTypes        []domain.ProblemType
 	studyTypes          []domain.StudyType
 }
 
-func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, userRfFunc userS.RepositoryFactoryFunc, pf service.ProcessorFactory, problemTypes []domain.ProblemType, studyTypes []domain.StudyType, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemTypes []domain.ProblemType, studyTypes []domain.StudyType, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
 	if db == nil {
 		return nil, libD.ErrInvalidArgument
 	}
@@ -31,7 +32,7 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, u
 	return &repositoryFactory{
 		db:                  db,
 		driverName:          driverName,
-		userRfFunc:          userRfFunc,
+		userRff:             userRff,
 		pf:                  pf,
 		problemRepositories: problemRepositories,
 		problemTypes:        problemTypes,
@@ -40,7 +41,7 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, u
 }
 
 func (f *repositoryFactory) NewWorkbookRepository(ctx context.Context) (service.WorkbookRepository, error) {
-	userRf, err := f.userRfFunc(ctx, f.db)
+	userRf, err := f.userRff(ctx, f.db)
 	if err != nil {
 		return nil, err
 	}
@@ -83,34 +84,36 @@ func (f *repositoryFactory) NewStatRepository(ctx context.Context) (service.Stat
 }
 
 func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service.StudyStatRepository, error) {
-	userRf, err := f.userRfFunc(ctx, f.db)
+	userRf, err := f.userRff(ctx, f.db)
 	if err != nil {
 		return nil, err
 	}
 	return NewStudyStatRepository(ctx, f.db, f, userRf)
 }
 
+type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
+
 type transaction struct {
-	db         *gorm.DB
-	rfFunc     service.RepositoryFactoryFunc
-	userRfFunc userS.RepositoryFactoryFunc
+	db      *gorm.DB
+	rff     RepositoryFactoryFunc
+	userRff userG.RepositoryFactoryFunc
 }
 
-func NewTransaction(db *gorm.DB, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) (service.Transaction, error) {
+func NewTransaction(db *gorm.DB, rff RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) (service.Transaction, error) {
 	return &transaction{
-		db:         db,
-		rfFunc:     rfFunc,
-		userRfFunc: userRfFunc,
+		db:      db,
+		rff:     rff,
+		userRff: userRff,
 	}, nil
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error) error {
 	return t.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := t.rfFunc(ctx, tx)
+		rf, err := t.rff(ctx, tx)
 		if err != nil {
 			return err
 		}
-		userRf, err := t.userRfFunc(ctx, tx)
+		userRf, err := t.userRff(ctx, tx)
 		if err != nil {
 			return err
 		}

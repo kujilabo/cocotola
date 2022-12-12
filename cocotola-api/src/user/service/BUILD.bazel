@@ -28,6 +28,5 @@ go_library(
         "//lib/errors",
         "//lib/log",
         "@com_github_casbin_casbin_v2//:casbin",
-        "@io_gorm_gorm//:gorm",
     ],
 )

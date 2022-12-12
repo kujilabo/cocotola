@@ -48,12 +48,13 @@ func newAuthMiddleware(organizationID userD.OrganizationID, userID userD.AppUser
 	}
 }
 
-func initAudioRouter(studentUsecaseAudio studentU.StudentUsecaseAudio, authMiddleware gin.HandlerFunc) *gin.Engine {
+func initAudioRouter(t *testing.T, studentUsecaseAudio studentU.StudentUsecaseAudio, authMiddleware gin.HandlerFunc) *gin.Engine {
 	router := gin.New()
 	router.Use(authMiddleware)
 	g := router.Group("v1")
 	fn := controller.NewInitAudioRouterFunc(studentUsecaseAudio)
-	fn(g)
+	err := fn(g)
+	require.NoError(t, err)
 	return router
 }
 
@@ -69,7 +70,7 @@ func Test_FindAudioByID_OK(t *testing.T) {
 	studentUsecaseAudio := new(studentU_mock.StudentUsecaseAudio)
 	studentUsecaseAudio.On("FindAudioByID", anythingOfContext, userD.OrganizationID(1), userD.AppUserID(2), domain.WorkbookID(3), domain.ProblemID(4), domain.AudioID(5)).Return(audio, nil)
 
-	r := initAudioRouter(studentUsecaseAudio, authMiddleware)
+	r := initAudioRouter(t, studentUsecaseAudio, authMiddleware)
 	w := httptest.NewRecorder()
 
 	// when

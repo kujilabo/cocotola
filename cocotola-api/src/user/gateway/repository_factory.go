@@ -8,6 +8,8 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
+type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
+
 type repositoryFactory struct {
 	db *gorm.DB
 }

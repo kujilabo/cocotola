@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"time"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
@@ -42,12 +41,12 @@ func (u *jobUsecase) registerStartedRecord(ctx context.Context, job service.Job)
 			return err
 		}
 
-		jobHistory, err := domain.NewJobHistory(tmpJobStatusID, job.GetName(), job.GetJobParameter(), "started", time.Now())
+		param, err := service.NewJobHistoryAddParameter(tmpJobStatusID, job.GetName(), job.GetJobParameter(), "started")
 		if err != nil {
 			return err
 		}
 
-		if err := jobHistoryRepo.AddJobHistory(ctx, jobHistory); err != nil {
+		if err := jobHistoryRepo.AddJobHistory(ctx, param); err != nil {
 			return err
 		}
 
@@ -76,12 +75,12 @@ func (u *jobUsecase) registerStoppedRecord(ctx context.Context, job service.Job,
 			return err
 		}
 
-		jobHistory, err := domain.NewJobHistory(jobStatusID, job.GetName(), job.GetJobParameter(), status, time.Now())
+		param, err := service.NewJobHistoryAddParameter(jobStatusID, job.GetName(), job.GetJobParameter(), status)
 		if err != nil {
 			return err
 		}
 
-		if err := jobHistoryRepo.AddJobHistory(ctx, jobHistory); err != nil {
+		if err := jobHistoryRepo.AddJobHistory(ctx, param); err != nil {
 			return err
 		}
 

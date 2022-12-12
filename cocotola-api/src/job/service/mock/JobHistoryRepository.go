@@ -16,13 +16,13 @@ type JobHistoryRepository struct {
 	mock.Mock
 }
 
-// AddJobHistory provides a mock function with given fields: ctx, jobHistory
-func (_m *JobHistoryRepository) AddJobHistory(ctx context.Context, jobHistory service.JobHistory) error {
-	ret := _m.Called(ctx, jobHistory)
+// AddJobHistory provides a mock function with given fields: ctx, param
+func (_m *JobHistoryRepository) AddJobHistory(ctx context.Context, param service.JobHistoryAddParameter) error {
+	ret := _m.Called(ctx, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, service.JobHistory) error); ok {
-		r0 = rf(ctx, jobHistory)
+	if rf, ok := ret.Get(0).(func(context.Context, service.JobHistoryAddParameter) error); ok {
+		r0 = rf(ctx, param)
 	} else {
 		r0 = ret.Error(0)
 	}

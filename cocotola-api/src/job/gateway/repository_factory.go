@@ -8,20 +8,20 @@ import (
 )
 
 type transaction struct {
-	db     *gorm.DB
-	rfFunc service.RepositoryFactoryFunc
+	db  *gorm.DB
+	rff service.RepositoryFactoryFunc
 }
 
-func NewTransaction(db *gorm.DB, rfFunc service.RepositoryFactoryFunc) (service.Transaction, error) {
+func NewTransaction(db *gorm.DB, rff service.RepositoryFactoryFunc) (service.Transaction, error) {
 	return &transaction{
-		db:     db,
-		rfFunc: rfFunc,
+		db:  db,
+		rff: rff,
 	}, nil
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
 	return t.db.Transaction(func(tx *gorm.DB) error {
-		rf, err := t.rfFunc(ctx, tx)
+		rf, err := t.rff(ctx, tx)
 		if err != nil {
 			return err
 		}

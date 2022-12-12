@@ -4,25 +4,26 @@ import (
 	"context"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/auth/service"
+	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	"gorm.io/gorm"
 )
 
 type transaction struct {
-	db         *gorm.DB
-	userRfFunc userS.RepositoryFactoryFunc
+	db      *gorm.DB
+	userRff userG.RepositoryFactoryFunc
 }
 
-func NewTransaction(db *gorm.DB, userRfFunc userS.RepositoryFactoryFunc) (service.Transaction, error) {
+func NewTransaction(db *gorm.DB, userRff userG.RepositoryFactoryFunc) (service.Transaction, error) {
 	return &transaction{
-		db:         db,
-		userRfFunc: userRfFunc,
+		db:      db,
+		userRff: userRff,
 	}, nil
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(userRf userS.RepositoryFactory) error) error {
 	return t.db.Transaction(func(tx *gorm.DB) error {
-		userRf, err := t.userRfFunc(ctx, tx)
+		userRf, err := t.userRff(ctx, tx)
 		if err != nil {
 			return err
 		}

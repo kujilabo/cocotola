@@ -55,11 +55,11 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 				},
 				want: []want{
 					{
-						workbookID:   domain.WorkbookID(workbook11.GetID()),
+						workbookID:   workbook11.GetWorkbookID(),
 						workbookName: "WB11",
 					},
 					{
-						workbookID:   domain.WorkbookID(workbook12.GetID()),
+						workbookID:   workbook12.GetWorkbookID(),
 						workbookName: "WB12",
 					},
 				},
@@ -72,7 +72,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 				},
 				want: []want{
 					{
-						workbookID:   domain.WorkbookID(workbook21.GetID()),
+						workbookID:   workbook21.GetWorkbookID(),
 						workbookName: "WB21",
 					},
 				},
@@ -139,7 +139,7 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 					param:    "WB11",
 				},
 				want: want{
-					workbookID:   domain.WorkbookID(workbook11.GetID()),
+					workbookID:   workbook11.GetWorkbookID(),
 					workbookName: "WB11",
 					audioEnabled: "false",
 				},
@@ -189,20 +189,20 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 		workbook22 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB22")
 
 		// user1 can read user1's workbooks(WB11, WB12)
-		workbook11Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook11.GetID()))
+		workbook11Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook11.GetWorkbookID())
 		assert.NoError(t, err)
 		assert.Equal(t, workbook11Tmp.GetID(), workbook11.GetID())
-		workbook12Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook12.GetID()))
+		workbook12Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook12.GetWorkbookID())
 		assert.NoError(t, err)
 		assert.Equal(t, workbook12Tmp.GetID(), workbook12.GetID())
 
 		// user1 cannot read user2's workbooks(WB21, WB22)
-		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook21.GetID())); err != nil {
+		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook21.GetWorkbookID()); err != nil {
 			assert.True(t, errors.Is(err, service.ErrWorkbookPermissionDenied))
 		} else {
 			assert.Fail(t, "err is nil")
 		}
-		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook22.GetID())); err != nil {
+		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook22.GetWorkbookID()); err != nil {
 			assert.True(t, errors.Is(err, service.ErrWorkbookPermissionDenied))
 		} else {
 			assert.Fail(t, "err is nil")

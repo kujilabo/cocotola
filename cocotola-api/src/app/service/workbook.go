@@ -74,7 +74,7 @@ func (m *workbook) FindAllProblems(ctx context.Context, operator domain.StudentM
 	if err != nil {
 		return nil, err
 	}
-	return problemRepo.FindAllProblems(ctx, operator, domain.WorkbookID(m.GetWorkbookModel().GetID()))
+	return problemRepo.FindAllProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
 }
 
 func (m *workbook) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param ProblemIDsCondition) (ProblemSearchResult, error) {
@@ -90,7 +90,7 @@ func (m *workbook) FindProblemIDs(ctx context.Context, operator domain.StudentMo
 	if err != nil {
 		return nil, err
 	}
-	return problemRepo.FindProblemIDs(ctx, operator, domain.WorkbookID(m.GetWorkbookModel().GetID()))
+	return problemRepo.FindProblemIDs(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
 }
 
 func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentModel, problemID domain.ProblemID) (Problem, error) {
@@ -98,7 +98,7 @@ func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentM
 	if err != nil {
 		return nil, err
 	}
-	id, err := NewProblemSelectParameter1(domain.WorkbookID(m.GetWorkbookModel().GetID()), problemID)
+	id, err := NewProblemSelectParameter1(m.GetWorkbookModel().GetWorkbookID(), problemID)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (m *workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentMo
 		return liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
 	}
 
-	return workbookRepo.UpdateWorkbook(ctx, operator, domain.WorkbookID(m.GetWorkbookModel().GetID()), version, parameter)
+	return workbookRepo.UpdateWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version, parameter)
 }
 
 func (m *workbook) RemoveWorkbook(ctx context.Context, operator domain.StudentModel, version int) error {
@@ -193,7 +193,7 @@ func (m *workbook) RemoveWorkbook(ctx context.Context, operator domain.StudentMo
 		return liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
 	}
 
-	return workbookRepo.RemoveWorkbook(ctx, operator, domain.WorkbookID(m.GetWorkbookModel().GetID()), version)
+	return workbookRepo.RemoveWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version)
 }
 
 func (m *workbook) CountProblems(ctx context.Context, operator domain.StudentModel) (int, error) {
@@ -202,5 +202,5 @@ func (m *workbook) CountProblems(ctx context.Context, operator domain.StudentMod
 		return 0, err
 	}
 
-	return problemRepo.CountProblems(ctx, operator, domain.WorkbookID(m.GetWorkbookModel().GetID()))
+	return problemRepo.CountProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
 }
