@@ -10,6 +10,7 @@ type WorkbookID uint
 
 type WorkbookModel interface {
 	userD.Model
+	GetWorkbookID() WorkbookID
 	GetSpaceID() userD.SpaceID
 	GetOwnerID() userD.AppUserID
 	GetName() string
@@ -46,6 +47,10 @@ func NewWorkbookModel(model userD.Model, spaceID userD.SpaceID, ownerID userD.Ap
 	}
 
 	return m, libD.Validator.Struct(m)
+}
+
+func (m *workbookModel) GetWorkbookID() WorkbookID {
+	return WorkbookID(m.GetID())
 }
 
 func (m *workbookModel) GetSpaceID() userD.SpaceID {

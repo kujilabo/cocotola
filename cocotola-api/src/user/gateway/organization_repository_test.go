@@ -18,10 +18,10 @@ const invalidOrgID = 99999
 func TestGetOrganization(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
-		orgID, _ := setupOrganization(t, ts)
+		orgID, _ := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 
-		orgRepo, err := gateway.NewOrganizationRepository(ts.db)
+		orgRepo, err := gateway.NewOrganizationRepository(ctx, ts.db)
 		require.NoError(t, err)
 
 		// get organization registered
@@ -49,11 +49,11 @@ func TestGetOrganization(t *testing.T) {
 func TestFindOrganizationByName(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
-		orgID, _ := setupOrganization(t, ts)
+		orgID, _ := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		systemAdminModel := domain.NewSystemAdminModel()
 
-		orgRepo, err := gateway.NewOrganizationRepository(ts.db)
+		orgRepo, err := gateway.NewOrganizationRepository(ctx, ts.db)
 		require.NoError(t, err)
 
 		var orgName string

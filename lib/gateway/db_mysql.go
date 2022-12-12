@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4/database"
 	migrate_mysql "github.com/golang-migrate/migrate/v4/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -12,8 +13,6 @@ import (
 	gorm_logrus "github.com/onrik/gorm-logrus"
 	gorm_mysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
-
-	"github.com/go-sql-driver/mysql"
 )
 
 func OpenMySQL(username, password, host string, port int, database string) (*gorm.DB, error) {
@@ -27,6 +26,7 @@ func OpenMySQL(username, password, host string, port int, database string) (*gor
 		MultiStatements: true,
 		Params:          map[string]string{"charset": "utf8"},
 		Collation:       "utf8mb4_unicode_ci",
+		Loc:             jst,
 	}
 	dsn := c.FormatDSN()
 	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&multiStatements=true", username, password, host, port, database)

@@ -26,8 +26,8 @@ type guestStudent struct {
 	userRf    userS.RepositoryFactory
 }
 
-func NewGuestStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
-	spaceRepo, err := userRf.NewSpaceRepository()
+func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
+	spaceRepo, err := userRf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

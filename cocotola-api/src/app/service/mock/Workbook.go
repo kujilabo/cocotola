@@ -385,6 +385,20 @@ func (_m *Workbook) GetVersion() int {
 	return r0
 }
 
+// GetWorkbookID provides a mock function with given fields:
+func (_m *Workbook) GetWorkbookID() domain.WorkbookID {
+	ret := _m.Called()
+
+	var r0 domain.WorkbookID
+	if rf, ok := ret.Get(0).(func() domain.WorkbookID); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(domain.WorkbookID)
+	}
+
+	return r0
+}
+
 // HasPrivilege provides a mock function with given fields: privilege
 func (_m *Workbook) HasPrivilege(privilege userdomain.RBACAction) bool {
 	ret := _m.Called(privilege)

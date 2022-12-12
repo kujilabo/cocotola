@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"gorm.io/gorm"
-
 	"github.com/kujilabo/cocotola/cocotola-api/src/auth/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -22,15 +20,15 @@ type GoogleUserUsecase interface {
 }
 
 type googleUserUsecase struct {
-	db                      *gorm.DB
+	transaction             service.Transaction
 	googleAuthClient        service.GoogleAuthClient
 	authTokenManager        service.AuthTokenManager
-	registerAppUserCallback func(ctx context.Context, db *gorm.DB, organizationName string, appUser userD.AppUserModel) error
+	registerAppUserCallback func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error
 }
 
-func NewGoogleUserUsecase(db *gorm.DB, googleAuthClient service.GoogleAuthClient, authTokenManager service.AuthTokenManager, registerAppUserCallback func(ctx context.Context, db *gorm.DB, organizationName string, appUser userD.AppUserModel) error) GoogleUserUsecase {
+func NewGoogleUserUsecase(transaction service.Transaction, googleAuthClient service.GoogleAuthClient, authTokenManager service.AuthTokenManager, registerAppUserCallback func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error) GoogleUserUsecase {
 	return &googleUserUsecase{
-		db:                      db,
+		transaction:             transaction,
 		googleAuthClient:        googleAuthClient,
 		authTokenManager:        authTokenManager,
 		registerAppUserCallback: registerAppUserCallback,
@@ -46,38 +44,60 @@ func (s *googleUserUsecase) RetrieveUserInfo(ctx context.Context, googleAuthResp
 }
 
 func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo *service.GoogleUserInfo, googleAuthResponse *service.GoogleAuthResponse, organizationName string) (*service.TokenSet, error) {
-	logger := log.FromContext(ctx)
 	var tokenSet *service.TokenSet
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		systemAdmin, err := userS.NewSystemAdminFromDB(ctx, tx)
-		if err != nil {
+	var organization userS.Organization
+	var appUser userS.AppUser
+	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
+		systemAdmin := userS.NewSystemAdmin(rf)
+
+		tmpOrganization, tmpAppUser, err := s.registerAppUser(ctx, systemAdmin, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
+		if err != nil && !errors.Is(err, userS.ErrAppUserAlreadyExists) {
 			return err
 		}
 
+		organization = tmpOrganization
+		appUser = tmpAppUser
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	if err := s.registerAppUserCallback(ctx, organizationName, appUser); err != nil {
+		return nil, liberrors.Errorf("failed to registerStudentCallback. err: %w", err)
+	}
+
+	tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, appUser, organization)
+	if err != nil {
+		return nil, err
+	}
+	tokenSet = tokenSetTmp
+	return tokenSet, nil
+}
+
+func (s *googleUserUsecase) registerAppUser(ctx context.Context, systemAdmin userS.SystemAdmin, organizationName string, loginID string, username string,
+	providerID, providerAccessToken, providerRefreshToken string) (userS.Organization, userS.AppUser, error) {
+	logger := log.FromContext(ctx)
+
+	var organization userS.Organization
+	var appUser userS.AppUser
+
+	if err := func() error {
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
 		if err != nil {
 			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
 		}
 
-		organization, err := systemOwner.GetOrganization(ctx)
+		tmpOrganization, err := systemOwner.GetOrganization(ctx)
 		if err != nil {
 			return liberrors.Errorf("failed to FindOrganization. err: %w", err)
 		}
 
-		loginID := googleUserInfo.Email
-		logger.Infof("googleuserIndo: %+v", googleUserInfo)
-
-		appUser, err := systemOwner.FindAppUserByLoginID(ctx, loginID)
+		appUser1, err := systemOwner.FindAppUserByLoginID(ctx, loginID)
 		if err == nil {
-			logger.Infof("user already exists. student: %+v", appUser)
-			tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, appUser, organization)
-			if err != nil {
-				return err
-			}
-
-			tokenSet = tokenSetTmp
-			return nil
+			organization = tmpOrganization
+			appUser = appUser1
+			return userS.ErrAppUserAlreadyExists
 		}
 
 		if !errors.Is(err, userS.ErrAppUserNotFound) {
@@ -85,17 +105,17 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 			return err
 		}
 
-		logger.Infof("Add student. %+v", appUser)
+		logger.Infof("Add student. %+v", appUser1)
 		parameter, err := userS.NewAppUserAddParameter(
-			googleUserInfo.Email,
-			googleUserInfo.Name,
+			loginID,  //googleUserInfo.Email,
+			username, //googleUserInfo.Name,
 			[]string{""},
 			map[string]string{
 				"password":             "----",
 				"provider":             "google",
-				"providerId":           googleUserInfo.Email,
-				"providerAccessToken":  googleAuthResponse.AccessToken,
-				"providerRefreshToken": googleAuthResponse.RefreshToken,
+				"providerId":           providerID,           //googleUserInfo.Email,
+				"providerAccessToken":  providerAccessToken,  // googleAuthResponse.AccessToken,
+				"providerRefreshToken": providerRefreshToken, //googleAuthResponse.RefreshToken,
 			},
 		)
 		if err != nil {
@@ -107,23 +127,19 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 			return liberrors.Errorf("failed to AddStudent. err: %w", err)
 		}
 
-		student2, err := systemOwner.FindAppUserByID(ctx, studentID)
+		appUser2, err := systemOwner.FindAppUserByID(ctx, studentID)
 		if err != nil {
 			return liberrors.Errorf("failed to FindStudentByID. err: %w", err)
 		}
 
-		if err := s.registerAppUserCallback(ctx, tx, organizationName, student2); err != nil {
-			return liberrors.Errorf("failed to registerStudentCallback. err: %w", err)
-		}
-
-		tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, student2, organization)
-		if err != nil {
-			return err
-		}
-		tokenSet = tokenSetTmp
+		appUser = appUser2
 		return nil
-	}); err != nil {
-		return nil, err
+	}(); err != nil {
+		if errors.Is(err, userS.ErrAppUserAlreadyExists) {
+			return organization, appUser, nil
+		} else {
+			return nil, nil, err
+		}
 	}
-	return tokenSet, nil
+	return organization, appUser, nil
 }

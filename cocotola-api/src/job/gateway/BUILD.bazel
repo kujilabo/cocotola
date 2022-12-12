@@ -1,0 +1,44 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "gateway",
+    srcs = [
+        "init.go",
+        "job_history_repository.go",
+        "job_status_repository.go",
+        "repository_factory.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/job/gateway",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service",
+        "//lib/errors",
+        "//lib/gateway",
+        "@com_github_google_uuid//:uuid",
+        "@io_gorm_gorm//:gorm",
+        "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "db_test.go",
+        "gateway_test.go",
+        "job_status_repository_test.go",
+    ],
+    deps = [
+        ":gateway",
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service",
+        "//cocotola-api/src/sqls",
+        "//cocotola-api/src/user/gateway",
+        "//cocotola-api/src/user/service",
+        "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+        "@io_gorm_gorm//:gorm",
+    ],
+)

@@ -18,7 +18,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, owner := setupOrganization(t, ts)
+		orgID, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
@@ -46,7 +46,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo, err := ts.rf.NewSpaceRepository()
+		spaceRepo, err := ts.rf.NewSpaceRepository(ctx)
 		require.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
@@ -70,7 +70,7 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
-		orgID, owner := setupOrganization(t, ts)
+		orgID, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
@@ -98,7 +98,7 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo, err := ts.rf.NewSpaceRepository()
+		spaceRepo, err := ts.rf.NewSpaceRepository(ctx)
 		require.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {

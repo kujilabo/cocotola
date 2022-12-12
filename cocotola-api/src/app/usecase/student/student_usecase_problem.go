@@ -1,11 +1,10 @@
+//go:generate mockery --output mock --name StudentUsecaseProblem
 package student
 
 import (
 	"context"
 	"errors"
 	"io"
-
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -40,26 +39,21 @@ type StudentUsecaseProblem interface {
 }
 
 type studentUsecaseProblem struct {
-	db             *gorm.DB
+	transaction    service.Transaction
 	pf             service.ProcessorFactory
-	rfFunc         service.RepositoryFactoryFunc
-	userRfFunc     userS.RepositoryFactoryFunc
 	problemMonitor service.ProblemMonitor
 }
 
-func NewStudentUsecaseProblem(db *gorm.DB, pf service.ProcessorFactory, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) StudentUsecaseProblem {
+func NewStudentUsecaseProblem(transaction service.Transaction, pf service.ProcessorFactory) StudentUsecaseProblem {
 	return &studentUsecaseProblem{
-		db:         db,
-		pf:         pf,
-		rfFunc:     rfFunc,
-		userRfFunc: userRfFunc,
+		pf: pf,
 	}
 }
 
 func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemSearchCondition) (service.ProblemSearchResult, error) {
 	var result service.ProblemSearchResult
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return err
 		}
@@ -77,8 +71,8 @@ func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, or
 
 func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.ProblemSearchResult, error) {
 	var result service.ProblemSearchResult
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -96,8 +90,8 @@ func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context,
 
 func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemIDsCondition) (service.ProblemSearchResult, error) {
 	var result service.ProblemSearchResult
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -115,8 +109,8 @@ func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, or
 
 func (s *studentUsecaseProblem) FindProblemByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter1) (domain.ProblemModel, error) {
 	var result domain.ProblemModel
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, id.GetWorkbookID())
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -134,8 +128,8 @@ func (s *studentUsecaseProblem) FindProblemByID(ctx context.Context, organizatio
 
 func (s *studentUsecaseProblem) FindProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) ([]domain.ProblemID, error) {
 	var result []domain.ProblemID
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -154,8 +148,8 @@ func (s *studentUsecaseProblem) FindProblemIDs(ctx context.Context, organization
 func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, param service.ProblemAddParameter) ([]domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	var result []domain.ProblemID
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		studentService, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, param.GetWorkbookID())
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		studentService, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, param.GetWorkbookID())
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -173,8 +167,8 @@ func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID u
 }
 
 func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, id.GetWorkbookID())
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -189,8 +183,8 @@ func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationI
 }
 
 func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, id.GetWorkbookID())
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -208,8 +202,8 @@ func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationI
 	logger := log.FromContext(ctx)
 	logger.Debug("ProblemService.RemoveProblem")
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, id.GetWorkbookID())
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
@@ -242,11 +236,16 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 
 	var problemType string
 	{
-		_, workbook, err := s.findStudentAndWorkbook(ctx, s.db, organizationID, operatorID, workbookID)
-		if err != nil {
-			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
+		if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+			_, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
+			if err != nil {
+				return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
+			}
+			problemType = workbook.GetProblemType()
+			return nil
+		}); err != nil {
+			return err
 		}
-		problemType = workbook.GetProblemType()
 	}
 	iterator, err := newIterator(workbookID, problemType)
 	if err != nil {
@@ -267,8 +266,8 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 
 		logger.Infof("param.properties: %+v", param.GetProperties())
 
-		if err := s.db.Transaction(func(tx *gorm.DB) error {
-			student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+		if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+			student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 			if err != nil {
 				return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 			}
@@ -292,16 +291,8 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 	return nil
 }
 
-func (s *studentUsecaseProblem) findStudentAndWorkbook(ctx context.Context, tx *gorm.DB, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
-	repo, err := s.rfFunc(ctx, tx)
-	if err != nil {
-		return nil, nil, err
-	}
-	userRepo, err := s.userRfFunc(ctx, tx)
-	if err != nil {
-		return nil, nil, err
-	}
-	student, err := usecase.FindStudent(ctx, s.pf, repo, userRepo, organizationID, operatorID)
+func (s *studentUsecaseProblem) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
+	student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}

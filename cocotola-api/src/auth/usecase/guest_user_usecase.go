@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"gorm.io/gorm"
-
 	"github.com/kujilabo/cocotola/cocotola-api/src/auth/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -17,23 +15,22 @@ type GuestUserUsecase interface {
 }
 
 type guestUserUsecase struct {
-	db               *gorm.DB
+	transaction      service.Transaction
 	authTokenManager service.AuthTokenManager
 }
 
-func NewGuestUserUsecase(authTokenManager service.AuthTokenManager) GuestUserUsecase {
+func NewGuestUserUsecase(transaction service.Transaction, authTokenManager service.AuthTokenManager) GuestUserUsecase {
 	return &guestUserUsecase{
+		transaction:      transaction,
 		authTokenManager: authTokenManager,
 	}
 }
 
 func (s *guestUserUsecase) RetrieveGuestToken(ctx context.Context, organizationName string) (*service.TokenSet, error) {
 	var tokenSet *service.TokenSet
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		systemAdmin, err := userS.NewSystemAdminFromDB(ctx, tx)
-		if err != nil {
-			return err
-		}
+
+	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
+		systemAdmin := userS.NewSystemAdmin(rf)
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
 		if err != nil {

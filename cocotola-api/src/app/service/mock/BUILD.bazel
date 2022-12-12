@@ -3,6 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mock",
     srcs = [
+        "Audio.go",
         "GuestStudent.go",
         "Problem.go",
         "ProblemAddParameter.go",
@@ -23,6 +24,7 @@ go_library(
         "StudyTypeRepository.go",
         "SynthesizerClient.go",
         "SystemStudent.go",
+        "Transaction.go",
         "UserQuotaRepository.go",
         "Workbook.go",
         "WorkbookAddParameter.go",

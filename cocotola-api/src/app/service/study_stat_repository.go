@@ -8,5 +8,6 @@ import (
 )
 
 type StudyStatRepository interface {
-	AggregateResultsOfAllUsers(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time) error
+	AggregateResults(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time, userID domain.AppUserID) error
+	CleanStudyStats(ctx context.Context, operator domain.SystemOwnerModel, expirationDate time.Time) error
 }

@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "mock",
+    srcs = [
+        "JobHistoryRepository.go",
+        "JobStatusRepository.go",
+        "RepositoryFactory.go",
+        "Transaction.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/job/service/mock",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service",
+        "@com_github_stretchr_testify//mock",
+    ],
+)

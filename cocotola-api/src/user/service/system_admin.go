@@ -2,23 +2,11 @@ package service
 
 import (
 	"context"
-	"errors"
-
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
-
-var rfFunc func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)
-
-func InitSystemAdmin(rfFuncArg func(ctx context.Context, db *gorm.DB) (RepositoryFactory, error)) {
-	if rfFuncArg == nil {
-		panic(errors.New("invalid argment"))
-	}
-	rfFunc = rfFuncArg
-}
 
 type SystemAdmin interface {
 	domain.SystemAdminModel
@@ -43,16 +31,9 @@ func NewSystemAdmin(rf RepositoryFactory) SystemAdmin {
 		rf:               rf,
 	}
 }
-func NewSystemAdminFromDB(ctx context.Context, db *gorm.DB) (SystemAdmin, error) {
-	rf, err := rfFunc(ctx, db)
-	if err != nil {
-		return nil, err
-	}
-	return NewSystemAdmin(rf), nil
-}
 
 func (s *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {
-	appUserRepo, err := s.rf.NewAppUserRepository()
+	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +41,7 @@ func (s *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organ
 }
 
 func (s *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, organizationName string) (SystemOwner, error) {
-	appUserRepo, err := s.rf.NewAppUserRepository()
+	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +49,7 @@ func (s *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, org
 }
 
 func (s *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (Organization, error) {
-	orgRepo, err := s.rf.NewOrganizationRepository()
+	orgRepo, err := s.rf.NewOrganizationRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +58,7 @@ func (s *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (
 
 func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAddParameter) (domain.OrganizationID, error) {
 	logger := log.FromContext(ctx)
-	orgRepo, err := s.rf.NewOrganizationRepository()
+	orgRepo, err := s.rf.NewOrganizationRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -86,7 +67,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddOrganization. error: %w", err)
 	}
-	appUserRepo, err := s.rf.NewAppUserRepository()
+	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -119,7 +100,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to FindOwnerByLoginID. error: %w", err)
 	}
 
-	appUserGroupRepo, err := s.rf.NewAppUserGroupRepository()
+	appUserGroupRepo, err := s.rf.NewAppUserGroupRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -130,7 +111,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to AddPublicGroup. error: %w", err)
 	}
 
-	groupUserRepo, err := s.rf.NewGroupUserRepository()
+	groupUserRepo, err := s.rf.NewGroupUserRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -139,7 +120,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to AddGroupUser. error: %w", err)
 	}
 
-	spaceRepo, err := s.rf.NewSpaceRepository()
+	spaceRepo, err := s.rf.NewSpaceRepository(ctx)
 	if err != nil {
 		return 0, err
 	}

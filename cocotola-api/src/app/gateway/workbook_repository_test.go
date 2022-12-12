@@ -16,20 +16,20 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		// user1 has two workbooks
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		workbook12 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
 
 		// user2 has one workbook
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
-		student2 := testNewStudent(t, ts, user2)
+		student2 := testNewStudent(ctx, t, ts, user2)
 		space2, _ := student2.GetPersonalSpace(ctx)
 		workbook21 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 
@@ -55,11 +55,11 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 				},
 				want: []want{
 					{
-						workbookID:   domain.WorkbookID(workbook11.GetID()),
+						workbookID:   workbook11.GetWorkbookID(),
 						workbookName: "WB11",
 					},
 					{
-						workbookID:   domain.WorkbookID(workbook12.GetID()),
+						workbookID:   workbook12.GetWorkbookID(),
 						workbookName: "WB12",
 					},
 				},
@@ -72,7 +72,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 				},
 				want: []want{
 					{
-						workbookID:   domain.WorkbookID(workbook21.GetID()),
+						workbookID:   workbook21.GetWorkbookID(),
 						workbookName: "WB21",
 					},
 				},
@@ -105,14 +105,14 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
 		// user1 has two workbooks
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
@@ -139,7 +139,7 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 					param:    "WB11",
 				},
 				want: want{
-					workbookID:   domain.WorkbookID(workbook11.GetID()),
+					workbookID:   workbook11.GetWorkbookID(),
 					workbookName: "WB11",
 					audioEnabled: "false",
 				},
@@ -169,7 +169,7 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
-		orgID, sysOwner, owner := setupOrganization(t, ts)
+		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
 
@@ -177,32 +177,32 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
 
 		// user1 has two workbooks(WB11, WB12)
-		student1 := testNewStudent(t, ts, user1)
+		student1 := testNewStudent(ctx, t, ts, user1)
 		space1, _ := student1.GetPersonalSpace(ctx)
 		workbook11 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB11")
 		workbook12 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student1, userD.SpaceID(space1.GetID()), "WB12")
 
 		// user2 has two workbooks(WB11, WB12)
-		student2 := testNewStudent(t, ts, user2)
+		student2 := testNewStudent(ctx, t, ts, user2)
 		space2, _ := student2.GetPersonalSpace(ctx)
 		workbook21 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 		workbook22 := testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB22")
 
 		// user1 can read user1's workbooks(WB11, WB12)
-		workbook11Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook11.GetID()))
+		workbook11Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook11.GetWorkbookID())
 		assert.NoError(t, err)
 		assert.Equal(t, workbook11Tmp.GetID(), workbook11.GetID())
-		workbook12Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook12.GetID()))
+		workbook12Tmp, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook12.GetWorkbookID())
 		assert.NoError(t, err)
 		assert.Equal(t, workbook12Tmp.GetID(), workbook12.GetID())
 
 		// user1 cannot read user2's workbooks(WB21, WB22)
-		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook21.GetID())); err != nil {
+		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook21.GetWorkbookID()); err != nil {
 			assert.True(t, errors.Is(err, service.ErrWorkbookPermissionDenied))
 		} else {
 			assert.Fail(t, "err is nil")
 		}
-		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, domain.WorkbookID(workbook22.GetID())); err != nil {
+		if _, err := workbookRepo.FindWorkbookByID(ctx, student1, workbook22.GetWorkbookID()); err != nil {
 			assert.True(t, errors.Is(err, service.ErrWorkbookPermissionDenied))
 		} else {
 			assert.Fail(t, "err is nil")

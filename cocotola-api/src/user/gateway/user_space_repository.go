@@ -33,7 +33,7 @@ func (e *userSpaceEntity) TableName() string {
 	return "user_space"
 }
 
-func NewUserSpaceRepository(rf service.RepositoryFactory, db *gorm.DB) (service.UserSpaceRepository, error) {
+func NewUserSpaceRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.UserSpaceRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

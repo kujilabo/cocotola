@@ -55,7 +55,7 @@ type spaceRepository struct {
 	db *gorm.DB
 }
 
-func NewSpaceRepository(db *gorm.DB) (service.SpaceRepository, error) {
+func NewSpaceRepository(ctx context.Context, db *gorm.DB) (service.SpaceRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

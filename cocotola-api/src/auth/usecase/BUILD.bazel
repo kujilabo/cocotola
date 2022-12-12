@@ -14,6 +14,5 @@ go_library(
         "//cocotola-api/src/user/service",
         "//lib/errors",
         "//lib/log",
-        "@io_gorm_gorm//:gorm",
     ],
 )

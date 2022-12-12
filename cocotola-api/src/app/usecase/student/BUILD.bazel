@@ -21,7 +21,6 @@ go_library(
         "//lib/domain",
         "//lib/errors",
         "//lib/log",
-        "@io_gorm_gorm//:gorm",
         "@io_opentelemetry_go_otel//:otel",
     ],
 )

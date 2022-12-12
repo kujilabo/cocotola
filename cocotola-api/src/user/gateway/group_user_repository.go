@@ -35,7 +35,7 @@ func (u *groupUserEntity) TableName() string {
 	return GroupUserTableName
 }
 
-func NewGroupUserRepository(db *gorm.DB) (service.GroupUserRepository, error) {
+func NewGroupUserRepository(ctx context.Context, db *gorm.DB) (service.GroupUserRepository, error) {
 	if db == nil {
 		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
 	}

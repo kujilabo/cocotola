@@ -1,10 +1,9 @@
+//go:generate mockery --output mock --name StudentUsecaseAudio
 package student
 
 import (
 	"context"
 	"errors"
-
-	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -21,27 +20,23 @@ type StudentUsecaseAudio interface {
 }
 
 type studentUsecaseAudio struct {
-	db                *gorm.DB
+	transaction       service.Transaction
 	pf                service.ProcessorFactory
-	rfFunc            service.RepositoryFactoryFunc
-	userRfFunc        userS.RepositoryFactoryFunc
 	synthesizerClient service.SynthesizerClient
 }
 
-func NewStudentUsecaseAudio(db *gorm.DB, pf service.ProcessorFactory, rfFunc service.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient service.SynthesizerClient) StudentUsecaseAudio {
+func NewStudentUsecaseAudio(transaction service.Transaction, pf service.ProcessorFactory, synthesizerClient service.SynthesizerClient) StudentUsecaseAudio {
 	return &studentUsecaseAudio{
-		db:                db,
+		transaction:       transaction,
 		pf:                pf,
-		rfFunc:            rfFunc,
-		userRfFunc:        userRfFunc,
 		synthesizerClient: synthesizerClient,
 	}
 }
 
 func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, problemID domain.ProblemID, audioID domain.AudioID) (service.Audio, error) {
 	var result service.Audio
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, tx, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return err
 		}
@@ -78,16 +73,8 @@ func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID 
 	return result, nil
 }
 
-func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, tx *gorm.DB, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
-	repo, err := s.rfFunc(ctx, tx)
-	if err != nil {
-		return nil, nil, err
-	}
-	userRepo, err := s.userRfFunc(ctx, tx)
-	if err != nil {
-		return nil, nil, err
-	}
-	studentService, err := usecase.FindStudent(ctx, s.pf, repo, userRepo, organizationID, operatorID)
+func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
+	studentService, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}

@@ -11,8 +11,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-const userFetchSize = 10
-
 type studyStatEntity struct {
 	OrganizationID uint
 	AppUserID      uint
@@ -42,59 +40,53 @@ func NewStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.Reposit
 	}, nil
 }
 
-func (r *studyStatRepository) AggregateResultsOfAllUsers(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time) error {
-	userRepo, err := r.userRf.NewAppUserRepository()
-	if err != nil {
-		return err
-	}
+func (r *studyStatRepository) AggregateResults(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time, userID domain.AppUserID) error {
 	studyRecordRepo, err := r.rf.NewStudyRecordRepository(ctx)
 	if err != nil {
 		return err
 	}
 
-	pageNo := 1
-	pageSize := userFetchSize
-	for {
-		userIDs, err := userRepo.FindAppUserIDs(ctx, operator, pageNo, pageSize)
-		if err != nil {
-			return err
-		}
-		if len(userIDs) == 0 {
-			break
-		}
-		for _, userID := range userIDs {
-			results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
-			if err != nil {
-				return err
-			}
+	results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
+	if err != nil {
+		return err
+	}
 
-			for _, result := range results.Results {
-				entity := studyStatEntity{
-					OrganizationID: uint(operator.GetOrganizationID()),
-					AppUserID:      uint(userID),
-					WorkbookID:     result.WorkbookID,
-					ProblemTypeID:  result.ProblemTypeID,
-					StudyTypeID:    result.StudyTypeID,
-					Answered:       result.Answered,
-					Mastered:       result.Mastered,
-				}
-				// Upsert
-				if result := r.db.Clauses(clause.OnConflict{
-					Columns: []clause.Column{
-						{Name: "app_user_id"},
-						{Name: "record_date"},
-					}, // key colume
-					DoUpdates: clause.AssignmentColumns([]string{
-						"answered",
-						"mastered",
-					}), // column needed to be updated
-				}).Create(&entity); result.Error != nil {
-					return result.Error
-				}
-			}
+	for _, result := range results.Results {
+		entity := studyStatEntity{
+			OrganizationID: uint(operator.GetOrganizationID()),
+			AppUserID:      uint(userID),
+			WorkbookID:     result.WorkbookID,
+			ProblemTypeID:  result.ProblemTypeID,
+			StudyTypeID:    result.StudyTypeID,
+			Answered:       result.Answered,
+			Mastered:       result.Mastered,
 		}
+		// Upsert
+		if result := r.db.Clauses(clause.OnConflict{
+			Columns: []clause.Column{
+				{Name: "app_user_id"},
+				{Name: "record_date"},
+			}, // key colume
+			DoUpdates: clause.AssignmentColumns([]string{
+				"answered",
+				"mastered",
+			}), // column needed to be updated
+		}).Create(&entity); result.Error != nil {
+			return result.Error
+		}
+	}
 
-		pageNo++
+	return nil
+}
+
+func (r *studyStatRepository) CleanStudyStats(ctx context.Context, operator domain.SystemOwnerModel, expirationDate time.Time) error {
+
+	studyStatEntity := studyStatEntity{}
+	if result := r.db.
+		Where("organization_id = ?", operator.GetOrganizationID()).
+		Where("started_at < ?", expirationDate).
+		Delete(&studyStatEntity); result.Error != nil {
+		return result.Error
 	}
 
 	return nil

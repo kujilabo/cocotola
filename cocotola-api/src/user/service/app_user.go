@@ -39,7 +39,7 @@ func NewAppUser(rf RepositoryFactory, appUserModel domain.AppUserModel) (AppUser
 }
 
 func (a *appUser) GetDefaultSpace(ctx context.Context) (Space, error) {
-	spaceRepo, err := a.rf.NewSpaceRepository()
+	spaceRepo, err := a.rf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (a *appUser) GetDefaultSpace(ctx context.Context) (Space, error) {
 }
 
 func (a *appUser) GetPersonalSpace(ctx context.Context) (Space, error) {
-	spaceRepo, err := a.rf.NewSpaceRepository()
+	spaceRepo, err := a.rf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -1,0 +1,11 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "domain",
+    srcs = [
+        "job_history.go",
+        "jog.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/job/domain",
+    visibility = ["//visibility:public"],
+)

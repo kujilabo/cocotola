@@ -47,14 +47,14 @@ type student struct {
 	userRf    userS.RepositoryFactory
 }
 
-func NewStudent(pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
+func NewStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
 	if pf == nil {
 		return nil, liberrors.Errorf("pf is nil. err: %w", libD.ErrInvalidArgument)
 	}
 	if studentModel == nil {
 		return nil, errors.New("studentModel is nil")
 	}
-	spaceRepo, err := userRf.NewSpaceRepository()
+	spaceRepo, err := userRf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}

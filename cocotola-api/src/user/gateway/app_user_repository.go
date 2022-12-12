@@ -90,7 +90,7 @@ func (e *appUserEntity) TableName() string {
 // 	}
 // }
 
-func (e *appUserEntity) toSystemOwner(rf service.RepositoryFactory) (service.SystemOwner, error) {
+func (e *appUserEntity) toSystemOwner(ctx context.Context, rf service.RepositoryFactory) (service.SystemOwner, error) {
 	if e.LoginID != SystemOwnerLoginID {
 		return nil, liberrors.Errorf("invalid system owner. loginID: %s", e.LoginID)
 	}
@@ -110,7 +110,7 @@ func (e *appUserEntity) toSystemOwner(rf service.RepositoryFactory) (service.Sys
 		return nil, err
 	}
 
-	systemOwner, err := service.NewSystemOwner(rf, systemOwnerModel)
+	systemOwner, err := service.NewSystemOwner(ctx, rf, systemOwnerModel)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (e *appUserEntity) toOwner(rf service.RepositoryFactory, roles []string, pr
 	return service.NewOwner(rf, appUser), nil
 }
 
-func NewAppUserRepository(rf service.RepositoryFactory, db *gorm.DB) (service.AppUserRepository, error) {
+func NewAppUserRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.AppUserRepository, error) {
 	if rf == nil {
 		return nil, liberrors.Errorf("rf is nil. err: %w", libD.ErrInvalidArgument)
 	}
@@ -179,7 +179,7 @@ func (r *appUserRepository) FindSystemOwnerByOrganizationID(ctx context.Context,
 		}
 		return nil, result.Error
 	}
-	return appUser.toSystemOwner(r.rf)
+	return appUser.toSystemOwner(ctx, r.rf)
 }
 
 func (r *appUserRepository) FindSystemOwnerByOrganizationName(ctx context.Context, operator domain.SystemAdminModel, organizationName string) (service.SystemOwner, error) {
@@ -198,7 +198,7 @@ func (r *appUserRepository) FindSystemOwnerByOrganizationName(ctx context.Contex
 
 		return nil, result.Error
 	}
-	return appUser.toSystemOwner(r.rf)
+	return appUser.toSystemOwner(ctx, r.rf)
 }
 
 func (r *appUserRepository) FindAppUserByID(ctx context.Context, operator domain.AppUserModel, id domain.AppUserID) (service.AppUser, error) {
@@ -344,7 +344,7 @@ func (r *appUserRepository) AddFirstOwner(ctx context.Context, operator domain.S
 }
 
 func (r *appUserRepository) FindAppUserIDs(ctx context.Context, operator domain.SystemOwnerModel, pageNo, pageSize int) ([]domain.AppUserID, error) {
-	_, span := tracer.Start(ctx, "appUserRepository.FindAppUserByID")
+	_, span := tracer.Start(ctx, "appUserRepository.FindAppUserIDs")
 	defer span.End()
 
 	limit := pageSize
@@ -353,7 +353,7 @@ func (r *appUserRepository) FindAppUserIDs(ctx context.Context, operator domain.
 	var entities []appUserEntity
 	if result := r.db.Where(&appUserEntity{
 		OrganizationID: uint(operator.GetOrganizationID()),
-	}).Limit(limit).Offset(offset).Find(&entities); result.Error != nil {
+	}).Limit(limit).Offset(offset).Order("id").Find(&entities); result.Error != nil {
 		return nil, result.Error
 	}
 

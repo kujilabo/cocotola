@@ -74,7 +74,7 @@ import (
 func Test_appUserRepository_AddAppUser(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
-		orgID, owner := setupOrganization(t, ts)
+		orgID, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 
 		type args struct {
@@ -103,7 +103,7 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 				err: service.ErrAppUserAlreadyExists,
 			},
 		}
-		appUserRepo, err := gateway.NewAppUserRepository(ts.rf, ts.db)
+		appUserRepo, err := gateway.NewAppUserRepository(ctx, ts.rf, ts.db)
 		assert.NoError(t, err)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {

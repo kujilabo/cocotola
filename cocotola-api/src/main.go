@@ -31,7 +31,9 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller"
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	appG "github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	studentU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student"
 	authG "github.com/kujilabo/cocotola/cocotola-api/src/auth/gateway"
@@ -94,10 +96,9 @@ func main() {
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
+	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
 		return userG.NewRepositoryFactory(db)
 	}
-	appS.UserRfFunc = userRfFunc
 
 	if err := initApp1(ctx, db, cfg.App.OwnerPassword); err != nil {
 		panic(err)
@@ -149,25 +150,29 @@ func main() {
 		panic(err)
 	}
 
-	rfFunc := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
-		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, userRfFunc, pf, problemTypes, studyTypes, problemRepositories)
+	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
+		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, userRff, pf, problemTypes, studyTypes, problemRepositories)
 	}
-	appS.RfFunc = rfFunc
 
-	if err := initApp2(ctx, db, rfFunc, userRfFunc); err != nil {
+	transaction, err := gateway.NewTransaction(db, rff, userRff)
+	if err != nil {
+		panic(err)
+	}
+
+	if err := initApp2(ctx, db, rff, userRff); err != nil {
 		panic(err)
 	}
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	result := run(context.Background(), cfg, db, pf, rfFunc, userRfFunc, synthesizer, translatorClient, tatoebaClient, newIterator)
+	result := run(context.Background(), cfg, transaction, db, pf, rff, userRff, synthesizer, translatorClient, tatoebaClient, newIterator)
 
 	time.Sleep(gracefulShutdownTime2)
 	logrus.Info("exited")
 	os.Exit(result)
 }
 
-func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
+func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -176,10 +181,10 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return appServer(ctx, cfg, db, pf, rff, userRff, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
-		return jobServer(ctx, cfg, db, pf, rfFunc, userRfFunc, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return jobServer(ctx, cfg, pf, transaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
@@ -199,7 +204,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Processor
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
@@ -214,25 +219,34 @@ func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pro
 
 	googleAuthClient := authG.NewGoogleAuthClient(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL, time.Duration(cfg.Auth.APITimeoutSec)*time.Second)
 
-	registerAppUserCallback := func(ctx context.Context, db *gorm.DB, organizationName string, appUser userD.AppUserModel) error {
-		rf, err := rfFunc(ctx, db)
+	registerAppUserCallback := func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error {
+		rf, err := rff(ctx, db)
 		if err != nil {
 			return err
 		}
-		userRf, err := userRfFunc(ctx, db)
+		userRf, err := userRff(ctx, db)
 		if err != nil {
 			return err
 		}
 		return callback(ctx, cfg.App.TestUserEmail, pf, rf, userRf, organizationName, appUser)
 	}
 
-	googleUserUsecase := authU.NewGoogleUserUsecase(db, googleAuthClient, authTokenManager, registerAppUserCallback)
-	guestUserUsecase := authU.NewGuestUserUsecase(authTokenManager)
-	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(db, pf, rfFunc, userRfFunc)
-	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(db, pf, rfFunc, userRfFunc)
-	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(db, pf, rfFunc, userRfFunc)
-	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(db, pf, rfFunc, userRfFunc, synthesizerClient)
-	studentUsecaseStat := studentU.NewStudentUsecaseStat(db, pf, rfFunc, userRfFunc)
+	authTransaction, err := authG.NewTransaction(db, userRff)
+	if err != nil {
+		panic(err)
+	}
+
+	transaction, err := gateway.NewTransaction(db, rff, userRff)
+	if err != nil {
+		panic(err)
+	}
+	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback)
+	guestUserUsecase := authU.NewGuestUserUsecase(authTransaction, authTokenManager)
+	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(transaction, pf)
+	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(transaction, pf)
+	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(transaction, pf)
+	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(transaction, pf, synthesizerClient)
+	studentUsecaseStat := studentU.NewStudentUsecaseStat(transaction, pf)
 
 	publicRouterGroupFunc := []controller.InitRouterGroupFunc{
 		controller.NewInitAuthRouterFunc(googleUserUsecase, guestUserUsecase, authTokenManager),
@@ -294,8 +308,8 @@ func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pro
 	}
 }
 
-func jobServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
-	router, err := controller.NewJobRouter(db, rfFunc, userRfFunc, cfg.Debug)
+func jobServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory, transaction service.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+	router, err := controller.NewJobRouter(transaction, cfg.Debug)
 	if err != nil {
 		panic(err)
 	}
@@ -407,10 +421,10 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
 	}
 
-	userRfFunc := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
-		return userG.NewRepositoryFactory(db)
-	}
-	userS.InitSystemAdmin(userRfFunc)
+	// userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
+	// 	return userG.NewRepositoryFactory(db)
+	// }
+	// userS.InitSystemAdmin(userRff)
 
 	return cfg, db, sqlDB, tp, nil
 }
@@ -419,7 +433,12 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 	logger := log.FromContext(ctx)
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		systemAdmin, err := userS.NewSystemAdminFromDB(ctx, tx)
+		userRf, err := userG.NewRepositoryFactory(db)
+		if err != nil {
+			return err
+		}
+
+		systemAdmin := userS.NewSystemAdmin(userRf)
 		if err != nil {
 			return err
 		}
@@ -456,29 +475,29 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 	return nil
 }
 
-func initApp2(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) error {
-	if err := initApp2_1(ctx, db, rfFunc, userRfFunc); err != nil {
+func initApp2(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) error {
+	if err := initApp2_1(ctx, db, rff, userRff); err != nil {
 		return liberrors.Errorf("failed to initApp2_1. err: %w", err)
 	}
 
-	if err := initApp2_2(ctx, db, rfFunc, userRfFunc); err != nil {
+	if err := initApp2_2(ctx, db, rff, userRff); err != nil {
 		return liberrors.Errorf("failed to initApp2_2. err: %w", err)
 	}
 
-	if err := initApp2_3(ctx, db, rfFunc, userRfFunc); err != nil {
+	if err := initApp2_3(ctx, db, rff, userRff); err != nil {
 		return liberrors.Errorf("failed to initApp2_3. err: %w", err)
 	}
 
 	return nil
 }
 
-func initApp2_1(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) error {
+func initApp2_1(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) error {
 	var propertiesSystemStudentID userD.AppUserID
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		userRf, err := userRfFunc(ctx, tx)
+		userRf, err := userRff(ctx, tx)
 		if err != nil {
-			return liberrors.Errorf("userRfFunc. err: %w", err)
+			return liberrors.Errorf("userRff. err: %w", err)
 		}
 
 		systemAdmin := userS.NewSystemAdmin(userRf)
@@ -518,14 +537,14 @@ func initApp2_1(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 	return nil
 }
 
-func initApp2_2(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) error {
+func initApp2_2(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) error {
 
 	var propertiesSystemSpaceID userD.SpaceID
 
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		userRf, err := userRfFunc(ctx, tx)
+		userRf, err := userRff(ctx, tx)
 		if err != nil {
-			return liberrors.Errorf("userRfFunc. err: %w", err)
+			return liberrors.Errorf("userRff. err: %w", err)
 		}
 
 		systemAdmin := userS.NewSystemAdmin(userRf)
@@ -561,15 +580,15 @@ func initApp2_2(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 	return nil
 }
 
-func initApp2_3(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryFunc, userRfFunc userS.RepositoryFactoryFunc) error {
+func initApp2_3(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc) error {
 	var propertiesTatoebaWorkbookID appD.WorkbookID
 	if err := db.Transaction(func(tx *gorm.DB) error {
-		rf, err := rfFunc(ctx, tx)
+		rf, err := rff(ctx, tx)
 		if err != nil {
 			return err
 		}
 
-		userRf, err := userRfFunc(ctx, tx)
+		userRf, err := userRff(ctx, tx)
 		if err != nil {
 			return err
 		}
@@ -614,7 +633,7 @@ func initApp2_3(ctx context.Context, db *gorm.DB, rfFunc appS.RepositoryFactoryF
 
 			propertiesTatoebaWorkbookID = tatoebaWorkbookID
 		} else {
-			propertiesTatoebaWorkbookID = appD.WorkbookID(tatoebaWorkbook.GetID())
+			propertiesTatoebaWorkbookID = tatoebaWorkbook.GetWorkbookID()
 		}
 
 		return nil
@@ -637,7 +656,7 @@ func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactor
 			return liberrors.Errorf("NewStudentModel. err: %w", err)
 		}
 
-		student, err := appS.NewStudent(pf, repo, userRepo, studentModel)
+		student, err := appS.NewStudent(ctx, pf, repo, userRepo, studentModel)
 		if err != nil {
 			return liberrors.Errorf("NewStudent. err: %w", err)
 		}

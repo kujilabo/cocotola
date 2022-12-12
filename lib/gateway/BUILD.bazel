@@ -6,6 +6,7 @@ go_library(
         "db.go",
         "db_mysql.go",
         "db_sqlite.go",
+        "init.go",
         "metrics_server.go",
         "signal_watch.go",
     ],

@@ -24,7 +24,7 @@ func init() {
 		return gateway.NewRepositoryFactory(db)
 	}
 
-	service.InitSystemAdmin(userRfFunc)
+	// service.InitSystemAdmin(userRfFunc)
 }
 
 func RandString(n int) string {

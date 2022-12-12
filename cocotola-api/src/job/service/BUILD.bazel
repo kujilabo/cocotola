@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "service",
+    srcs = [
+        "app_properties.go",
+        "job.go",
+        "job_history_repository.go",
+        "job_service.go",
+        "job_status.go",
+        "job_status_repository.go",
+        "repository_factory.go",
+    ],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/job/service",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/job/domain",
+        "//lib/domain",
+        "@io_gorm_gorm//:gorm",
+    ],
+)
