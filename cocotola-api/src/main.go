@@ -62,6 +62,8 @@ import (
 
 const readHeaderTimeout = time.Duration(30) * time.Second
 
+const jobIntervalSec = 5
+
 // type newIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error)
 
 func main() {
@@ -194,7 +196,7 @@ func main() {
 		jobUseCaseStat := jobU.NewJobUsecaseStat(appTransaction, jobService)
 
 		s := gocron.NewScheduler(time.UTC)
-		if _, err := s.Every(5).Seconds().Do(func() {
+		if _, err := s.Every(jobIntervalSec).Seconds().Do(func() {
 			if err := jobUseCaseStat.AggregateStudyResultsOfAllUsers(context.Background(), systemAdminModel); err != nil {
 				logrus.Errorf("AggregateStudyResultsOfAllUsers. err: %v", err)
 			}
