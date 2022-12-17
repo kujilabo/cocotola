@@ -92,7 +92,7 @@ type workbookRepository struct {
 	problemTypes []domain.ProblemType
 }
 
-func NewWorkbookRepository(ctx context.Context, driverName string, rf service.RepositoryFactory, pf service.ProcessorFactory, db *gorm.DB, problemTypes []domain.ProblemType) service.WorkbookRepository {
+func newWorkbookRepository(ctx context.Context, driverName string, rf service.RepositoryFactory, pf service.ProcessorFactory, db *gorm.DB, problemTypes []domain.ProblemType) service.WorkbookRepository {
 	return &workbookRepository{
 		driverName:   driverName,
 		db:           db,
@@ -299,10 +299,7 @@ func (r *workbookRepository) getPrivileges(ctx context.Context, operator userD.A
 		return nil, err
 	}
 
-	rbacRepo, err := userRf.NewRBACRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	rbacRepo := userRf.NewRBACRepository(ctx)
 
 	workbookRoles := r.getAllWorkbookRoles(workbookID)
 	userObject := userD.NewUserObject(userD.AppUserID(operator.GetID()))
@@ -351,10 +348,7 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.App
 		return 0, err
 	}
 
-	rbacRepo, err := userRf.NewRBACRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
+	rbacRepo := userRf.NewRBACRepository(ctx)
 	userObject := userD.NewUserObject(userD.AppUserID(operator.GetID()))
 	workbookObject := domain.NewWorkbookObject(workbookID)
 	workbookWriter := domain.NewWorkbookWriter(workbookID)

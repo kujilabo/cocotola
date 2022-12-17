@@ -21,7 +21,7 @@ import (
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
-const englishWordName = "english_word_problem"
+const englishWordName = "english_word"
 const englishWordID = 1
 const memorizationName = "memorization"
 const memorizationID = 1
@@ -38,11 +38,11 @@ type testService struct {
 
 func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	logrus.SetLevel(logrus.WarnLevel)
-	englishWord := testNewProblemType(t, englishWordID, englishWordName)
-	memorization := testNewStudyType(t, memorizationID, memorizationName)
-	dictation := testNewStudyType(t, dictationID, dictationName)
-	problemTypes := []domain.ProblemType{englishWord}
-	studyTypes := []domain.StudyType{memorization, dictation}
+	// englishWord := testNewProblemType(t, englishWordID, englishWordName)
+	// memorization := testNewStudyType(t, memorizationID, memorizationName)
+	// dictation := testNewStudyType(t, dictationID, dictationName)
+	// problemTypes := []domain.ProblemType{englishWord}
+	// studyTypes := []domain.StudyType{memorization, dictation}
 
 	problemAddProcessor := map[string]service.ProblemAddProcessor{}
 	problemUpdateProcessor := map[string]service.ProblemUpdateProcessor{}
@@ -66,8 +66,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 		defer sqlDB.Close()
 
-		rbacRepo, err := userG.NewRBACRepository(ctx, db)
-		require.NoError(t, err)
+		rbacRepo := userG.NewRBACRepository(ctx, db)
 		err = rbacRepo.Init()
 		require.NoError(t, err)
 
@@ -77,7 +76,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 				return problemRepository, nil
 			},
 		}
-		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemTypes, studyTypes, problemRepositories)
+		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemRepositories)
 		require.NoError(t, err)
 		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf}
 
@@ -96,8 +95,7 @@ func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD
 	require.NoError(t, err)
 	orgAddParam, err := userS.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	require.NoError(t, err)
-	orgRepo, err := userG.NewOrganizationRepository(ctx, ts.db)
-	require.NoError(t, err)
+	orgRepo := userG.NewOrganizationRepository(ctx, ts.db)
 
 	// register new organization
 	orgID, err := orgRepo.AddOrganization(ctx, sysAd, orgAddParam)
@@ -108,8 +106,7 @@ func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD
 	require.NoError(t, err)
 	logrus.Debugf("OrgID: %d \n", org.GetID())
 
-	appUserRepo, err := userG.NewAppUserRepository(ctx, userRf, ts.db)
-	require.NoError(t, err)
+	appUserRepo := userG.NewAppUserRepository(ctx, userRf, ts.db)
 	sysOwnerID, err := appUserRepo.AddSystemOwner(ctx, sysAd, orgID)
 	require.NoError(t, err)
 	require.Greater(t, int(uint(sysOwnerID)), 0)
@@ -125,8 +122,7 @@ func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD
 	firstOwner, err := appUserRepo.FindOwnerByLoginID(ctx, sysOwner, "OWNER_ID")
 	require.NoError(t, err)
 
-	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
-	require.NoError(t, err)
+	spaceRepo := userG.NewSpaceRepository(ctx, ts.db)
 	_, err = spaceRepo.AddDefaultSpace(ctx, sysOwner)
 	require.NoError(t, err)
 	_, err = spaceRepo.AddPersonalSpace(ctx, sysOwner, firstOwner)
@@ -174,7 +170,7 @@ func testNewWorkbookSearchCondition(t *testing.T) service.WorkbookSearchConditio
 }
 
 func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddParameter {
-	p, err := service.NewWorkbookAddParameter("english_word_problem", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
+	p, err := service.NewWorkbookAddParameter("english_word", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
 	require.NoError(t, err)
 	return p
 }
@@ -182,16 +178,14 @@ func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddP
 func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner userS.SystemOwner, owner userS.Owner, loginID, username string) userS.AppUser {
 	userRf, err := ts.rf.NewUserRepositoryFactory(ctx)
 	require.NoError(t, err)
-	appUserRepo, err := userG.NewAppUserRepository(ctx, userRf, ts.db)
-	require.NoError(t, err)
+	appUserRepo := userG.NewAppUserRepository(ctx, userRf, ts.db)
 	userID1, err := appUserRepo.AddAppUser(ctx, owner, testNewAppUserAddParameter(t, loginID, username))
 	require.NoError(t, err)
 	user1, err := appUserRepo.FindAppUserByID(ctx, owner, userID1)
 	require.NoError(t, err)
 	require.Equal(t, loginID, user1.GetLoginID())
 
-	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
-	require.NoError(t, err)
+	spaceRepo := userG.NewSpaceRepository(ctx, ts.db)
 
 	spaceID1, err := spaceRepo.AddPersonalSpace(ctx, sysOwner, user1)
 	require.NoError(t, err)

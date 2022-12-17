@@ -25,16 +25,8 @@ func NewJobService(ctx context.Context, transaction Transaction) (JobService, er
 func (s *jobService) registerStartedRecord(ctx context.Context, job Job) (domain.JobStatusID, error) {
 	var jobStatusID domain.JobStatusID
 	if err := s.transaction.Do(ctx, func(rf RepositoryFactory) error {
-		jobStatusRepo, err := rf.NewJobStatusRepository(ctx)
-		if err != nil {
-			return err
-		}
-
-		jobHistoryRepo, err := rf.NewJobHistoryRepository(ctx)
-		if err != nil {
-			return err
-		}
-
+		jobStatusRepo := rf.NewJobStatusRepository(ctx)
+		jobHistoryRepo := rf.NewJobHistoryRepository(ctx)
 		tmpJobStatusID, err := jobStatusRepo.AddJobStatus(ctx, job)
 		if err != nil {
 			return err
@@ -60,15 +52,8 @@ func (s *jobService) registerStartedRecord(ctx context.Context, job Job) (domain
 
 func (s *jobService) registerStoppedRecord(ctx context.Context, job Job, jobStatusID domain.JobStatusID, status string) error {
 	if err := s.transaction.Do(ctx, func(rf RepositoryFactory) error {
-		jobStatusRepo, err := rf.NewJobStatusRepository(ctx)
-		if err != nil {
-			return err
-		}
-
-		jobHistoryRepo, err := rf.NewJobHistoryRepository(ctx)
-		if err != nil {
-			return err
-		}
+		jobStatusRepo := rf.NewJobStatusRepository(ctx)
+		jobHistoryRepo := rf.NewJobHistoryRepository(ctx)
 
 		if err := jobStatusRepo.RemoveJobStatus(ctx, jobStatusID); err != nil {
 			return err

@@ -31,10 +31,7 @@ func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFact
 		return nil, err
 	}
 
-	spaceRepo, err := userRf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	spaceRepo := userRf.NewSpaceRepository(ctx)
 
 	m := &guestStudent{
 		StudentModel: studentModel,

@@ -8,8 +8,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -40,14 +38,14 @@ func (e *organizationEntity) toModel() (service.Organization, error) {
 	return service.NewOrganization(organizationModel)
 }
 
-func NewOrganizationRepository(ctx context.Context, db *gorm.DB) (service.OrganizationRepository, error) {
+func NewOrganizationRepository(ctx context.Context, db *gorm.DB) service.OrganizationRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &organizationRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *organizationRepository) GetOrganization(ctx context.Context, operator domain.AppUserModel) (service.Organization, error) {

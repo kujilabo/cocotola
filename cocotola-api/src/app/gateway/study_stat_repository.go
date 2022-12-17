@@ -33,18 +33,15 @@ type studyStatRepository struct {
 	rf service.RepositoryFactory
 }
 
-func NewStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory) (service.StudyStatRepository, error) {
+func newStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory) service.StudyStatRepository {
 	return &studyStatRepository{
 		db: db,
 		rf: rf,
-	}, nil
+	}
 }
 
 func (r *studyStatRepository) AggregateResults(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time, userID domain.AppUserID) error {
-	studyRecordRepo, err := r.rf.NewStudyRecordRepository(ctx)
-	if err != nil {
-		return err
-	}
+	studyRecordRepo := r.rf.NewStudyRecordRepository(ctx)
 
 	results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
 	if err != nil {

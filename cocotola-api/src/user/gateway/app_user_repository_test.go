@@ -103,8 +103,7 @@ func Test_appUserRepository_AddAppUser(t *testing.T) {
 				err: service.ErrAppUserAlreadyExists,
 			},
 		}
-		appUserRepo, err := gateway.NewAppUserRepository(ctx, ts.rf, ts.db)
-		assert.NoError(t, err)
+		appUserRepo := gateway.NewAppUserRepository(ctx, ts.rf, ts.db)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := appUserRepo.AddAppUser(ctx, tt.args.operator, tt.args.param)

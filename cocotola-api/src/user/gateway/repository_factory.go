@@ -18,31 +18,31 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB) (service.RepositoryF
 	}, nil
 }
 
-func (f *repositoryFactory) NewOrganizationRepository(ctx context.Context) (service.OrganizationRepository, error) {
+func (f *repositoryFactory) NewOrganizationRepository(ctx context.Context) service.OrganizationRepository {
 	return NewOrganizationRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewSpaceRepository(ctx context.Context) (service.SpaceRepository, error) {
+func (f *repositoryFactory) NewSpaceRepository(ctx context.Context) service.SpaceRepository {
 	return NewSpaceRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewAppUserRepository(ctx context.Context) (service.AppUserRepository, error) {
+func (f *repositoryFactory) NewAppUserRepository(ctx context.Context) service.AppUserRepository {
 	return NewAppUserRepository(ctx, f, f.db)
 }
 
-func (f *repositoryFactory) NewAppUserGroupRepository(ctx context.Context) (service.AppUserGroupRepository, error) {
+func (f *repositoryFactory) NewAppUserGroupRepository(ctx context.Context) service.AppUserGroupRepository {
 	return NewAppUserGroupRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewGroupUserRepository(ctx context.Context) (service.GroupUserRepository, error) {
+func (f *repositoryFactory) NewGroupUserRepository(ctx context.Context) service.GroupUserRepository {
 	return NewGroupUserRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewUserSpaceRepository(ctx context.Context) (service.UserSpaceRepository, error) {
+func (f *repositoryFactory) NewUserSpaceRepository(ctx context.Context) service.UserSpaceRepository {
 	return NewUserSpaceRepository(ctx, f, f.db)
 }
 
-func (f *repositoryFactory) NewRBACRepository(ctx context.Context) (service.RBACRepository, error) {
+func (f *repositoryFactory) NewRBACRepository(ctx context.Context) service.RBACRepository {
 	return NewRBACRepository(ctx, f.db)
 }
 

@@ -28,14 +28,8 @@ type systemAdmin struct {
 }
 
 func NewSystemAdmin(ctx context.Context, rf RepositoryFactory) (SystemAdmin, error) {
-	orgRepo, err := rf.NewOrganizationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	appUserRepo, err := rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	orgRepo := rf.NewOrganizationRepository(ctx)
+	appUserRepo := rf.NewAppUserRepository(ctx)
 
 	return &systemAdmin{
 		SystemAdminModel: domain.NewSystemAdminModel(),
@@ -94,10 +88,7 @@ func (m *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to FindOwnerByLoginID. error: %w", err)
 	}
 
-	appUserGroupRepo, err := m.rf.NewAppUserGroupRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
+	appUserGroupRepo := m.rf.NewAppUserGroupRepository(ctx)
 
 	// add public group
 	publicGroupID, err := appUserGroupRepo.AddPublicGroup(ctx, systemOwner)
@@ -105,19 +96,15 @@ func (m *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to AddPublicGroup. error: %w", err)
 	}
 
-	groupUserRepo, err := m.rf.NewGroupUserRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
+	groupUserRepo := m.rf.NewGroupUserRepository(ctx)
+
 	// public-group <-> owner
 	if err := groupUserRepo.AddGroupUser(ctx, systemOwner, publicGroupID, ownerID); err != nil {
 		return 0, liberrors.Errorf("failed to AddGroupUser. error: %w", err)
 	}
 
-	spaceRepo, err := m.rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
+	spaceRepo := m.rf.NewSpaceRepository(ctx)
+
 	// add default space
 	spaceID, err := spaceRepo.AddDefaultSpace(ctx, systemOwner)
 	if err != nil {

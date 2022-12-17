@@ -2,13 +2,12 @@ package gateway
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -46,14 +45,14 @@ func (e *appUserGroupEntity) toAppUserGroup() (service.AppUserGroup, error) {
 	return service.NewAppUserGroup(appUserGroupMdoel)
 }
 
-func NewAppUserGroupRepository(ctx context.Context, db *gorm.DB) (service.AppUserGroupRepository, error) {
+func NewAppUserGroupRepository(ctx context.Context, db *gorm.DB) service.AppUserGroupRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &appUserGroupRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *appUserGroupRepository) FindPublicGroup(ctx context.Context, operator domain.SystemOwnerModel) (service.AppUserGroup, error) {

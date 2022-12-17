@@ -32,10 +32,7 @@ func (p *problemQuotaHandler) Update(ctx context.Context, event service.ProblemE
 			return err
 		}
 
-		userQuotaRepo, err := p.rf.NewUserQuotaRepository(ctx)
-		if err != nil {
-			return err
-		}
+		userQuotaRepo := p.rf.NewUserQuotaRepository(ctx)
 
 		{
 			unit := processor.GetUnitForSizeQuota()

@@ -38,11 +38,11 @@ type studyRecordRepository struct {
 	db *gorm.DB
 }
 
-func NewStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.StudyRecordRepository, error) {
+func newStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.StudyRecordRepository {
 	return &studyRecordRepository{
 		rf: rf,
 		db: db,
-	}, nil
+	}
 }
 
 func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.SystemOwnerModel, appUserID userD.AppUserID, workbookID domain.WorkbookID, problemTypeID uint, studyTypeID uint, problemID domain.ProblemID, mastered bool) error {

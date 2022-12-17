@@ -19,7 +19,6 @@ type AppUser interface {
 
 type appUser struct {
 	domain.AppUserModel
-	rf        RepositoryFactory
 	spaceRepo SpaceRepository
 }
 
@@ -30,14 +29,10 @@ func NewAppUser(ctx context.Context, rf RepositoryFactory, appUserModel domain.A
 	if appUserModel == nil {
 		return nil, liberrors.Errorf("appUserModel is nil. err: %w", libD.ErrInvalidArgument)
 	}
-	spaceRepo, err := rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	spaceRepo := rf.NewSpaceRepository(ctx)
 
 	m := &appUser{
 		AppUserModel: appUserModel,
-		rf:           rf,
 		spaceRepo:    spaceRepo,
 	}
 

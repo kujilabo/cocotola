@@ -18,7 +18,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
-		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
+		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
 
 		// user1 has two workbooks
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
@@ -107,7 +107,7 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
-		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
+		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
@@ -171,7 +171,7 @@ func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
 	fn := func(ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
-		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
+		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")

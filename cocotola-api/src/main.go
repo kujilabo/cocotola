@@ -121,16 +121,6 @@ func main() {
 		return nil, liberrors.Errorf("processor not found. problemType: %s", problemType)
 	}
 
-	problemTypes, err := findAllProblemTypes(ctx, db)
-	if err != nil {
-		panic(err)
-	}
-
-	studyTypes, err := findAllStudyTypes(ctx, db)
-	if err != nil {
-		panic(err)
-	}
-
 	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
 		return jobG.NewRepositoryFactory(ctx, db)
 	}
@@ -140,7 +130,7 @@ func main() {
 	}
 
 	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
-		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemTypes, studyTypes, problemRepositories)
+		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemRepositories)
 	}
 
 	jobTransaction, authTransaction, appTransaction, err := initTransaction(db, jobRff, userRff, rff)
@@ -187,10 +177,7 @@ func initLocalEnv(ctx context.Context, jobTransaction jobS.Transaction, appTrans
 }
 
 func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, rff appG.RepositoryFactoryFunc) (jobS.Transaction, authS.Transaction, appS.Transaction, error) {
-	jobTransaction, err := jobG.NewTransaction(db, jobRff)
-	if err != nil {
-		return nil, nil, nil, err
-	}
+	jobTransaction := jobG.NewTransaction(db, jobRff)
 
 	authTransaction, err := authG.NewTransaction(db, userRff)
 	if err != nil {
@@ -202,30 +189,6 @@ func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff use
 		return nil, nil, nil, err
 	}
 	return jobTransaction, authTransaction, appTransaction, nil
-
-}
-func findAllProblemTypes(ctx context.Context, db *gorm.DB) ([]appD.ProblemType, error) {
-	problemTypeRepo, err := appG.NewProblemTypeRepository(db)
-	if err != nil {
-		return nil, err
-	}
-	problemTypes, err := problemTypeRepo.FindAllProblemTypes(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return problemTypes, nil
-}
-
-func findAllStudyTypes(ctx context.Context, db *gorm.DB) ([]appD.StudyType, error) {
-	studyTypeRepo, err := appG.NewStudyTypeRepository(db)
-	if err != nil {
-		return nil, err
-	}
-	studyTypes, err := studyTypeRepo.FindAllStudyTypes(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return studyTypes, nil
 }
 
 func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
@@ -548,7 +511,7 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return liberrors.Errorf("userRff. err: %w", err)
+			return err
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
@@ -597,7 +560,7 @@ func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return liberrors.Errorf("userRff. err: %w", err)
+			return err
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)

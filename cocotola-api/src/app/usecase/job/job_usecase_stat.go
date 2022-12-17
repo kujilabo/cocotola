@@ -45,10 +45,7 @@ func (u *jobUsecaseStat) getSystemOwnerAndRepositoryFactory(ctx context.Context,
 			return err
 		}
 
-		appUserRepo, err := userRf.NewAppUserRepository(ctx)
-		if err != nil {
-			return err
-		}
+		appUserRepo := userRf.NewAppUserRepository(ctx)
 
 		so, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, systemAdmin, "cocotola")
 		if err != nil {
@@ -66,17 +63,8 @@ func (u *jobUsecaseStat) getSystemOwnerAndRepositoryFactory(ctx context.Context,
 	return systemOwner, userRepositoryFactory, repositoryFactory, nil
 }
 
-func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, systemAdmin domain.SystemAdminModel) error {
-	_, span := tracer.Start(ctx, "jobUsecaseStat.AggregateStudyResultsOfAllUsers")
-	defer span.End()
+func (u *jobUsecaseStat) getTargetDateList(ctx context.Context, makeJobName func(targetDate time.Time) jobD.JobName) ([]time.Time, error) {
 	logger := log.FromContext(ctx)
-
-	// Check if the process has already been executed.
-
-	makeJobName := func(targetDate time.Time) jobD.JobName {
-		return jobD.JobName("AggregateStudyResults-" + targetDate.Format("2006-01-02"))
-	}
-
 	targetDateList := make([]time.Time, 0)
 
 	now := time.Now()
@@ -87,10 +75,7 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 			return err
 		}
 
-		jobHistoryRepo, err := jobRf.NewJobHistoryRepository(ctx)
-		if err != nil {
-			return err
-		}
+		jobHistoryRepo := jobRf.NewJobHistoryRepository(ctx)
 
 		for i := 1; i <= 7; i++ {
 			date := today.AddDate(0, 0, -1*i)
@@ -106,28 +91,35 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 		}
 		return nil
 	}); err != nil {
-		return err
+		return nil, err
 	}
 
-	makeFunc := func(targetDate time.Time) func(context.Context) error {
+	return targetDateList, nil
+}
+
+func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, systemAdmin domain.SystemAdminModel) error {
+	_, span := tracer.Start(ctx, "jobUsecaseStat.AggregateStudyResultsOfAllUsers")
+	defer span.End()
+
+	// Check if the process has already been executed.
+
+	makeJobName := func(targetDate time.Time) jobD.JobName {
+		return jobD.JobName("AggregateStudyResults-" + targetDate.Format("2006-01-02"))
+	}
+
+	makeJobFunc := func(targetDate time.Time) func(context.Context) error {
 		return func(ctx context.Context) error {
 			pageNo := 1
 			pageSize := userFetchSize
-			if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+			return u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 				systemOwner, userRf, rf, err := u.getSystemOwnerAndRepositoryFactory(ctx, systemAdmin, rf)
 				if err != nil {
 					return err
 				}
 
-				studyStatRepo, err := rf.NewStudyStatRepository(ctx)
-				if err != nil {
-					return err
-				}
+				studyStatRepo := rf.NewStudyStatRepository(ctx)
 
-				userRepo, err := userRf.NewAppUserRepository(ctx)
-				if err != nil {
-					return err
-				}
+				userRepo := userRf.NewAppUserRepository(ctx)
 
 				for {
 					userIDs, err := userRepo.FindAppUserIDs(ctx, systemOwner, pageNo, pageSize)
@@ -149,16 +141,18 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 				}
 
 				return nil
-			}); err != nil {
-				return err
-			}
-			return nil
+			})
 		}
+	}
+
+	targetDateList, err := u.getTargetDateList(ctx, makeJobName)
+	if err != nil {
+		return err
 	}
 
 	for _, targetDate := range targetDateList {
 		jobName := makeJobName(targetDate)
-		fn := makeFunc(targetDate)
+		fn := makeJobFunc(targetDate)
 		job, err := jobS.NewJob(jobName, time.Minute, false, fn)
 		if err != nil {
 			return err
@@ -181,10 +175,7 @@ func (u *jobUsecaseStat) CleanStudyStats(ctx context.Context, systemAdmin domain
 			return err
 		}
 
-		studyStatRepo, err := rf.NewStudyStatRepository(ctx)
-		if err != nil {
-			return err
-		}
+		studyStatRepo := rf.NewStudyStatRepository(ctx)
 
 		expirationDate := time.Now().AddDate(0, 0, -1*studyStatsRetentionDays)
 

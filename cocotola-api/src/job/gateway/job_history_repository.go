@@ -30,10 +30,10 @@ type jobHistoryRepository struct {
 	db *gorm.DB
 }
 
-func NewJobHistoryRepository(ctx context.Context, db *gorm.DB) (service.JobHistoryRepository, error) {
+func newJobHistoryRepository(ctx context.Context, db *gorm.DB) service.JobHistoryRepository {
 	return &jobHistoryRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *jobHistoryRepository) AddJobHistory(ctx context.Context, param service.JobHistoryAddParameter) error {

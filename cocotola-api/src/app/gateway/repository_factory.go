@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"context"
+	"errors"
 
 	"gorm.io/gorm"
 
@@ -11,7 +12,6 @@ import (
 	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
@@ -26,9 +26,21 @@ type repositoryFactory struct {
 	studyTypes          []domain.StudyType
 }
 
-func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemTypes []domain.ProblemType, studyTypes []domain.StudyType, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
 	if db == nil {
-		return nil, libD.ErrInvalidArgument
+		panic(errors.New("db is nil"))
+	}
+
+	problemTypeRepo := newProblemTypeRepository(db)
+	problemTypes, err := problemTypeRepo.FindAllProblemTypes(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	studyTypeRepo := newStudyTypeRepository(db)
+	studyTypes, err := studyTypeRepo.FindAllStudyTypes(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	return &repositoryFactory{
@@ -42,8 +54,8 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, j
 	}, nil
 }
 
-func (f *repositoryFactory) NewWorkbookRepository(ctx context.Context) (service.WorkbookRepository, error) {
-	return NewWorkbookRepository(ctx, f.driverName, f, f.pf, f.db, f.problemTypes), nil
+func (f *repositoryFactory) NewWorkbookRepository(ctx context.Context) service.WorkbookRepository {
+	return newWorkbookRepository(ctx, f.driverName, f, f.pf, f.db, f.problemTypes)
 }
 
 func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemType string) (service.ProblemRepository, error) {
@@ -57,32 +69,32 @@ func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemTyp
 	return problemRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewProblemTypeRepository(ctx context.Context) (service.ProblemTypeRepository, error) {
-	return NewProblemTypeRepository(f.db)
+func (f *repositoryFactory) NewProblemTypeRepository(ctx context.Context) service.ProblemTypeRepository {
+	return newProblemTypeRepository(f.db)
 }
 
-func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) (service.StudyTypeRepository, error) {
-	return NewStudyTypeRepository(f.db)
+func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) service.StudyTypeRepository {
+	return newStudyTypeRepository(f.db)
 }
 
-func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) (service.StudyRecordRepository, error) {
-	return NewStudyRecordRepository(ctx, f, f.db)
+func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) service.StudyRecordRepository {
+	return newStudyRecordRepository(ctx, f, f.db)
 }
 
-func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) (service.RecordbookRepository, error) {
-	return NewRecordbookRepository(ctx, f, f.db, f.problemTypes, f.studyTypes)
+func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) service.RecordbookRepository {
+	return newRecordbookRepository(ctx, f, f.db, f.problemTypes, f.studyTypes)
 }
 
-func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) (service.UserQuotaRepository, error) {
-	return NewUserQuotaRepository(f.db)
+func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) service.UserQuotaRepository {
+	return newUserQuotaRepository(f.db)
 }
 
-func (f *repositoryFactory) NewStatRepository(ctx context.Context) (service.StatRepository, error) {
-	return NewStatRepository(ctx, f.db)
+func (f *repositoryFactory) NewStatRepository(ctx context.Context) service.StatRepository {
+	return newStatRepository(ctx, f.db)
 }
 
-func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service.StudyStatRepository, error) {
-	return NewStudyStatRepository(ctx, f.db, f)
+func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) service.StudyStatRepository {
+	return newStudyStatRepository(ctx, f.db, f)
 }
 
 func (f *repositoryFactory) NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error) {

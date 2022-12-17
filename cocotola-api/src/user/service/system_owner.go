@@ -36,30 +36,12 @@ type systemOwner struct {
 
 func NewSystemOwner(ctx context.Context, rf RepositoryFactory, systemOwnerModel domain.SystemOwnerModel) (SystemOwner, error) {
 
-	orgRepo, err := rf.NewOrganizationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	appUserRepo, err := rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	spaceRepo, err := rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	appUserGroupRepo, err := rf.NewAppUserGroupRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	groupUserRepo, err := rf.NewGroupUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	rbacRepo, err := rf.NewRBACRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	orgRepo := rf.NewOrganizationRepository(ctx)
+	appUserRepo := rf.NewAppUserRepository(ctx)
+	spaceRepo := rf.NewSpaceRepository(ctx)
+	appUserGroupRepo := rf.NewAppUserGroupRepository(ctx)
+	groupUserRepo := rf.NewGroupUserRepository(ctx)
+	rbacRepo := rf.NewRBACRepository(ctx)
 
 	m := &systemOwner{
 		SystemOwnerModel: systemOwnerModel,

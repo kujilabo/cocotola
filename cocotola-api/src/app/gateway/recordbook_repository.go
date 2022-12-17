@@ -44,13 +44,16 @@ type recordbookRepository struct {
 	studyTypes   []domain.StudyType
 }
 
-func NewRecordbookRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB, problemTypes []domain.ProblemType, studyTypes []domain.StudyType) (service.RecordbookRepository, error) {
+func newRecordbookRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB, problemTypes []domain.ProblemType, studyTypes []domain.StudyType) service.RecordbookRepository {
+	if db == nil {
+		panic(errors.New("db is nil"))
+	}
 	return &recordbookRepository{
 		rf:           rf,
 		db:           db,
 		problemTypes: problemTypes,
 		studyTypes:   studyTypes,
-	}, nil
+	}
 }
 
 // func (r *studyResultRepository) toStudyType(studyTypeID uint) string {

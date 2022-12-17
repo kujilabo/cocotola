@@ -26,10 +26,10 @@ type studyTypeRepository struct {
 	db *gorm.DB
 }
 
-func NewStudyTypeRepository(db *gorm.DB) (service.StudyTypeRepository, error) {
+func newStudyTypeRepository(db *gorm.DB) service.StudyTypeRepository {
 	return &studyTypeRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *studyTypeRepository) FindAllStudyTypes(ctx context.Context) ([]domain.StudyType, error) {

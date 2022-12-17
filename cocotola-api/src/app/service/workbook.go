@@ -50,10 +50,7 @@ type workbook struct {
 }
 
 func NewWorkbook(ctx context.Context, rf RepositoryFactory, pf ProcessorFactory, workbookModel domain.WorkbookModel) (Workbook, error) {
-	workbookRepo, err := rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	workbookRepo := rf.NewWorkbookRepository(ctx)
 
 	problemRepo, err := rf.NewProblemRepository(ctx, workbookModel.GetProblemType())
 	if err != nil {

@@ -10,23 +10,23 @@ import (
 )
 
 type RepositoryFactory interface {
-	NewWorkbookRepository(ctx context.Context) (WorkbookRepository, error)
+	NewWorkbookRepository(ctx context.Context) WorkbookRepository
 
 	NewProblemRepository(ctx context.Context, problemType string) (ProblemRepository, error)
 
-	NewProblemTypeRepository(ctx context.Context) (ProblemTypeRepository, error)
+	NewProblemTypeRepository(ctx context.Context) ProblemTypeRepository
 
-	NewStudyTypeRepository(ctx context.Context) (StudyTypeRepository, error)
+	NewStudyTypeRepository(ctx context.Context) StudyTypeRepository
 
-	NewStudyRecordRepository(ctx context.Context) (StudyRecordRepository, error)
+	NewStudyRecordRepository(ctx context.Context) StudyRecordRepository
 
-	NewRecordbookRepository(ctx context.Context) (RecordbookRepository, error)
+	NewRecordbookRepository(ctx context.Context) RecordbookRepository
 
-	NewUserQuotaRepository(ctx context.Context) (UserQuotaRepository, error)
+	NewUserQuotaRepository(ctx context.Context) UserQuotaRepository
 
-	NewStatRepository(ctx context.Context) (StatRepository, error)
+	NewStatRepository(ctx context.Context) StatRepository
 
-	NewStudyStatRepository(ctx context.Context) (StudyStatRepository, error)
+	NewStudyStatRepository(ctx context.Context) StudyStatRepository
 
 	NewUserRepositoryFactory(ctx context.Context) (userS.RepositoryFactory, error)
 

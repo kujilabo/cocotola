@@ -68,7 +68,7 @@ func (_m *RepositoryFactory) NewProblemRepository(ctx context.Context, problemTy
 }
 
 // NewProblemTypeRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) (appservice.ProblemTypeRepository, error) {
+func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) appservice.ProblemTypeRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.ProblemTypeRepository
@@ -80,18 +80,11 @@ func (_m *RepositoryFactory) NewProblemTypeRepository(ctx context.Context) (apps
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewRecordbookRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) (appservice.RecordbookRepository, error) {
+func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) appservice.RecordbookRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.RecordbookRepository
@@ -103,18 +96,11 @@ func (_m *RepositoryFactory) NewRecordbookRepository(ctx context.Context) (appse
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewStatRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStatRepository(ctx context.Context) (appservice.StatRepository, error) {
+func (_m *RepositoryFactory) NewStatRepository(ctx context.Context) appservice.StatRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.StatRepository
@@ -126,18 +112,11 @@ func (_m *RepositoryFactory) NewStatRepository(ctx context.Context) (appservice.
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewStudyRecordRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) (appservice.StudyRecordRepository, error) {
+func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) appservice.StudyRecordRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.StudyRecordRepository
@@ -149,18 +128,11 @@ func (_m *RepositoryFactory) NewStudyRecordRepository(ctx context.Context) (apps
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewStudyStatRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStudyStatRepository(ctx context.Context) (appservice.StudyStatRepository, error) {
+func (_m *RepositoryFactory) NewStudyStatRepository(ctx context.Context) appservice.StudyStatRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.StudyStatRepository
@@ -172,18 +144,11 @@ func (_m *RepositoryFactory) NewStudyStatRepository(ctx context.Context) (appser
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewStudyTypeRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) (appservice.StudyTypeRepository, error) {
+func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) appservice.StudyTypeRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.StudyTypeRepository
@@ -195,18 +160,11 @@ func (_m *RepositoryFactory) NewStudyTypeRepository(ctx context.Context) (appser
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewUserQuotaRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) (appservice.UserQuotaRepository, error) {
+func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) appservice.UserQuotaRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.UserQuotaRepository
@@ -218,14 +176,7 @@ func (_m *RepositoryFactory) NewUserQuotaRepository(ctx context.Context) (appser
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewUserRepositoryFactory provides a mock function with given fields: ctx
@@ -252,7 +203,7 @@ func (_m *RepositoryFactory) NewUserRepositoryFactory(ctx context.Context) (user
 }
 
 // NewWorkbookRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewWorkbookRepository(ctx context.Context) (appservice.WorkbookRepository, error) {
+func (_m *RepositoryFactory) NewWorkbookRepository(ctx context.Context) appservice.WorkbookRepository {
 	ret := _m.Called(ctx)
 
 	var r0 appservice.WorkbookRepository
@@ -264,14 +215,7 @@ func (_m *RepositoryFactory) NewWorkbookRepository(ctx context.Context) (appserv
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewRepositoryFactory creates a new instance of RepositoryFactory. It also registers a cleanup function to assert the mocks expectations.

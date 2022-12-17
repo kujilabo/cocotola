@@ -35,10 +35,10 @@ type jobStatusRepository struct {
 	db *gorm.DB
 }
 
-func NewJobStatusRepository(ctx context.Context, db *gorm.DB) (service.JobStatusRepository, error) {
+func newJobStatusRepository(ctx context.Context, db *gorm.DB) service.JobStatusRepository {
 	return &jobStatusRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job) (domain.JobStatusID, error) {

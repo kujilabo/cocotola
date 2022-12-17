@@ -20,8 +20,8 @@ func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
-		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
-		studyRecordRepo, _ := ts.rf.NewStudyRecordRepository(ctx)
+		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
+		studyRecordRepo := ts.rf.NewStudyRecordRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")

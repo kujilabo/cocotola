@@ -60,11 +60,7 @@ func NewStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, 
 		return nil, err
 	}
 
-	spaceRepo, err := userRf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+	spaceRepo := userRf.NewSpaceRepository(ctx)
 	m := &student{
 		StudentModel: studentModel,
 		pf:           pf,
@@ -95,19 +91,13 @@ func (s *student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition 
 		return nil, liberrors.Errorf("NewWorkbookSearchCondition. err: %w", err)
 	}
 
-	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return nil, liberrors.Errorf("NewWorkbookRepository. err: %w", err)
-	}
+	workbookRepo := s.rf.NewWorkbookRepository(ctx)
 
 	return workbookRepo.FindPersonalWorkbooks(ctx, s, newCondition)
 }
 
 func (s *student) FindWorkbookByID(ctx context.Context, id domain.WorkbookID) (Workbook, error) {
-	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return nil, liberrors.Errorf("s.rf.NewWorkbookRepository. err: %w", err)
-	}
+	workbookRepo := s.rf.NewWorkbookRepository(ctx)
 
 	return workbookRepo.FindWorkbookByID(ctx, s, id)
 }
@@ -118,10 +108,7 @@ func (s *student) FindWorkbookByName(ctx context.Context, name string) (Workbook
 		return nil, liberrors.Errorf("s.GetPersonalSpace. err: %w", err)
 	}
 
-	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return nil, liberrors.Errorf("s.rf.NewWorkbookRepository. err: %w", err)
-	}
+	workbookRepo := s.rf.NewWorkbookRepository(ctx)
 
 	return workbookRepo.FindWorkbookByName(ctx, s, userD.SpaceID(space.GetID()), name)
 }
@@ -132,10 +119,7 @@ func (s *student) AddWorkbookToPersonalSpace(ctx context.Context, parameter Work
 		return 0, liberrors.Errorf("failed to GetPersonalSpace. err: %w", err)
 	}
 
-	workbookRepo, err := s.rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return 0, liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
-	}
+	workbookRepo := s.rf.NewWorkbookRepository(ctx)
 
 	workbookID, err := workbookRepo.AddWorkbook(ctx, s, userD.SpaceID(space.GetID()), parameter)
 	if err != nil {
@@ -169,10 +153,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 		return liberrors.Errorf("s.pf.NewProblemQuotaProcessor. err: %w", err)
 	}
 
-	userQuotaRepo, err := s.rf.NewUserQuotaRepository(ctx)
-	if err != nil {
-		return liberrors.Errorf("s.rf.NewUserQuotaRepository. err: %w", err)
-	}
+	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
 
 	switch name {
 	case QuotaNameSize:
@@ -215,10 +196,7 @@ func (s *student) FindRecordbookSummary(ctx context.Context, workbookID domain.W
 }
 
 func (s *student) GetStat(ctx context.Context) (Stat, error) {
-	statRepo, err := s.rf.NewStatRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	statRepo := s.rf.NewStatRepository(ctx)
 
 	stat, err := statRepo.FindStat(ctx, s.GetAppUserID())
 	if err != nil {

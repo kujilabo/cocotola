@@ -7,8 +7,8 @@ import (
 )
 
 type RepositoryFactory interface {
-	NewJobStatusRepository(ctx context.Context) (JobStatusRepository, error)
-	NewJobHistoryRepository(ctx context.Context) (JobHistoryRepository, error)
+	NewJobStatusRepository(ctx context.Context) JobStatusRepository
+	NewJobHistoryRepository(ctx context.Context) JobHistoryRepository
 }
 
 type Transaction interface {

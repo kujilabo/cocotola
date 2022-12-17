@@ -8,8 +8,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -29,15 +27,15 @@ func (e *userSpaceEntity) TableName() string {
 	return "user_space"
 }
 
-func NewUserSpaceRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.UserSpaceRepository, error) {
+func NewUserSpaceRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.UserSpaceRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &userSpaceRepository{
 		db: db,
 		rf: rf,
-	}, nil
+	}
 }
 
 func (r *userSpaceRepository) Add(ctx context.Context, operator domain.AppUserModel, spaceID domain.SpaceID) error {

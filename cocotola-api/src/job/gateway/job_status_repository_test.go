@@ -24,8 +24,9 @@ func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_true(t
 	fn := func(ctx context.Context, ts testService) {
 		setupJob(t, ts)
 		defer teardownJob(t, ts)
-		jobStatusRepo, err := gateway.NewJobStatusRepository(ctx, ts.db)
+		rf, err := gateway.NewRepositoryFactory(ctx, ts.db)
 		require.NoError(t, err)
+		jobStatusRepo := rf.NewJobStatusRepository(ctx)
 
 		jobName := domain.JobName("job" + RandString(8))
 		job, err := service.NewJob(jobName, time.Second, true, emptyFunc)
@@ -47,8 +48,9 @@ func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_false(
 	fn := func(ctx context.Context, ts testService) {
 		setupJob(t, ts)
 		defer teardownJob(t, ts)
-		jobStatusRepo, err := gateway.NewJobStatusRepository(ctx, ts.db)
+		rf, err := gateway.NewRepositoryFactory(ctx, ts.db)
 		require.NoError(t, err)
+		jobStatusRepo := rf.NewJobStatusRepository(ctx)
 
 		jobName := domain.JobName("job" + RandString(8))
 		job, err := service.NewJob(jobName, time.Second, false, emptyFunc)
@@ -68,8 +70,9 @@ func Test_jobStatusRepository_RemoveExpiredJobStatus(t *testing.T) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		setupJob(t, ts)
 		defer teardownJob(t, ts)
-		jobStatusRepo, err := gateway.NewJobStatusRepository(ctx, ts.db)
+		rf, err := gateway.NewRepositoryFactory(ctx, ts.db)
 		require.NoError(t, err)
+		jobStatusRepo := rf.NewJobStatusRepository(ctx)
 
 		job1Name := domain.JobName("job1" + RandString(8))
 		job1, err := service.NewJob(job1Name, time.Second, false, emptyFunc)

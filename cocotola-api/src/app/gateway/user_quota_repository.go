@@ -36,10 +36,10 @@ type userQuotaRepository struct {
 	db *gorm.DB
 }
 
-func NewUserQuotaRepository(db *gorm.DB) (service.UserQuotaRepository, error) {
+func newUserQuotaRepository(db *gorm.DB) service.UserQuotaRepository {
 	return &userQuotaRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *userQuotaRepository) IsExceeded(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit service.QuotaUnit, limit int) (bool, error) {
