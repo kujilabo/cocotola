@@ -3,13 +3,11 @@ package gateway
 import (
 	"context"
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/passwordhelper"
@@ -36,12 +34,7 @@ type appUserRepository struct {
 }
 
 type appUserEntity struct {
-	ID                   uint
-	Version              int
-	CreatedAt            time.Time
-	UpdatedAt            time.Time
-	CreatedBy            uint
-	UpdatedBy            uint
+	SinmpleModelEntity
 	OrganizationID       uint
 	LoginID              string
 	Username             string
@@ -105,7 +98,12 @@ func (e *appUserEntity) toSystemOwner(ctx context.Context, rf service.Repository
 		return nil, err
 	}
 
-	systemOwnerModel, err := domain.NewSystemOwnerModel(appUserModel)
+	ownerModel, err := domain.NewOwnerModel(appUserModel)
+	if err != nil {
+		return nil, err
+	}
+
+	systemOwnerModel, err := domain.NewSystemOwnerModel(ownerModel)
 	if err != nil {
 		return nil, err
 	}
@@ -118,18 +116,21 @@ func (e *appUserEntity) toSystemOwner(ctx context.Context, rf service.Repository
 	return systemOwner, nil
 }
 
-func (e *appUserEntity) toAppUser(rf service.RepositoryFactory, roles []string, properties map[string]string) (service.AppUser, error) {
-	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
+func (e *appUserEntity) toAppUserModel(roles []string, properties map[string]string) (domain.AppUserModel, error) {
+	model, err := e.toModel()
+	if err != nil {
+		return nil, err
+	}
+	return domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, roles, properties)
+}
+
+func (e *appUserEntity) toAppUser(ctx context.Context, rf service.RepositoryFactory, roles []string, properties map[string]string) (service.AppUser, error) {
+	appUserModel, err := e.toAppUserModel(roles, properties)
 	if err != nil {
 		return nil, err
 	}
 
-	appUserModel, err := domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, roles, properties)
-	if err != nil {
-		return nil, err
-	}
-
-	appUser, err := service.NewAppUser(rf, appUserModel)
+	appUser, err := service.NewAppUser(ctx, rf, appUserModel)
 	if err != nil {
 		return nil, err
 	}
@@ -138,32 +139,29 @@ func (e *appUserEntity) toAppUser(rf service.RepositoryFactory, roles []string, 
 }
 
 func (e *appUserEntity) toOwner(rf service.RepositoryFactory, roles []string, properties map[string]string) (service.Owner, error) {
-	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
+	appUserModel, err := e.toAppUserModel(roles, properties)
 	if err != nil {
 		return nil, err
 	}
 
-	appUserModel, err := domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, roles, properties)
+	ownerModel, err := domain.NewOwnerModel(appUserModel)
 	if err != nil {
 		return nil, err
 	}
 
-	appUser, err := service.NewAppUser(rf, appUserModel)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewOwner(rf, appUser), nil
+	return service.NewOwner(rf, ownerModel), nil
 }
 
-func NewAppUserRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.AppUserRepository, error) {
+func NewAppUserRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.AppUserRepository {
 	if rf == nil {
-		return nil, liberrors.Errorf("rf is nil. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("rf is nil"))
+	} else if db == nil {
+		panic(errors.New("db is nil"))
 	}
 	return &appUserRepository{
 		rf: rf,
 		db: db,
-	}, nil
+	}
 }
 
 func (r *appUserRepository) FindSystemOwnerByOrganizationID(ctx context.Context, operator domain.SystemAdminModel, organizationID domain.OrganizationID) (service.SystemOwner, error) {
@@ -207,8 +205,10 @@ func (r *appUserRepository) FindAppUserByID(ctx context.Context, operator domain
 
 	appUser := appUserEntity{}
 	if result := r.db.Where(&appUserEntity{
+		SinmpleModelEntity: SinmpleModelEntity{
+			ID: uint(id),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
-		ID:             uint(id),
 	}).First(&appUser); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, service.ErrAppUserNotFound
@@ -220,7 +220,7 @@ func (r *appUserRepository) FindAppUserByID(ctx context.Context, operator domain
 	roles := []string{appUser.Role}
 	properties := map[string]string{}
 
-	return appUser.toAppUser(r.rf, roles, properties)
+	return appUser.toAppUser(ctx, r.rf, roles, properties)
 }
 
 func (r *appUserRepository) FindAppUserByLoginID(ctx context.Context, operator domain.AppUserModel, loginID string) (service.AppUser, error) {
@@ -230,6 +230,7 @@ func (r *appUserRepository) FindAppUserByLoginID(ctx context.Context, operator d
 	if loginID == "" {
 		return nil, errors.New("invalid parameter")
 	}
+
 	appUser := appUserEntity{}
 	if result := r.db.Where(&appUserEntity{
 		OrganizationID: uint(operator.GetOrganizationID()),
@@ -245,7 +246,7 @@ func (r *appUserRepository) FindAppUserByLoginID(ctx context.Context, operator d
 	roles := []string{appUser.Role}
 	properties := map[string]string{}
 
-	return appUser.toAppUser(r.rf, roles, properties)
+	return appUser.toAppUser(ctx, r.rf, roles, properties)
 }
 
 func (r *appUserRepository) FindOwnerByLoginID(ctx context.Context, operator domain.SystemOwnerModel, loginID string) (service.Owner, error) {
@@ -293,9 +294,11 @@ func (r *appUserRepository) AddAppUser(ctx context.Context, operator domain.Owne
 	}
 
 	appUserEntity := appUserEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		LoginID:        param.GetLoginID(),
 		Username:       param.GetUsername(),
@@ -310,9 +313,11 @@ func (r *appUserRepository) AddSystemOwner(ctx context.Context, operator domain.
 	defer span.End()
 
 	appUserEntity := appUserEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(organizationID),
 		LoginID:        SystemOwnerLoginID,
 		Username:       "SystemOwner",
@@ -331,9 +336,11 @@ func (r *appUserRepository) AddFirstOwner(ctx context.Context, operator domain.S
 	}
 
 	appUserEntity := appUserEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		LoginID:        param.GetLoginID(),
 		Username:       param.GetUsername(),

@@ -134,7 +134,7 @@ dev-docker-down:
 	@chmod -R 777 docker/test
 
 dev-docker-clean:
-	# @rm -rf docker/development/
+	@rm -rf docker/development/mysql-*
 
 test-docker-up:
 	@docker-compose -f docker/test/docker-compose.yml up -d

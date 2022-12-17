@@ -30,7 +30,10 @@ func (s *guestUserUsecase) RetrieveGuestToken(ctx context.Context, organizationN
 	var tokenSet *service.TokenSet
 
 	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
-		systemAdmin := userS.NewSystemAdmin(rf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, rf)
+		if err != nil {
+			return err
+		}
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
 		if err != nil {

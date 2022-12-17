@@ -10,9 +10,11 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
 type studyRecordEntity struct {
+	ID             string
 	OrganizationID uint
 	AppUserID      uint
 	WorkbookID     uint
@@ -36,11 +38,11 @@ type studyRecordRepository struct {
 	db *gorm.DB
 }
 
-func NewStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.StudyRecordRepository, error) {
+func newStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.StudyRecordRepository {
 	return &studyRecordRepository{
 		rf: rf,
 		db: db,
-	}, nil
+	}
 }
 
 func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.SystemOwnerModel, appUserID userD.AppUserID, workbookID domain.WorkbookID, problemTypeID uint, studyTypeID uint, problemID domain.ProblemID, mastered bool) error {
@@ -49,6 +51,7 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 
 	entity := studyRecordEntity{
+		ID:             libD.NewULID(),
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserID:      uint(appUserID),
 		WorkbookID:     uint(workbookID),

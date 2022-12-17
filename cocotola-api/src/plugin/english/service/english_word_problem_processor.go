@@ -344,10 +344,7 @@ func (p *englishWordProblemProcessor) GetLimitForUpdateQuota() int {
 
 func (p *englishWordProblemProcessor) findOrAddSentenceFromTatoeba(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, tatoebaSentenceNumberFrom, tatoebaSentenceNumberTo int, lang2 appD.Lang2) (appD.ProblemID, error) {
 	systemSpaceID := appS.GetSystemSpaceID()
-	workbookRepo, err := rf.NewWorkbookRepository(ctx)
-	if err != nil {
-		return 0, liberrors.Errorf("failed to NewWorkbookRepository. err: %w", err)
-	}
+	workbookRepo := rf.NewWorkbookRepository(ctx)
 
 	tatoebaWorkbook, err := workbookRepo.FindWorkbookByName(ctx, operator, systemSpaceID, appS.TatoebaWorkbookName)
 	if err != nil {

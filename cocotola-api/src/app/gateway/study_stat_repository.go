@@ -4,14 +4,16 @@ import (
 	"context"
 	"time"
 
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
 type studyStatEntity struct {
+	ID             string
 	OrganizationID uint
 	AppUserID      uint
 	WorkbookID     uint
@@ -27,24 +29,19 @@ func (e *studyStatEntity) TableName() string {
 }
 
 type studyStatRepository struct {
-	db     *gorm.DB
-	rf     service.RepositoryFactory
-	userRf userS.RepositoryFactory
+	db *gorm.DB
+	rf service.RepositoryFactory
 }
 
-func NewStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory, userRf userS.RepositoryFactory) (service.StudyStatRepository, error) {
+func newStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory) service.StudyStatRepository {
 	return &studyStatRepository{
-		db:     db,
-		rf:     rf,
-		userRf: userRf,
-	}, nil
+		db: db,
+		rf: rf,
+	}
 }
 
 func (r *studyStatRepository) AggregateResults(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time, userID domain.AppUserID) error {
-	studyRecordRepo, err := r.rf.NewStudyRecordRepository(ctx)
-	if err != nil {
-		return err
-	}
+	studyRecordRepo := r.rf.NewStudyRecordRepository(ctx)
 
 	results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
 	if err != nil {
@@ -53,6 +50,7 @@ func (r *studyStatRepository) AggregateResults(ctx context.Context, operator dom
 
 	for _, result := range results.Results {
 		entity := studyStatEntity{
+			ID:             libD.NewULID(),
 			OrganizationID: uint(operator.GetOrganizationID()),
 			AppUserID:      uint(userID),
 			WorkbookID:     result.WorkbookID,

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
@@ -21,8 +20,7 @@ func TestGetOrganization(t *testing.T) {
 		orgID, _ := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 
-		orgRepo, err := gateway.NewOrganizationRepository(ctx, ts.db)
-		require.NoError(t, err)
+		orgRepo := gateway.NewOrganizationRepository(ctx, ts.db)
 
 		// get organization registered
 		model, err := domain.NewModel(1, 1, time.Now(), time.Now(), 1, 1)
@@ -53,8 +51,7 @@ func TestFindOrganizationByName(t *testing.T) {
 		defer teardownOrganization(t, ts, orgID)
 		systemAdminModel := domain.NewSystemAdminModel()
 
-		orgRepo, err := gateway.NewOrganizationRepository(ctx, ts.db)
-		require.NoError(t, err)
+		orgRepo := gateway.NewOrganizationRepository(ctx, ts.db)
 
 		var orgName string
 

@@ -3,12 +3,22 @@ package service
 
 import (
 	"context"
+	"errors"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
+var ErrJobHistoryNotFound = errors.New("JobHistory not found")
+
 type JobHistory interface {
+}
+
+type jobHistory struct {
+}
+
+func NewJobHistory() (JobHistory, error) {
+	return &jobHistory{}, nil
 }
 
 type JobHistoryAddParameter interface {
@@ -54,4 +64,5 @@ func (m *jobHistoryAddParameter) GetStatus() string {
 
 type JobHistoryRepository interface {
 	AddJobHistory(ctx context.Context, param JobHistoryAddParameter) error
+	FindJobHistoryByJobName(ctx context.Context, jobName domain.JobName) (JobHistory, error)
 }

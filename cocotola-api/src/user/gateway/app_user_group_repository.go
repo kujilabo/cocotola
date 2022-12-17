@@ -2,14 +2,12 @@ package gateway
 
 import (
 	"context"
-	"time"
+	"errors"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -22,12 +20,7 @@ type appUserGroupRepository struct {
 }
 
 type appUserGroupEntity struct {
-	ID             uint
-	Version        int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	SinmpleModelEntity
 	OrganizationID uint
 	Key            string
 	Name           string
@@ -39,7 +32,7 @@ func (e *appUserGroupEntity) TableName() string {
 }
 
 func (e *appUserGroupEntity) toAppUserGroup() (service.AppUserGroup, error) {
-	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
+	model, err := e.toModel()
 	if err != nil {
 		return nil, err
 	}
@@ -52,14 +45,14 @@ func (e *appUserGroupEntity) toAppUserGroup() (service.AppUserGroup, error) {
 	return service.NewAppUserGroup(appUserGroupMdoel)
 }
 
-func NewAppUserGroupRepository(ctx context.Context, db *gorm.DB) (service.AppUserGroupRepository, error) {
+func NewAppUserGroupRepository(ctx context.Context, db *gorm.DB) service.AppUserGroupRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &appUserGroupRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *appUserGroupRepository) FindPublicGroup(ctx context.Context, operator domain.SystemOwnerModel) (service.AppUserGroup, error) {
@@ -81,9 +74,11 @@ func (r *appUserGroupRepository) AddPublicGroup(ctx context.Context, operator do
 	defer span.End()
 
 	appUserGroup := appUserGroupEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Key:            "public",
 		Name:           "Public group",
@@ -99,9 +94,11 @@ func (r *appUserGroupRepository) AddPersonalGroup(ctx context.Context, operator 
 	defer span.End()
 
 	appUserGroup := appUserGroupEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Key:            "#" + operator.GetLoginID(),
 		Name:           "Personal group",

@@ -3,14 +3,11 @@ package gateway
 import (
 	"context"
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -20,10 +17,7 @@ type userSpaceRepository struct {
 }
 
 type userSpaceEntity struct {
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	JunctionModelEntity
 	OrganizationID uint
 	AppUserID      uint
 	SpaceID        uint
@@ -33,21 +27,25 @@ func (e *userSpaceEntity) TableName() string {
 	return "user_space"
 }
 
-func NewUserSpaceRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) (service.UserSpaceRepository, error) {
+func NewUserSpaceRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.UserSpaceRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &userSpaceRepository{
 		db: db,
 		rf: rf,
-	}, nil
+	}
 }
 
 func (r *userSpaceRepository) Add(ctx context.Context, operator domain.AppUserModel, spaceID domain.SpaceID) error {
+	_, span := tracer.Start(ctx, "userSpaceRepository.Add")
+	defer span.End()
+
 	if result := r.db.Create(&userSpaceEntity{
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		JunctionModelEntity: JunctionModelEntity{
+			CreatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserID:      operator.GetID(),
 		SpaceID:        uint(spaceID),
@@ -59,7 +57,10 @@ func (r *userSpaceRepository) Add(ctx context.Context, operator domain.AppUserMo
 }
 
 func (r *userSpaceRepository) Remove(ctx context.Context, operator domain.AppUserModel, spaceID uint) error {
-	if result := r.db.Where(userSpaceEntity{
+	_, span := tracer.Start(ctx, "userSpaceRepository.Remove")
+	defer span.End()
+
+	if result := r.db.Where(&userSpaceEntity{
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserID:      operator.GetID(),
 		SpaceID:        spaceID,
@@ -71,7 +72,7 @@ func (r *userSpaceRepository) Remove(ctx context.Context, operator domain.AppUse
 
 func (r *userSpaceRepository) IsBelongedTo(ctx context.Context, operator domain.AppUserModel, spaceID uint) (bool, error) {
 	entity := userSpaceEntity{}
-	if result := r.db.Where(userSpaceEntity{
+	if result := r.db.Where(&userSpaceEntity{
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserID:      operator.GetID(),
 		SpaceID:        spaceID,

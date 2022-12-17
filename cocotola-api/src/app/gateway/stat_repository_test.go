@@ -5,12 +5,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	// "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
+
 	// userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
 func Test_statRepository_FindStat(t *testing.T) {
@@ -18,11 +20,12 @@ func Test_statRepository_FindStat(t *testing.T) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	// logrus.Warnf("today: %v", today)
 
+	logrus.SetLevel(logrus.WarnLevel)
 	fn := func(ctx context.Context, ts testService) {
-		// logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetLevel(logrus.DebugLevel)
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
-		workbookRepo, _ := ts.rf.NewWorkbookRepository(ctx)
+		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
 
 		user1 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_1", "USERNAME_1")
 		user2 := testNewAppUser(t, ctx, ts, sysOwner, owner, "LOGIN_ID_2", "USERNAME_2")
@@ -39,12 +42,12 @@ func Test_statRepository_FindStat(t *testing.T) {
 		testNewWorkbook(t, ctx, ts.db, workbookRepo, student2, userD.SpaceID(space2.GetID()), "WB21")
 
 		// yesterday
-		ts.db.Debug().Exec("INSERT INTO study_stat (organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?)", uint(orgID), user1.GetID(), workbook11.GetID(), 1, 1, 10, 20, today.AddDate(0, 0, -1))
-		ts.db.Debug().Exec("INSERT INTO study_stat (organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?)", uint(orgID), user1.GetID(), workbook11.GetID(), 1, 2, 11, 21, today.AddDate(0, 0, -1))
+		ts.db.Debug().Exec("INSERT INTO study_stat (id, organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", libD.NewULID(), uint(orgID), user1.GetID(), workbook11.GetID(), 1, 1, 10, 20, today.AddDate(0, 0, -1))
+		ts.db.Debug().Exec("INSERT INTO study_stat (id, organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", libD.NewULID(), uint(orgID), user1.GetID(), workbook11.GetID(), 1, 2, 11, 21, today.AddDate(0, 0, -1))
 		// two days ago
-		ts.db.Debug().Exec("INSERT INTO study_stat (organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?)", uint(orgID), user1.GetID(), workbook11.GetID(), 1, 2, 12, 22, today.AddDate(0, 0, -2))
+		ts.db.Debug().Exec("INSERT INTO study_stat (id, organization_id, app_user_id, workbook_id, problem_type_id, study_type_id, answered, mastered, record_date) values(?, ?, ?, ?, ?, ?, ?, ?, ?)", libD.NewULID(), uint(orgID), user1.GetID(), workbook11.GetID(), 1, 2, 12, 22, today.AddDate(0, 0, -2))
 
-		statRepo, _ := gateway.NewStatRepository(ctx, ts.db)
+		statRepo := ts.rf.NewStatRepository(ctx)
 		stat, err := statRepo.FindStat(ctx, userD.AppUserID(user1.GetID()))
 		assert.NoError(t, err)
 

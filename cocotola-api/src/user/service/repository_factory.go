@@ -4,12 +4,12 @@ package service
 import "context"
 
 type RepositoryFactory interface {
-	NewOrganizationRepository(ctx context.Context) (OrganizationRepository, error)
-	NewSpaceRepository(ctx context.Context) (SpaceRepository, error)
-	NewAppUserRepository(ctx context.Context) (AppUserRepository, error)
-	NewAppUserGroupRepository(ctx context.Context) (AppUserGroupRepository, error)
+	NewOrganizationRepository(ctx context.Context) OrganizationRepository
+	NewSpaceRepository(ctx context.Context) SpaceRepository
+	NewAppUserRepository(ctx context.Context) AppUserRepository
+	NewAppUserGroupRepository(ctx context.Context) AppUserGroupRepository
 
-	NewGroupUserRepository(ctx context.Context) (GroupUserRepository, error)
-	NewUserSpaceRepository(ctx context.Context) (UserSpaceRepository, error)
-	NewRBACRepository(ctx context.Context) (RBACRepository, error)
+	NewGroupUserRepository(ctx context.Context) GroupUserRepository
+	NewUserSpaceRepository(ctx context.Context) UserSpaceRepository
+	NewRBACRepository(ctx context.Context) RBACRepository
 }

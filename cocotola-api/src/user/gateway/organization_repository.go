@@ -3,14 +3,11 @@ package gateway
 import (
 	"context"
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -19,13 +16,8 @@ type organizationRepository struct {
 }
 
 type organizationEntity struct {
-	ID        uint
-	Version   int
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	CreatedBy uint
-	UpdatedBy uint
-	Name      string
+	SinmpleModelEntity
+	Name string
 }
 
 func (e *organizationEntity) TableName() string {
@@ -46,14 +38,14 @@ func (e *organizationEntity) toModel() (service.Organization, error) {
 	return service.NewOrganization(organizationModel)
 }
 
-func NewOrganizationRepository(ctx context.Context, db *gorm.DB) (service.OrganizationRepository, error) {
+func NewOrganizationRepository(ctx context.Context, db *gorm.DB) service.OrganizationRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &organizationRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *organizationRepository) GetOrganization(ctx context.Context, operator domain.AppUserModel) (service.Organization, error) {
@@ -63,7 +55,9 @@ func (r *organizationRepository) GetOrganization(ctx context.Context, operator d
 	organization := organizationEntity{}
 
 	if result := r.db.Where(organizationEntity{
-		ID: uint(operator.GetOrganizationID()),
+		SinmpleModelEntity: SinmpleModelEntity{
+			ID: uint(operator.GetOrganizationID()),
+		},
 	}).First(&organization); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, service.ErrOrganizationNotFound
@@ -99,7 +93,9 @@ func (r *organizationRepository) FindOrganizationByID(ctx context.Context, opera
 	organization := organizationEntity{}
 
 	if result := r.db.Where(organizationEntity{
-		ID: uint(id),
+		SinmpleModelEntity: SinmpleModelEntity{
+			ID: uint(id),
+		},
 	}).First(&organization); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, service.ErrOrganizationNotFound
@@ -115,10 +111,12 @@ func (r *organizationRepository) AddOrganization(ctx context.Context, operator d
 	defer span.End()
 
 	organization := organizationEntity{
-		Version:   1,
-		CreatedBy: operator.GetID(),
-		UpdatedBy: operator.GetID(),
-		Name:      param.GetName(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
+		Name: param.GetName(),
 	}
 
 	if result := r.db.Create(&organization); result.Error != nil {

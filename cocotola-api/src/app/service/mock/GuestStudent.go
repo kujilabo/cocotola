@@ -12,6 +12,8 @@ import (
 
 	testing "testing"
 
+	time "time"
+
 	userservice "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
@@ -41,6 +43,48 @@ func (_m *GuestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condit
 	}
 
 	return r0, r1
+}
+
+// GetAppUserID provides a mock function with given fields:
+func (_m *GuestStudent) GetAppUserID() domain.AppUserID {
+	ret := _m.Called()
+
+	var r0 domain.AppUserID
+	if rf, ok := ret.Get(0).(func() domain.AppUserID); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(domain.AppUserID)
+	}
+
+	return r0
+}
+
+// GetCreatedAt provides a mock function with given fields:
+func (_m *GuestStudent) GetCreatedAt() time.Time {
+	ret := _m.Called()
+
+	var r0 time.Time
+	if rf, ok := ret.Get(0).(func() time.Time); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(time.Time)
+	}
+
+	return r0
+}
+
+// GetCreatedBy provides a mock function with given fields:
+func (_m *GuestStudent) GetCreatedBy() uint {
+	ret := _m.Called()
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func() uint); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
 }
 
 // GetDefaultSpace provides a mock function with given fields: ctx
@@ -140,6 +184,34 @@ func (_m *GuestStudent) GetRoles() []string {
 	return r0
 }
 
+// GetUpdatedAt provides a mock function with given fields:
+func (_m *GuestStudent) GetUpdatedAt() time.Time {
+	ret := _m.Called()
+
+	var r0 time.Time
+	if rf, ok := ret.Get(0).(func() time.Time); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(time.Time)
+	}
+
+	return r0
+}
+
+// GetUpdatedBy provides a mock function with given fields:
+func (_m *GuestStudent) GetUpdatedBy() uint {
+	ret := _m.Called()
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func() uint); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
 // GetUsername provides a mock function with given fields:
 func (_m *GuestStudent) GetUsername() string {
 	ret := _m.Called()
@@ -149,6 +221,20 @@ func (_m *GuestStudent) GetUsername() string {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// GetVersion provides a mock function with given fields:
+func (_m *GuestStudent) GetVersion() int {
+	ret := _m.Called()
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int)
 	}
 
 	return r0

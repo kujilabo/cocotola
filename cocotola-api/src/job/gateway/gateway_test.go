@@ -1,28 +1,23 @@
 package gateway_test
 
 import (
-	"context"
 	"crypto/rand"
 	"math/big"
 
-	"gorm.io/gorm"
-
 	"github.com/kujilabo/cocotola/cocotola-api/src/sqls"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
-var userRff func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
+// var userRff func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func init() {
 	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
 
-	userRff = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(db)
-	}
+	// userRff = func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+	// 	return gateway.NewRepositoryFactory(ctx, db)
+	// }
 
 	// service.InitSystemAdmin(userRff)
 }

@@ -12,13 +12,16 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	service_mock "github.com/kujilabo/cocotola/cocotola-api/src/app/service/mock"
+	jobG "github.com/kujilabo/cocotola/cocotola-api/src/job/gateway"
+	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
 )
 
-const englishWordName = "english_word_problem"
+const englishWordName = "english_word"
 const englishWordID = 1
 const memorizationName = "memorization"
 const memorizationID = 1
@@ -31,22 +34,28 @@ type testService struct {
 	db         *gorm.DB
 	pf         service.ProcessorFactory
 	rf         service.RepositoryFactory
-	userRf     userS.RepositoryFactory
 }
 
 func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	logrus.SetLevel(logrus.WarnLevel)
-	englishWord := testNewProblemType(t, englishWordID, englishWordName)
-	memorization := testNewStudyType(t, memorizationID, memorizationName)
-	dictation := testNewStudyType(t, dictationID, dictationName)
-	problemTypes := []domain.ProblemType{englishWord}
-	studyTypes := []domain.StudyType{memorization, dictation}
+	// englishWord := testNewProblemType(t, englishWordID, englishWordName)
+	// memorization := testNewStudyType(t, memorizationID, memorizationName)
+	// dictation := testNewStudyType(t, dictationID, dictationName)
+	// problemTypes := []domain.ProblemType{englishWord}
+	// studyTypes := []domain.StudyType{memorization, dictation}
 
 	problemAddProcessor := map[string]service.ProblemAddProcessor{}
 	problemUpdateProcessor := map[string]service.ProblemUpdateProcessor{}
 	problemRemoveProcessor := map[string]service.ProblemRemoveProcessor{}
 	problemImportProcessor := map[string]service.ProblemImportProcessor{}
 	problemQuotaProcessor := map[string]service.ProblemQuotaProcessor{}
+
+	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
+		return jobG.NewRepositoryFactory(ctx, db)
+	}
+	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
+		return userG.NewRepositoryFactory(ctx, db)
+	}
 
 	pf := service.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
@@ -57,65 +66,66 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 		defer sqlDB.Close()
 
-		rbacRepo, err := userG.NewRBACRepository(ctx, db)
-		require.NoError(t, err)
+		rbacRepo := userG.NewRBACRepository(ctx, db)
 		err = rbacRepo.Init()
 		require.NoError(t, err)
 
-		userRf, err := userG.NewRepositoryFactory(db)
+		problemRepository := new(service_mock.ProblemRepository)
+		problemRepositories := map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error){
+			englishWordName: func(context.Context, *gorm.DB) (service.ProblemRepository, error) {
+				return problemRepository, nil
+			},
+		}
+		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemRepositories)
 		require.NoError(t, err)
-		problemRepositories := map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error){}
-		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, userRfFunc, pf, problemTypes, studyTypes, problemRepositories)
-		require.NoError(t, err)
-		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf, userRf: userRf}
+		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf}
 
 		fn(ctx, testService)
 	}
 }
 
 func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD.OrganizationID, userS.SystemOwner, userS.Owner) {
-	bg := context.Background()
 	orgName := RandString(orgNameLength)
-	sysAd := userS.NewSystemAdmin(ts.userRf)
+	userRf, err := ts.rf.NewUserRepositoryFactory(ctx)
+	require.NoError(t, err)
+	sysAd, err := userS.NewSystemAdmin(ctx, userRf)
+	require.NoError(t, err)
 
 	firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	require.NoError(t, err)
 	orgAddParam, err := userS.NewOrganizationAddParameter(orgName, firstOwnerAddParam)
 	require.NoError(t, err)
-	orgRepo, err := userG.NewOrganizationRepository(ctx, ts.db)
-	require.NoError(t, err)
+	orgRepo := userG.NewOrganizationRepository(ctx, ts.db)
 
 	// register new organization
-	orgID, err := orgRepo.AddOrganization(bg, sysAd, orgAddParam)
+	orgID, err := orgRepo.AddOrganization(ctx, sysAd, orgAddParam)
 	require.NoError(t, err)
 	require.Greater(t, int(uint(orgID)), 0)
 	logrus.Debugf("OrgID: %d \n", uint(orgID))
-	org, err := orgRepo.FindOrganizationByID(bg, sysAd, orgID)
+	org, err := orgRepo.FindOrganizationByID(ctx, sysAd, orgID)
 	require.NoError(t, err)
 	logrus.Debugf("OrgID: %d \n", org.GetID())
 
-	appUserRepo, err := userG.NewAppUserRepository(ctx, ts.userRf, ts.db)
-	require.NoError(t, err)
-	sysOwnerID, err := appUserRepo.AddSystemOwner(bg, sysAd, orgID)
-	require.NoError(t, err)
-	require.Greater(t, int(uint(sysOwnerID)), 0)
-
-	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(bg, sysAd, orgName)
+	appUserRepo := userG.NewAppUserRepository(ctx, userRf, ts.db)
+	sysOwnerID, err := appUserRepo.AddSystemOwner(ctx, sysAd, orgID)
 	require.NoError(t, err)
 	require.Greater(t, int(uint(sysOwnerID)), 0)
 
-	firstOwnerID, err := appUserRepo.AddFirstOwner(bg, sysOwner, firstOwnerAddParam)
+	sysOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, sysAd, orgName)
+	require.NoError(t, err)
+	require.Greater(t, int(uint(sysOwnerID)), 0)
+
+	firstOwnerID, err := appUserRepo.AddFirstOwner(ctx, sysOwner, firstOwnerAddParam)
 	require.NoError(t, err)
 	require.Greater(t, int(uint(firstOwnerID)), 0)
 
-	firstOwner, err := appUserRepo.FindOwnerByLoginID(bg, sysOwner, "OWNER_ID")
+	firstOwner, err := appUserRepo.FindOwnerByLoginID(ctx, sysOwner, "OWNER_ID")
 	require.NoError(t, err)
 
-	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
+	spaceRepo := userG.NewSpaceRepository(ctx, ts.db)
+	_, err = spaceRepo.AddDefaultSpace(ctx, sysOwner)
 	require.NoError(t, err)
-	_, err = spaceRepo.AddDefaultSpace(bg, sysOwner)
-	require.NoError(t, err)
-	_, err = spaceRepo.AddPersonalSpace(bg, sysOwner, firstOwner)
+	_, err = spaceRepo.AddPersonalSpace(ctx, sysOwner, firstOwner)
 	require.NoError(t, err)
 
 	return orgID, sysOwner, firstOwner
@@ -160,22 +170,22 @@ func testNewWorkbookSearchCondition(t *testing.T) service.WorkbookSearchConditio
 }
 
 func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddParameter {
-	p, err := service.NewWorkbookAddParameter("english_word_problem", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
+	p, err := service.NewWorkbookAddParameter("english_word", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
 	require.NoError(t, err)
 	return p
 }
 
 func testNewAppUser(t *testing.T, ctx context.Context, ts testService, sysOwner userS.SystemOwner, owner userS.Owner, loginID, username string) userS.AppUser {
-	appUserRepo, err := userG.NewAppUserRepository(ctx, ts.userRf, ts.db)
+	userRf, err := ts.rf.NewUserRepositoryFactory(ctx)
 	require.NoError(t, err)
+	appUserRepo := userG.NewAppUserRepository(ctx, userRf, ts.db)
 	userID1, err := appUserRepo.AddAppUser(ctx, owner, testNewAppUserAddParameter(t, loginID, username))
 	require.NoError(t, err)
 	user1, err := appUserRepo.FindAppUserByID(ctx, owner, userID1)
 	require.NoError(t, err)
 	require.Equal(t, loginID, user1.GetLoginID())
 
-	spaceRepo, err := userG.NewSpaceRepository(ctx, ts.db)
-	require.NoError(t, err)
+	spaceRepo := userG.NewSpaceRepository(ctx, ts.db)
 
 	spaceID1, err := spaceRepo.AddPersonalSpace(ctx, sysOwner, user1)
 	require.NoError(t, err)
@@ -193,9 +203,9 @@ func testNewStudentModel(t *testing.T, appUserModel userD.AppUserModel) domain.S
 	return s
 }
 
-func testNewStudent(ctx context.Context, t *testing.T, testService testService, appUserModel userD.AppUserModel) service.Student {
+func testNewStudent(ctx context.Context, t *testing.T, ts testService, appUserModel userD.AppUserModel) service.Student {
 	studentModel := testNewStudentModel(t, appUserModel)
-	s, err := service.NewStudent(ctx, testService.pf, testService.rf, testService.userRf, studentModel)
+	s, err := service.NewStudent(ctx, ts.pf, ts.rf, studentModel)
 	require.NoError(t, err)
 	return s
 }

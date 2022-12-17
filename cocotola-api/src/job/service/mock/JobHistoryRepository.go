@@ -5,8 +5,10 @@ package mocks
 import (
 	context "context"
 
-	service "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
+	domain "github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	mock "github.com/stretchr/testify/mock"
+
+	service "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 
 	testing "testing"
 )
@@ -28,6 +30,29 @@ func (_m *JobHistoryRepository) AddJobHistory(ctx context.Context, param service
 	}
 
 	return r0
+}
+
+// FindJobHistoryByJobName provides a mock function with given fields: ctx, jobName
+func (_m *JobHistoryRepository) FindJobHistoryByJobName(ctx context.Context, jobName domain.JobName) (service.JobHistory, error) {
+	ret := _m.Called(ctx, jobName)
+
+	var r0 service.JobHistory
+	if rf, ok := ret.Get(0).(func(context.Context, domain.JobName) service.JobHistory); ok {
+		r0 = rf(ctx, jobName)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(service.JobHistory)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, domain.JobName) error); ok {
+		r1 = rf(ctx, jobName)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // NewJobHistoryRepository creates a new instance of JobHistoryRepository. It also registers a cleanup function to assert the mocks expectations.

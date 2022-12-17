@@ -36,30 +36,12 @@ type systemOwner struct {
 
 func NewSystemOwner(ctx context.Context, rf RepositoryFactory, systemOwnerModel domain.SystemOwnerModel) (SystemOwner, error) {
 
-	orgRepo, err := rf.NewOrganizationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	appUserRepo, err := rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	spaceRepo, err := rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	appUserGroupRepo, err := rf.NewAppUserGroupRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	groupUserRepo, err := rf.NewGroupUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	rbacRepo, err := rf.NewRBACRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+	orgRepo := rf.NewOrganizationRepository(ctx)
+	appUserRepo := rf.NewAppUserRepository(ctx)
+	spaceRepo := rf.NewSpaceRepository(ctx)
+	appUserGroupRepo := rf.NewAppUserGroupRepository(ctx)
+	groupUserRepo := rf.NewGroupUserRepository(ctx)
+	rbacRepo := rf.NewRBACRepository(ctx)
 
 	m := &systemOwner{
 		SystemOwnerModel: systemOwnerModel,
@@ -74,48 +56,48 @@ func NewSystemOwner(ctx context.Context, rf RepositoryFactory, systemOwnerModel 
 	return m, libD.Validator.Struct(m)
 }
 
-func (s *systemOwner) GetOrganization(ctx context.Context) (Organization, error) {
-	return s.orgRepo.GetOrganization(ctx, s)
+func (m *systemOwner) GetOrganization(ctx context.Context) (Organization, error) {
+	return m.orgRepo.GetOrganization(ctx, m)
 }
 
-func (s *systemOwner) FindAppUserByID(ctx context.Context, id domain.AppUserID) (AppUser, error) {
-	return s.appUserRepo.FindAppUserByID(ctx, s, id)
+func (m *systemOwner) FindAppUserByID(ctx context.Context, id domain.AppUserID) (AppUser, error) {
+	return m.appUserRepo.FindAppUserByID(ctx, m, id)
 }
 
-func (s *systemOwner) FindAppUserByLoginID(ctx context.Context, loginID string) (AppUser, error) {
-	return s.appUserRepo.FindAppUserByLoginID(ctx, s, loginID)
+func (m *systemOwner) FindAppUserByLoginID(ctx context.Context, loginID string) (AppUser, error) {
+	return m.appUserRepo.FindAppUserByLoginID(ctx, m, loginID)
 }
 
-func (s *systemOwner) FindSystemSpace(ctx context.Context) (Space, error) {
-	return s.spaceRepo.FindSystemSpace(ctx, s)
+func (m *systemOwner) FindSystemSpace(ctx context.Context) (Space, error) {
+	return m.spaceRepo.FindSystemSpace(ctx, m)
 }
 
-func (s *systemOwner) AddAppUser(ctx context.Context, param AppUserAddParameter) (domain.AppUserID, error) {
+func (m *systemOwner) AddAppUser(ctx context.Context, param AppUserAddParameter) (domain.AppUserID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("AddStudent")
-	appUserID, err := s.appUserRepo.AddAppUser(ctx, s, param)
+	appUserID, err := m.appUserRepo.AddAppUser(ctx, m, param)
 	if err != nil {
 		return 0, err
 	}
-	appUser, err := s.appUserRepo.FindAppUserByID(ctx, s, appUserID)
+	appUser, err := m.appUserRepo.FindAppUserByID(ctx, m, appUserID)
 	if err != nil {
 		return 0, err
 	}
 
-	// personalGroupID, err := s.rf.NewAppUserGroupRepository().AddPersonalGroup(s, studentID)
+	// personalGroupID, err := m.rf.NewAppUserGroupRepository().AddPersonalGroup(m, studentID)
 	// if err != nil {
 	// 	return 0, err
 	// }
 
-	publicGroup, err := s.appUserGroupRepo.FindPublicGroup(ctx, s)
+	publicGroup, err := m.appUserGroupRepo.FindPublicGroup(ctx, m)
 	if err != nil {
 		return 0, err
 	}
-	if err := s.groupUserRepo.AddGroupUser(ctx, s, domain.AppUserGroupID(publicGroup.GetID()), domain.AppUserID(appUser.GetID())); err != nil {
+	if err := m.groupUserRepo.AddGroupUser(ctx, m, publicGroup.GetAppUerGroupID(), appUser.GetAppUserID()); err != nil {
 		return 0, err
 	}
 
-	spaceID, err := s.spaceRepo.AddPersonalSpace(ctx, s, appUser)
+	spaceID, err := m.spaceRepo.AddPersonalSpace(ctx, m, appUser)
 	if err != nil {
 		return 0, err
 	}
@@ -126,35 +108,35 @@ func (s *systemOwner) AddAppUser(ctx context.Context, param AppUserAddParameter)
 	spaceObject := domain.NewSpaceObject(spaceID)
 	userSubject := domain.NewUserObject(appUserID)
 
-	if err := s.rbacRepo.AddNamedPolicy(spaceWriter, spaceObject, "read"); err != nil {
+	if err := m.rbacRepo.AddNamedPolicy(spaceWriter, spaceObject, "read"); err != nil {
 		return 0, err
 	}
 
-	if err := s.rbacRepo.AddNamedPolicy(spaceWriter, spaceObject, "write"); err != nil {
+	if err := m.rbacRepo.AddNamedPolicy(spaceWriter, spaceObject, "write"); err != nil {
 		return 0, err
 	}
 
-	if err := s.rbacRepo.AddNamedGroupingPolicy(userSubject, spaceWriter); err != nil {
+	if err := m.rbacRepo.AddNamedGroupingPolicy(userSubject, spaceWriter); err != nil {
 		return 0, err
 	}
 
-	// defaultSpace, err := s.rf.NewSpaceRepository().FindDefaultSpace(ctx, s)
+	// defaultSpace, err := m.rf.NewSpaceRepository().FindDefaultSpace(ctx, s)
 	// if err != nil {
 	// 	return 0, err
 	// }
 
-	// if err := s.rf.NewUserSpaceRepository().Add(ctx, appUser, SpaceID(defaultSpace.GetID())); err != nil {
+	// if err := m.rf.NewUserSpaceRepository().Add(ctx, appUser, SpaceID(defaultSpace.GetID())); err != nil {
 	// 	return 0, err
 	// }
 
 	return appUserID, nil
 }
 
-func (s *systemOwner) AddSystemSpace(ctx context.Context) (domain.SpaceID, error) {
+func (m *systemOwner) AddSystemSpace(ctx context.Context) (domain.SpaceID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("AddSystemSpace")
 
-	spaceID, err := s.spaceRepo.AddSystemSpace(ctx, s)
+	spaceID, err := m.spaceRepo.AddSystemSpace(ctx, m)
 	if err != nil {
 		return 0, err
 	}

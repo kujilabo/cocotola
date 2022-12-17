@@ -12,6 +12,8 @@ import (
 
 	testing "testing"
 
+	time "time"
+
 	userdomain "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 
 	userservice "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -172,6 +174,48 @@ func (_m *Student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition
 	return r0, r1
 }
 
+// GetAppUserID provides a mock function with given fields:
+func (_m *Student) GetAppUserID() userdomain.AppUserID {
+	ret := _m.Called()
+
+	var r0 userdomain.AppUserID
+	if rf, ok := ret.Get(0).(func() userdomain.AppUserID); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(userdomain.AppUserID)
+	}
+
+	return r0
+}
+
+// GetCreatedAt provides a mock function with given fields:
+func (_m *Student) GetCreatedAt() time.Time {
+	ret := _m.Called()
+
+	var r0 time.Time
+	if rf, ok := ret.Get(0).(func() time.Time); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(time.Time)
+	}
+
+	return r0
+}
+
+// GetCreatedBy provides a mock function with given fields:
+func (_m *Student) GetCreatedBy() uint {
+	ret := _m.Called()
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func() uint); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
 // GetDefaultSpace provides a mock function with given fields: ctx
 func (_m *Student) GetDefaultSpace(ctx context.Context) (userservice.Space, error) {
 	ret := _m.Called(ctx)
@@ -315,6 +359,34 @@ func (_m *Student) GetStat(ctx context.Context) (service.Stat, error) {
 	return r0, r1
 }
 
+// GetUpdatedAt provides a mock function with given fields:
+func (_m *Student) GetUpdatedAt() time.Time {
+	ret := _m.Called()
+
+	var r0 time.Time
+	if rf, ok := ret.Get(0).(func() time.Time); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(time.Time)
+	}
+
+	return r0
+}
+
+// GetUpdatedBy provides a mock function with given fields:
+func (_m *Student) GetUpdatedBy() uint {
+	ret := _m.Called()
+
+	var r0 uint
+	if rf, ok := ret.Get(0).(func() uint); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint)
+	}
+
+	return r0
+}
+
 // GetUsername provides a mock function with given fields:
 func (_m *Student) GetUsername() string {
 	ret := _m.Called()
@@ -324,6 +396,20 @@ func (_m *Student) GetUsername() string {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// GetVersion provides a mock function with given fields:
+func (_m *Student) GetVersion() int {
+	ret := _m.Called()
+
+	var r0 int
+	if rf, ok := ret.Get(0).(func() int); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(int)
 	}
 
 	return r0

@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"io"
-	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -170,10 +169,6 @@ func NewAppRouter(initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterF
 	if debugConfig.Wait {
 		router.Use(middleware.NewWaitMiddleware())
 	}
-
-	router.GET("/healthcheck", func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
 
 	signingKey := []byte(authConfig.SigningKey)
 	authMiddleware := authM.NewAuthMiddleware(signingKey)

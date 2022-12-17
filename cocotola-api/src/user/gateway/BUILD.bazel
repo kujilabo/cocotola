@@ -7,6 +7,7 @@ go_library(
         "app_user_repository.go",
         "group_user_repository.go",
         "init.go",
+        "model_entity.go",
         "organization_repository.go",
         "rbac_repository.go",
         "repository_factory.go",

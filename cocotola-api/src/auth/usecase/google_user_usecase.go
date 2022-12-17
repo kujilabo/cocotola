@@ -49,7 +49,10 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	var organization userS.Organization
 	var appUser userS.AppUser
 	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
-		systemAdmin := userS.NewSystemAdmin(rf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, rf)
+		if err != nil {
+			return err
+		}
 
 		tmpOrganization, tmpAppUser, err := s.registerAppUser(ctx, systemAdmin, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
 		if err != nil && !errors.Is(err, userS.ErrAppUserAlreadyExists) {

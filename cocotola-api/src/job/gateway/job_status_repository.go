@@ -7,9 +7,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/google/uuid"
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
@@ -35,10 +35,10 @@ type jobStatusRepository struct {
 	db *gorm.DB
 }
 
-func NewJobStatusRepository(ctx context.Context, db *gorm.DB) (service.JobStatusRepository, error) {
+func newJobStatusRepository(ctx context.Context, db *gorm.DB) service.JobStatusRepository {
 	return &jobStatusRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job) (domain.JobStatusID, error) {
@@ -46,10 +46,7 @@ func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job)
 	defer span.End()
 
 	// jobStatusID
-	id, err := uuid.NewUUID()
-	if err != nil {
-		return "", err
-	}
+	id := libD.NewULID()
 
 	// concurrencyKey
 	var concurrencyKey *string
@@ -62,7 +59,7 @@ func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job)
 	expirationDatetime := time.Now().Add(job.GetTimeout())
 
 	entity := jobStatusEntity{
-		ID:                 id.String(),
+		ID:                 id,
 		JobName:            (string)(job.GetName()),
 		JobParameter:       job.GetJobParameter(),
 		ConcurrencyKey:     concurrencyKey,
@@ -73,7 +70,7 @@ func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job)
 		return "", libG.ConvertDuplicatedError(result.Error, service.ErrJobStatusAlreadyExists)
 	}
 
-	return domain.JobStatusID(id.String()), nil
+	return domain.JobStatusID(id), nil
 }
 
 func (r *jobStatusRepository) RemoveJobStatus(ctx context.Context, jobStatusID domain.JobStatusID) error {
@@ -81,7 +78,7 @@ func (r *jobStatusRepository) RemoveJobStatus(ctx context.Context, jobStatusID d
 	defer span.End()
 
 	result := r.db.
-		Where("expiration_datetime <= ?", time.Now()).
+		Where("id = ?", (string)(jobStatusID)).
 		Delete(&jobStatusEntity{})
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

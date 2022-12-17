@@ -9,6 +9,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
 var jst *time.Location
@@ -18,6 +19,7 @@ func init() {
 }
 
 type userQuotaEntity struct {
+	ID             string
 	OrganizationID uint
 	AppUserID      uint
 	Date           time.Time
@@ -34,10 +36,10 @@ type userQuotaRepository struct {
 	db *gorm.DB
 }
 
-func NewUserQuotaRepository(db *gorm.DB) (service.UserQuotaRepository, error) {
+func newUserQuotaRepository(db *gorm.DB) service.UserQuotaRepository {
 	return &userQuotaRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *userQuotaRepository) IsExceeded(ctx context.Context, organizationID userD.OrganizationID, appUserID userD.AppUserID, name string, unit service.QuotaUnit, limit int) (bool, error) {
@@ -88,6 +90,7 @@ func (r *userQuotaRepository) Increment(ctx context.Context, organizationID user
 		Name:           name,
 	}).First(&entity); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			entity.ID = libD.NewULID()
 			entity.OrganizationID = uint(organizationID)
 			entity.AppUserID = uint(appUserID)
 			entity.Date = date

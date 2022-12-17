@@ -17,7 +17,7 @@ type RepositoryFactory struct {
 }
 
 // NewAppUserGroupRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewAppUserGroupRepository(ctx context.Context) (service.AppUserGroupRepository, error) {
+func (_m *RepositoryFactory) NewAppUserGroupRepository(ctx context.Context) service.AppUserGroupRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.AppUserGroupRepository
@@ -29,18 +29,11 @@ func (_m *RepositoryFactory) NewAppUserGroupRepository(ctx context.Context) (ser
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewAppUserRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewAppUserRepository(ctx context.Context) (service.AppUserRepository, error) {
+func (_m *RepositoryFactory) NewAppUserRepository(ctx context.Context) service.AppUserRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.AppUserRepository
@@ -52,18 +45,11 @@ func (_m *RepositoryFactory) NewAppUserRepository(ctx context.Context) (service.
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewGroupUserRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewGroupUserRepository(ctx context.Context) (service.GroupUserRepository, error) {
+func (_m *RepositoryFactory) NewGroupUserRepository(ctx context.Context) service.GroupUserRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.GroupUserRepository
@@ -75,18 +61,11 @@ func (_m *RepositoryFactory) NewGroupUserRepository(ctx context.Context) (servic
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewOrganizationRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewOrganizationRepository(ctx context.Context) (service.OrganizationRepository, error) {
+func (_m *RepositoryFactory) NewOrganizationRepository(ctx context.Context) service.OrganizationRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.OrganizationRepository
@@ -98,18 +77,11 @@ func (_m *RepositoryFactory) NewOrganizationRepository(ctx context.Context) (ser
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewRBACRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewRBACRepository(ctx context.Context) (service.RBACRepository, error) {
+func (_m *RepositoryFactory) NewRBACRepository(ctx context.Context) service.RBACRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.RBACRepository
@@ -121,18 +93,11 @@ func (_m *RepositoryFactory) NewRBACRepository(ctx context.Context) (service.RBA
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewSpaceRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewSpaceRepository(ctx context.Context) (service.SpaceRepository, error) {
+func (_m *RepositoryFactory) NewSpaceRepository(ctx context.Context) service.SpaceRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.SpaceRepository
@@ -144,18 +109,11 @@ func (_m *RepositoryFactory) NewSpaceRepository(ctx context.Context) (service.Sp
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewUserSpaceRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewUserSpaceRepository(ctx context.Context) (service.UserSpaceRepository, error) {
+func (_m *RepositoryFactory) NewUserSpaceRepository(ctx context.Context) service.UserSpaceRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.UserSpaceRepository
@@ -167,14 +125,7 @@ func (_m *RepositoryFactory) NewUserSpaceRepository(ctx context.Context) (servic
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewRepositoryFactory creates a new instance of RepositoryFactory. It also registers a cleanup function to assert the mocks expectations.

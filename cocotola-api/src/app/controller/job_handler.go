@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 
 	jobU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/job"
@@ -29,11 +27,11 @@ func (h *jobHandler) AggregateStudyResultsOfAllUsers(c *gin.Context) {
 	ctx := c.Request.Context()
 	systemAdminModel := userD.NewSystemAdminModel()
 
-	now := time.Now()
-	yesterday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
+	// now := time.Now()
+	// yesterday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
 
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
-		if err := h.jobUsecaseStat.AggregateStudyResultsOfAllUsers(ctx, systemAdminModel, yesterday); err != nil {
+		if err := h.jobUsecaseStat.AggregateStudyResultsOfAllUsers(ctx, systemAdminModel); err != nil {
 			return err
 		}
 		return nil

@@ -10,8 +10,11 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-api/src/app/service",
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service",
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
+        "//lib/log",
         "@io_opentelemetry_go_otel//:otel",
     ],
 )

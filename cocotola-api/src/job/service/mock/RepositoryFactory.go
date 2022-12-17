@@ -17,7 +17,7 @@ type RepositoryFactory struct {
 }
 
 // NewJobHistoryRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewJobHistoryRepository(ctx context.Context) (service.JobHistoryRepository, error) {
+func (_m *RepositoryFactory) NewJobHistoryRepository(ctx context.Context) service.JobHistoryRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.JobHistoryRepository
@@ -29,18 +29,11 @@ func (_m *RepositoryFactory) NewJobHistoryRepository(ctx context.Context) (servi
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewJobStatusRepository provides a mock function with given fields: ctx
-func (_m *RepositoryFactory) NewJobStatusRepository(ctx context.Context) (service.JobStatusRepository, error) {
+func (_m *RepositoryFactory) NewJobStatusRepository(ctx context.Context) service.JobStatusRepository {
 	ret := _m.Called(ctx)
 
 	var r0 service.JobStatusRepository
@@ -52,14 +45,7 @@ func (_m *RepositoryFactory) NewJobStatusRepository(ctx context.Context) (servic
 		}
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // NewRepositoryFactory creates a new instance of RepositoryFactory. It also registers a cleanup function to assert the mocks expectations.

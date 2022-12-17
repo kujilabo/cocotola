@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
@@ -46,8 +45,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo, err := ts.rf.NewSpaceRepository(ctx)
-		require.NoError(t, err)
+		spaceRepo := ts.rf.NewSpaceRepository(ctx)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := spaceRepo.FindDefaultSpace(ctx, tt.args.operator)
@@ -98,8 +96,7 @@ func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
 				err:  nil,
 			},
 		}
-		spaceRepo, err := ts.rf.NewSpaceRepository(ctx)
-		require.NoError(t, err)
+		spaceRepo := ts.rf.NewSpaceRepository(ctx)
 		for _, tt := range tests {
 			t.Run(tt.name, func(t *testing.T) {
 				got, err := spaceRepo.FindPersonalSpace(ctx, tt.args.operator)

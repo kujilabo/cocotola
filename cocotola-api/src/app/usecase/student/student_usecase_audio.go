@@ -9,7 +9,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -35,8 +34,8 @@ func NewStudentUsecaseAudio(transaction service.Transaction, pf service.Processo
 
 func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, problemID domain.ProblemID, audioID domain.AudioID) (service.Audio, error) {
 	var result service.Audio
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, userRf, organizationID, operatorID, workbookID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
 			return err
 		}
@@ -73,8 +72,8 @@ func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID 
 	return result, nil
 }
 
-func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
-	studentService, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
+	studentService, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}

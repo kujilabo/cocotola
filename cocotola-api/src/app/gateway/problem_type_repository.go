@@ -26,10 +26,10 @@ type problemTypeRepository struct {
 	db *gorm.DB
 }
 
-func NewProblemTypeRepository(db *gorm.DB) (service.ProblemTypeRepository, error) {
+func newProblemTypeRepository(db *gorm.DB) service.ProblemTypeRepository {
 	return &problemTypeRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *problemTypeRepository) FindAllProblemTypes(ctx context.Context) ([]domain.ProblemType, error) {

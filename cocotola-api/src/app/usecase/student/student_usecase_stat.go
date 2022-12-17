@@ -7,7 +7,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
@@ -32,8 +31,8 @@ func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.O
 	defer span.End()
 
 	var result service.Stat
-	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory, userRf userS.RepositoryFactory) error {
-		student, err := s.findStudent(ctx, rf, userRf, organizationID, operatorID)
+	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		student, err := s.findStudent(ctx, rf, organizationID, operatorID)
 		if err != nil {
 			return err
 		}
@@ -52,8 +51,8 @@ func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.O
 	return result, nil
 }
 
-func (s *studentUsecaseStat) findStudent(ctx context.Context, rf service.RepositoryFactory, userRf userS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
-	student, err := usecase.FindStudent(ctx, s.pf, rf, userRf, organizationID, operatorID)
+func (s *studentUsecaseStat) findStudent(ctx context.Context, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.Student, error) {
+	student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}

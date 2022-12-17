@@ -2,14 +2,12 @@ package gateway
 
 import (
 	"context"
-	"time"
+	"errors"
 
 	"gorm.io/gorm"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -22,10 +20,7 @@ type groupUserRepository struct {
 }
 
 type groupUserEntity struct {
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	JunctionModelEntity
 	OrganizationID uint
 	AppUserGroupID uint
 	AppUserID      uint
@@ -35,14 +30,14 @@ func (u *groupUserEntity) TableName() string {
 	return GroupUserTableName
 }
 
-func NewGroupUserRepository(ctx context.Context, db *gorm.DB) (service.GroupUserRepository, error) {
+func NewGroupUserRepository(ctx context.Context, db *gorm.DB) service.GroupUserRepository {
 	if db == nil {
-		return nil, liberrors.Errorf("db is inl. err: %w", libD.ErrInvalidArgument)
+		panic(errors.New("db is nil"))
 	}
 
 	return &groupUserRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *groupUserRepository) AddGroupUser(ctx context.Context, operator domain.AppUserModel, appUserGroupID domain.AppUserGroupID, appUserID domain.AppUserID) error {
@@ -50,8 +45,9 @@ func (r *groupUserRepository) AddGroupUser(ctx context.Context, operator domain.
 	defer span.End()
 
 	groupUser := groupUserEntity{
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		JunctionModelEntity: JunctionModelEntity{
+			CreatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserGroupID: uint(appUserGroupID),
 		AppUserID:      uint(appUserID),
