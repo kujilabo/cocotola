@@ -7,17 +7,17 @@ import (
 const SystemOwnerID = 2
 
 type SystemOwnerModel interface {
-	AppUserModel
+	OwnerModel
 	IsSystemOwnerModel() bool
 }
 
 type systemOwnerModel struct {
-	AppUserModel
+	OwnerModel
 }
 
-func NewSystemOwnerModel(appUser AppUserModel) (SystemOwnerModel, error) {
+func NewSystemOwnerModel(appUser OwnerModel) (SystemOwnerModel, error) {
 	m := &systemOwnerModel{
-		AppUserModel: appUser,
+		OwnerModel: appUser,
 	}
 
 	return m, libD.Validator.Struct(m)

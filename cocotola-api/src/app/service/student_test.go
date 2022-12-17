@@ -38,37 +38,37 @@ func newRandStudent(t *testing.T, orgID userD.OrganizationID) domain.StudentMode
 func student_Init(t *testing.T, ctx context.Context) (
 	pf *service_mock.ProcessorFactory,
 	rf *service_mock.RepositoryFactory,
-	userRf *userS_mock.RepositoryFactory,
 	spaceRepo *userS_mock.SpaceRepository,
 	workbookRepo *service_mock.WorkbookRepository,
 	userQuotaRepo *service_mock.UserQuotaRepository,
 	problemQuotaProcessor *service_mock.ProblemQuotaProcessor) {
+
+	userRf := new(userS_mock.RepositoryFactory)
+	spaceRepo = new(userS_mock.SpaceRepository)
+	userRf.On("NewSpaceRepository", ctx).Return(spaceRepo, nil)
 
 	workbookRepo = new(service_mock.WorkbookRepository)
 	userQuotaRepo = new(service_mock.UserQuotaRepository)
 	rf = new(service_mock.RepositoryFactory)
 	rf.On("NewWorkbookRepository", ctx).Return(workbookRepo, nil)
 	rf.On("NewUserQuotaRepository", ctx).Return(userQuotaRepo, nil)
+	rf.On("NewUserRepositoryFactory", ctx).Return(userRf, nil)
 
 	problemQuotaProcessor = new(service_mock.ProblemQuotaProcessor)
 	pf = new(service_mock.ProcessorFactory)
 	pf.On("NewProblemQuotaProcessor", problemType1).Return(problemQuotaProcessor, nil)
 	pf.On("NewProblemQuotaProcessor", problemType2).Return(problemQuotaProcessor, nil)
-
-	userRf = new(userS_mock.RepositoryFactory)
-	spaceRepo = new(userS_mock.SpaceRepository)
-	userRf.On("NewSpaceRepository", ctx).Return(spaceRepo, nil)
 	return
 }
 
 func Test_student_GetDefaultSpace(t *testing.T) {
 	ctx := context.Background()
-	pf, rf, userRf, spaceRepo, _, _, _ := student_Init(t, ctx)
+	pf, rf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindDefaultSpace", ctx, mock.Anything).Return(expected, nil)
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetKey").Return("KEY")
@@ -83,12 +83,12 @@ func Test_student_GetDefaultSpace(t *testing.T) {
 
 func Test_student_GetPersonalSpace(t *testing.T) {
 	ctx := context.Background()
-	pf, rf, userRf, spaceRepo, _, _, _ := student_Init(t, ctx)
+	pf, rf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
 	expected := new(userD_mock.SpaceModel)
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(expected, nil)
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetKey").Return("KEY")
@@ -103,14 +103,14 @@ func Test_student_GetPersonalSpace(t *testing.T) {
 
 func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 	ctx := context.Background()
-	pf, rf, userRf, spaceRepo, workbookRepo, _, _ := student_Init(t, ctx)
+	pf, rf, spaceRepo, workbookRepo, _, _ := student_Init(t, ctx)
 
 	space := new(userD_mock.SpaceModel)
 	space.On("GetID").Return(uint(100))
 	spaceRepo.On("FindPersonalSpace", ctx, mock.Anything).Return(space, nil)
 
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected, err := service.NewWorkbookSearchResult(123, nil)
@@ -129,13 +129,13 @@ func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 
 func Test_student_FindWorkbookByID(t *testing.T) {
 	ctx := context.Background()
-	pf, rf, userRf, _, workbookRepo, _, _ := student_Init(t, ctx)
+	pf, rf, _, workbookRepo, _, _ := student_Init(t, ctx)
 
 	expected := new(service_mock.Workbook)
 	workbookRepo.On("FindWorkbookByID", ctx, mock.Anything, mock.Anything).Return(expected, nil)
 
 	studentModel := newRandStudent(t, userD.OrganizationID(1))
-	student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
+	student, err := service.NewStudent(ctx, pf, rf, studentModel)
 	require.NoError(t, err)
 	// given
 	expected.On("GetID").Return(uint(123))
@@ -213,7 +213,7 @@ func Test_student_CheckQuota(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pf, rf, userRf, _, _, userQuotaRepo, problemQuotaProcessor := student_Init(t, ctx)
+			pf, rf, _, _, userQuotaRepo, problemQuotaProcessor := student_Init(t, ctx)
 			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
 			problemQuotaProcessor.On("GetUnitForSizeQuota").Return(service.QuotaUnitPersitance)
 			problemQuotaProcessor.On("GetLimitForSizeQuota").Return(tt.quotaLimit)
@@ -222,7 +222,7 @@ func Test_student_CheckQuota(t *testing.T) {
 
 			studentModel := newRandStudent(t, userD.OrganizationID(1))
 
-			student, err := service.NewStudent(ctx, pf, rf, userRf, studentModel)
+			student, err := service.NewStudent(ctx, pf, rf, studentModel)
 			require.NoError(t, err)
 			require.NotNil(t, student)
 			err = student.CheckQuota(ctx, tt.args.problemType, tt.args.name)

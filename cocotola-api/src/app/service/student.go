@@ -44,16 +44,22 @@ type student struct {
 	rf        RepositoryFactory
 	pf        ProcessorFactory
 	spaceRepo userS.SpaceRepository
-	userRf    userS.RepositoryFactory
 }
 
-func NewStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
+func NewStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, studentModel domain.StudentModel) (Student, error) {
 	if pf == nil {
 		return nil, liberrors.Errorf("pf is nil. err: %w", libD.ErrInvalidArgument)
 	}
+
 	if studentModel == nil {
 		return nil, errors.New("studentModel is nil")
 	}
+
+	userRf, err := rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	spaceRepo, err := userRf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
@@ -64,7 +70,6 @@ func NewStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, 
 		pf:           pf,
 		rf:           rf,
 		spaceRepo:    spaceRepo,
-		userRf:       userRf,
 	}
 
 	return m, libD.Validator.Struct(m)
@@ -173,7 +178,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameSize:
 		unit := processor.GetUnitForSizeQuota()
 		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_size", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemType+"_size", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(size). err: %w", err)
 		}
@@ -186,7 +191,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameUpdate:
 		unit := processor.GetUnitForUpdateQuota()
 		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), userD.AppUserID(s.GetID()), problemType+"_update", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemType+"_update", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(update). err: %w", err)
 		}
@@ -215,7 +220,7 @@ func (s *student) GetStat(ctx context.Context) (Stat, error) {
 		return nil, err
 	}
 
-	stat, err := statRepo.FindStat(ctx, userD.AppUserID(s.GetID()))
+	stat, err := statRepo.FindStat(ctx, s.GetAppUserID())
 	if err != nil {
 		return nil, err
 	}

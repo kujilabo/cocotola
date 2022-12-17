@@ -92,7 +92,7 @@ func (c *synthesizerClient) Synthesize(ctx context.Context, lang2 domain.Lang2, 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
+		return nil, liberrors.Errorf("synthesize request. err: %w", err)
 	}
 	defer resp.Body.Close()
 

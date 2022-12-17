@@ -213,7 +213,7 @@ func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationI
 		problemType := workbook.GetProblemType()
 
 		{
-			event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeRemove, problemType, removedIDs)
+			event := service.NewProblemEvent(student.GetOrganizationID(), student.GetAppUserID(), service.ProblemEventTypeRemove, problemType, removedIDs)
 			if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 				return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 			}
@@ -315,7 +315,7 @@ func (s *studentUsecaseProblem) addProblem(ctx context.Context, student service.
 		return nil, liberrors.Errorf("workbook.AddProblem. err: %w", err)
 	}
 
-	event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeAdd, problemType, addedIDs)
+	event := service.NewProblemEvent(student.GetOrganizationID(), student.GetAppUserID(), service.ProblemEventTypeAdd, problemType, addedIDs)
 	if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 		return nil, liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 	}
@@ -337,21 +337,21 @@ func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student servi
 	}
 
 	{
-		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeAdd, problemType, addedIDs)
+		event := service.NewProblemEvent(student.GetOrganizationID(), student.GetAppUserID(), service.ProblemEventTypeAdd, problemType, addedIDs)
 		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
 
 	{
-		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeUpdate, problemType, updatedIDs)
+		event := service.NewProblemEvent(student.GetOrganizationID(), student.GetAppUserID(), service.ProblemEventTypeUpdate, problemType, updatedIDs)
 		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}
 	}
 
 	{
-		event := service.NewProblemEvent(student.GetOrganizationID(), userD.AppUserID(student.GetID()), service.ProblemEventTypeRemove, problemType, removedIDs)
+		event := service.NewProblemEvent(student.GetOrganizationID(), student.GetAppUserID(), service.ProblemEventTypeRemove, problemType, removedIDs)
 		if err := s.problemMonitor.NotifyObservers(ctx, event); err != nil {
 			return liberrors.Errorf("student.IncrementQuotaUsage(Size). err: %w", err)
 		}

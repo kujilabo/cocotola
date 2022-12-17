@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -22,10 +21,7 @@ type groupUserRepository struct {
 }
 
 type groupUserEntity struct {
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	JunctionModelEntity
 	OrganizationID uint
 	AppUserGroupID uint
 	AppUserID      uint
@@ -50,8 +46,9 @@ func (r *groupUserRepository) AddGroupUser(ctx context.Context, operator domain.
 	defer span.End()
 
 	groupUser := groupUserEntity{
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		JunctionModelEntity: JunctionModelEntity{
+			CreatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		AppUserGroupID: uint(appUserGroupID),
 		AppUserID:      uint(appUserID),

@@ -192,8 +192,8 @@ func main() {
 		systemAdminModel := userD.NewSystemAdminModel()
 
 		jobUseCaseStat := jobU.NewJobUsecaseStat(appTransaction, jobService)
+
 		s := gocron.NewScheduler(time.UTC)
-		s.StartAsync()
 		if _, err := s.Every(5).Seconds().Do(func() {
 			if err := jobUseCaseStat.AggregateStudyResultsOfAllUsers(context.Background(), systemAdminModel); err != nil {
 				logrus.Errorf("AggregateStudyResultsOfAllUsers. err: %v", err)
@@ -201,6 +201,7 @@ func main() {
 		}); err != nil {
 			panic(err)
 		}
+		s.StartAsync()
 	}
 
 	result := run(context.Background(), cfg, appTransaction, db, pf, rff, userRff, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
@@ -689,7 +690,7 @@ func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactor
 			return liberrors.Errorf("NewStudentModel. err: %w", err)
 		}
 
-		student, err := appS.NewStudent(ctx, pf, repo, userRepo, studentModel)
+		student, err := appS.NewStudent(ctx, pf, repo, studentModel)
 		if err != nil {
 			return liberrors.Errorf("NewStudent. err: %w", err)
 		}

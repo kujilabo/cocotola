@@ -1,9 +1,8 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "service",
     srcs = [
-        "app_properties.go",
         "job.go",
         "job_history_repository.go",
         "job_service.go",
@@ -16,6 +15,20 @@ go_library(
     deps = [
         "//cocotola-api/src/job/domain",
         "//lib/domain",
-        "@io_gorm_gorm//:gorm",
+        "//lib/log",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = ["job_service_test.go"],
+    deps = [
+        ":service",
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service/mock",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
     ],
 )

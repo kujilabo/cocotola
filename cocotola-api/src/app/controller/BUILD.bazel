@@ -26,6 +26,7 @@ go_library(
         "//cocotola-api/src/auth/controller/middleware",
         "//cocotola-api/src/auth/service",
         "//cocotola-api/src/auth/usecase",
+        "//cocotola-api/src/job/service",
         "//cocotola-api/src/plugin/common/controller",
         "//cocotola-api/src/plugin/common/service",
         "//cocotola-api/src/user/controller/helper",

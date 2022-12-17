@@ -3,7 +3,6 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "service",
     srcs = [
-        "app_properties.go",
         "app_user.go",
         "app_user_group.go",
         "app_user_group_repository.go",

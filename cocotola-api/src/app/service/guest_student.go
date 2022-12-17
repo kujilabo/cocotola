@@ -23,20 +23,24 @@ type guestStudent struct {
 	rf        RepositoryFactory
 	pf        ProcessorFactory
 	spaceRepo userS.SpaceRepository
-	userRf    userS.RepositoryFactory
 }
 
-func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, userRf userS.RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
+func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
+	userRf, err := rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	spaceRepo, err := userRf.NewSpaceRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
+
 	m := &guestStudent{
 		StudentModel: studentModel,
 		pf:           pf,
 		rf:           rf,
 		spaceRepo:    spaceRepo,
-		userRf:       userRf,
 	}
 
 	return m, libD.Validator.Struct(m)

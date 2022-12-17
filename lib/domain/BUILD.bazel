@@ -4,9 +4,13 @@ go_library(
     name = "domain",
     srcs = [
         "error.go",
+        "ulid.go",
         "validator.go",
     ],
     importpath = "github.com/kujilabo/cocotola/lib/domain",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_go_playground_validator_v10//:validator"],
+    deps = [
+        "@com_github_go_playground_validator_v10//:validator",
+        "@com_github_oklog_ulid_v2//:ulid",
+    ],
 )

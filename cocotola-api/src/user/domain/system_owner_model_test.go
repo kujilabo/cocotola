@@ -13,7 +13,9 @@ func TestNewSystemOwner(t *testing.T) {
 	assert.NoError(t, err)
 	appUser, err := NewAppUserModel(model, 1, "LOGIN_ID", "USERNAME", nil, nil)
 	assert.NoError(t, err)
-	systemOwner, err := NewSystemOwnerModel(appUser)
+	ower, err := NewOwnerModel(appUser)
+	assert.NoError(t, err)
+	systemOwner, err := NewSystemOwnerModel(ower)
 	assert.NoError(t, err)
 	log.Println(systemOwner)
 }

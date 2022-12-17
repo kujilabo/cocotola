@@ -17,7 +17,6 @@ go_library(
         "//cocotola-api/src/app/service",
         "//cocotola-api/src/app/usecase",
         "//cocotola-api/src/user/domain",
-        "//cocotola-api/src/user/service",
         "//lib/domain",
         "//lib/errors",
         "//lib/log",

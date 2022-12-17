@@ -18,38 +18,36 @@ type AppUser interface {
 }
 
 type appUser struct {
-	rf RepositoryFactory
 	domain.AppUserModel
+	rf        RepositoryFactory
+	spaceRepo SpaceRepository
 }
 
-func NewAppUser(rf RepositoryFactory, appUserModel domain.AppUserModel) (AppUser, error) {
+func NewAppUser(ctx context.Context, rf RepositoryFactory, appUserModel domain.AppUserModel) (AppUser, error) {
 	if rf == nil {
 		return nil, liberrors.Errorf("rf is nil. err: %w", libD.ErrInvalidArgument)
 	}
 	if appUserModel == nil {
 		return nil, liberrors.Errorf("appUserModel is nil. err: %w", libD.ErrInvalidArgument)
 	}
+	spaceRepo, err := rf.NewSpaceRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	m := &appUser{
-		rf:           rf,
 		AppUserModel: appUserModel,
+		rf:           rf,
+		spaceRepo:    spaceRepo,
 	}
 
 	return m, libD.Validator.Struct(m)
 }
 
-func (a *appUser) GetDefaultSpace(ctx context.Context) (Space, error) {
-	spaceRepo, err := a.rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return spaceRepo.FindDefaultSpace(ctx, a)
+func (m *appUser) GetDefaultSpace(ctx context.Context) (Space, error) {
+	return m.spaceRepo.FindDefaultSpace(ctx, m)
 }
 
-func (a *appUser) GetPersonalSpace(ctx context.Context) (Space, error) {
-	spaceRepo, err := a.rf.NewSpaceRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return spaceRepo.FindPersonalSpace(ctx, a)
+func (m *appUser) GetPersonalSpace(ctx context.Context) (Space, error) {
+	return m.spaceRepo.FindPersonalSpace(ctx, m)
 }

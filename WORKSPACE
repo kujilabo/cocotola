@@ -3679,8 +3679,8 @@ go_repository(
     name = "com_google_cloud_go_storage",
     build_file_proto_mode = "disable_global",
     importpath = "cloud.google.com/go/storage",
-    sum = "h1:YOO045NZI9RKfCj1c5A/ZtuuENUc8OAW+gHdGnDgyMQ=",
-    version = "v1.27.0",
+    sum = "h1:STgFzyU5/8miMl0//zKh2aQeTyeaUH3WN9bSUiJ09bA=",
+    version = "v1.10.0",
 )
 
 go_repository(
@@ -4367,8 +4367,8 @@ go_repository(
     name = "org_golang_x_time",
     build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/time",
-    sum = "h1:xYY+Bajn2a7VBmTM5GikTmnK8ZuX8YgnQCqZpbBNtmA=",
-    version = "v0.1.0",
+    sum = "h1:M73Iuj3xbbb9Uk1DYhzydthsj6oOd6l9bpuFcNoUvTs=",
+    version = "v0.0.0-20220224211638-0e9765cccd65",
 )
 
 go_repository(
@@ -5790,6 +5790,34 @@ go_repository(
     importpath = "gopkg.in/natefinch/npipe.v2",
     sum = "h1:+JknDZhAj8YMt7GC73Ei8pv4MzjDUNPHgQWJdtMAaDU=",
     version = "v2.0.0-20160621034901-c1b8fa8bdcce",
+)
+
+go_repository(
+    name = "com_github_go_co_op_gocron",
+    importpath = "github.com/go-co-op/gocron",
+    sum = "h1:SxTyJ5xnSN4byCq7b10LmmszFdxQlSQJod8s3gbnXxA=",
+    version = "v1.18.0",
+)
+
+go_repository(
+    name = "com_github_oklog_ulid_v2",
+    importpath = "github.com/oklog/ulid/v2",
+    sum = "h1:+9lhoxAP56we25tyYETBBY1YLA2SaoLvUFgrP2miPJU=",
+    version = "v2.1.0",
+)
+
+go_repository(
+    name = "com_github_pborman_getopt",
+    importpath = "github.com/pborman/getopt",
+    sum = "h1:BHT1/DKsYDGkUgQ2jmMaozVcdk+sVfz0+1ZJq4zkWgw=",
+    version = "v0.0.0-20170112200414-7148bc3a4c30",
+)
+
+go_repository(
+    name = "com_github_robfig_cron_v3",
+    importpath = "github.com/robfig/cron/v3",
+    sum = "h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=",
+    version = "v3.0.1",
 )
 
 # gazelle:repository_macro go_repositories.bzl%go_repositories

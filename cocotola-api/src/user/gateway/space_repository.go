@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"strconv"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -20,12 +19,7 @@ const SpaceTypePersonal = 2
 const SpaceTypeSystem = 3
 
 type spaceEntity struct {
-	ID             uint
-	Version        int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	SinmpleModelEntity
 	OrganizationID uint
 	Type           int
 	Key            string
@@ -128,9 +122,11 @@ func (r *spaceRepository) AddDefaultSpace(ctx context.Context, operator domain.S
 	defer span.End()
 
 	space := spaceEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Type:           SpaceTypeDefault,
 		Key:            "default",
@@ -148,9 +144,11 @@ func (r *spaceRepository) AddPersonalSpace(ctx context.Context, operator domain.
 	defer span.End()
 
 	space := spaceEntity{
-		Version:        1,
-		CreatedBy:      appUser.GetID(),
-		UpdatedBy:      appUser.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: appUser.GetID(),
+			UpdatedBy: appUser.GetID(),
+		},
 		OrganizationID: uint(appUser.GetOrganizationID()),
 		Type:           SpaceTypePersonal,
 		Key:            strconv.Itoa(int(appUser.GetID())),
@@ -169,9 +167,11 @@ func (r *spaceRepository) AddSystemSpace(ctx context.Context, operator domain.Sy
 	defer span.End()
 
 	space := spaceEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Type:           SpaceTypeSystem,
 		Key:            strconv.Itoa(int(operator.GetID())),

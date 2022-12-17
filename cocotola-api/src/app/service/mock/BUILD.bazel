@@ -38,6 +38,7 @@ go_library(
     deps = [
         "//cocotola-api/src/app/domain",
         "//cocotola-api/src/app/service",
+        "//cocotola-api/src/job/service",
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
         "@com_github_stretchr_testify//mock",

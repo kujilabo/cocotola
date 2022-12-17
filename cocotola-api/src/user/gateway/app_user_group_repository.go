@@ -2,7 +2,6 @@ package gateway
 
 import (
 	"context"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -22,12 +21,7 @@ type appUserGroupRepository struct {
 }
 
 type appUserGroupEntity struct {
-	ID             uint
-	Version        int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	SinmpleModelEntity
 	OrganizationID uint
 	Key            string
 	Name           string
@@ -39,7 +33,7 @@ func (e *appUserGroupEntity) TableName() string {
 }
 
 func (e *appUserGroupEntity) toAppUserGroup() (service.AppUserGroup, error) {
-	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
+	model, err := e.toModel()
 	if err != nil {
 		return nil, err
 	}
@@ -81,9 +75,11 @@ func (r *appUserGroupRepository) AddPublicGroup(ctx context.Context, operator do
 	defer span.End()
 
 	appUserGroup := appUserGroupEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Key:            "public",
 		Name:           "Public group",
@@ -99,9 +95,11 @@ func (r *appUserGroupRepository) AddPersonalGroup(ctx context.Context, operator 
 	defer span.End()
 
 	appUserGroup := appUserGroupEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		Key:            "#" + operator.GetLoginID(),
 		Name:           "Personal group",

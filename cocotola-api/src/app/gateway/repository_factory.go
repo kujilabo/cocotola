@@ -43,12 +43,7 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, j
 }
 
 func (f *repositoryFactory) NewWorkbookRepository(ctx context.Context) (service.WorkbookRepository, error) {
-	userRf, err := f.userRff(ctx, f.db)
-	if err != nil {
-		return nil, err
-	}
-
-	return NewWorkbookRepository(ctx, f.driverName, f, userRf, f.pf, f.db, f.problemTypes), nil
+	return NewWorkbookRepository(ctx, f.driverName, f, f.pf, f.db, f.problemTypes), nil
 }
 
 func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemType string) (service.ProblemRepository, error) {
@@ -56,6 +51,7 @@ func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemTyp
 	logger.Infof("problemType: %s", problemType)
 	problemRepository, ok := f.problemRepositories[problemType]
 	if !ok {
+		logger.Errorf("problemTypes: %+v", f.problemRepositories)
 		return nil, liberrors.Errorf("problem repository not found. problemType: %s", problemType)
 	}
 	return problemRepository(ctx, f.db)
@@ -86,11 +82,7 @@ func (f *repositoryFactory) NewStatRepository(ctx context.Context) (service.Stat
 }
 
 func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) (service.StudyStatRepository, error) {
-	userRf, err := f.userRff(ctx, f.db)
-	if err != nil {
-		return nil, err
-	}
-	return NewStudyStatRepository(ctx, f.db, f, userRf)
+	return NewStudyStatRepository(ctx, f.db, f)
 }
 
 func (f *repositoryFactory) NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error) {

@@ -43,6 +43,20 @@ func (_m *GuestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condit
 	return r0, r1
 }
 
+// GetAppUserID provides a mock function with given fields:
+func (_m *GuestStudent) GetAppUserID() domain.AppUserID {
+	ret := _m.Called()
+
+	var r0 domain.AppUserID
+	if rf, ok := ret.Get(0).(func() domain.AppUserID); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(domain.AppUserID)
+	}
+
+	return r0
+}
+
 // GetDefaultSpace provides a mock function with given fields: ctx
 func (_m *GuestStudent) GetDefaultSpace(ctx context.Context) (userservice.Space, error) {
 	ret := _m.Called(ctx)

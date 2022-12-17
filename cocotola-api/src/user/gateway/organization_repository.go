@@ -3,7 +3,6 @@ package gateway
 import (
 	"context"
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -19,13 +18,8 @@ type organizationRepository struct {
 }
 
 type organizationEntity struct {
-	ID        uint
-	Version   int
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	CreatedBy uint
-	UpdatedBy uint
-	Name      string
+	SinmpleModelEntity
+	Name string
 }
 
 func (e *organizationEntity) TableName() string {
@@ -63,7 +57,9 @@ func (r *organizationRepository) GetOrganization(ctx context.Context, operator d
 	organization := organizationEntity{}
 
 	if result := r.db.Where(organizationEntity{
-		ID: uint(operator.GetOrganizationID()),
+		SinmpleModelEntity: SinmpleModelEntity{
+			ID: uint(operator.GetOrganizationID()),
+		},
 	}).First(&organization); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, service.ErrOrganizationNotFound
@@ -99,7 +95,9 @@ func (r *organizationRepository) FindOrganizationByID(ctx context.Context, opera
 	organization := organizationEntity{}
 
 	if result := r.db.Where(organizationEntity{
-		ID: uint(id),
+		SinmpleModelEntity: SinmpleModelEntity{
+			ID: uint(id),
+		},
 	}).First(&organization); result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, service.ErrOrganizationNotFound
@@ -115,10 +113,12 @@ func (r *organizationRepository) AddOrganization(ctx context.Context, operator d
 	defer span.End()
 
 	organization := organizationEntity{
-		Version:   1,
-		CreatedBy: operator.GetID(),
-		UpdatedBy: operator.GetID(),
-		Name:      param.GetName(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
+		Name: param.GetName(),
 	}
 
 	if result := r.db.Create(&organization); result.Error != nil {

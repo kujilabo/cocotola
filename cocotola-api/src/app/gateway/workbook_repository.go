@@ -15,7 +15,6 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/gateway/casbinquery"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -89,17 +88,15 @@ type workbookRepository struct {
 	driverName   string
 	db           *gorm.DB
 	rf           service.RepositoryFactory
-	userRf       userS.RepositoryFactory
 	pf           service.ProcessorFactory
 	problemTypes []domain.ProblemType
 }
 
-func NewWorkbookRepository(ctx context.Context, driverName string, rf service.RepositoryFactory, userRf userS.RepositoryFactory, pf service.ProcessorFactory, db *gorm.DB, problemTypes []domain.ProblemType) service.WorkbookRepository {
+func NewWorkbookRepository(ctx context.Context, driverName string, rf service.RepositoryFactory, pf service.ProcessorFactory, db *gorm.DB, problemTypes []domain.ProblemType) service.WorkbookRepository {
 	return &workbookRepository{
 		driverName:   driverName,
 		db:           db,
 		rf:           rf,
-		userRf:       userRf,
 		pf:           pf,
 		problemTypes: problemTypes,
 	}
@@ -124,11 +121,11 @@ func (r *workbookRepository) toProblemTypeID(problemType string) uint {
 }
 
 func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator domain.StudentModel, param service.WorkbookSearchCondition) (service.WorkbookSearchResult, error) {
-	ctx, span := tracer.Start(ctx, "workbookRepository.FindWorkbooks")
+	ctx, span := tracer.Start(ctx, "workbookRepository.FindPersonalWorkbooks")
 	defer span.End()
 
 	logger := log.FromContext(ctx)
-	logger.Debugf("workbookRepository.FindWorkbooks. OperatorID: %d", operator.GetID())
+	logger.Debugf("workbookRepository.FindPersonalWorkbooks. OperatorID: %d", operator.GetID())
 
 	if param == nil {
 		return nil, libD.ErrInvalidArgument
@@ -253,7 +250,7 @@ func (r *workbookRepository) FindWorkbookByID(ctx context.Context, operator doma
 	if err != nil {
 		return nil, err
 	}
-	return service.NewWorkbook(r.rf, r.pf, workbookModel)
+	return service.NewWorkbook(ctx, r.rf, r.pf, workbookModel)
 }
 
 func (r *workbookRepository) FindWorkbookByName(ctx context.Context, operator userD.AppUserModel, spaceID userD.SpaceID, name string) (service.Workbook, error) {
@@ -293,11 +290,16 @@ func (r *workbookRepository) FindWorkbookByName(ctx context.Context, operator us
 	if err != nil {
 		return nil, err
 	}
-	return service.NewWorkbook(r.rf, r.pf, workbookModel)
+	return service.NewWorkbook(ctx, r.rf, r.pf, workbookModel)
 }
 
 func (r *workbookRepository) getPrivileges(ctx context.Context, operator userD.AppUserModel, workbookID domain.WorkbookID) (userD.Privileges, error) {
-	rbacRepo, err := r.userRf.NewRBACRepository(ctx)
+	userRf, err := r.rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	rbacRepo, err := userRf.NewRBACRepository(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +346,12 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.App
 
 	workbookID := domain.WorkbookID(workbook.ID)
 
-	rbacRepo, err := r.userRf.NewRBACRepository(ctx)
+	userRf, err := r.rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	rbacRepo, err := userRf.NewRBACRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -394,8 +401,9 @@ func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator domain
 	defer span.End()
 
 	if result := r.db.Model(&workbookEntity{}).
-		Where("organization_id = ? and id = ? and version = ?",
-			uint(operator.GetOrganizationID()), uint(id), version).
+		Where("organization_id = ?", uint(operator.GetOrganizationID())).
+		Where("id = ?", uint(id)).
+		Where("version = ?", version).
 		Updates(map[string]interface{}{
 			"name":          param.GetName(),
 			"question_text": param.GetQuestionText(),

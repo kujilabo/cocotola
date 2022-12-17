@@ -32,5 +32,5 @@ func FindStudent(ctx context.Context, pf service.ProcessorFactory, rf service.Re
 		return nil, err
 	}
 
-	return service.NewStudent(ctx, pf, rf, userRf, studentModel)
+	return service.NewStudent(ctx, pf, rf, studentModel)
 }
