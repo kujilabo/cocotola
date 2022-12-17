@@ -171,12 +171,12 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 	return nil
 }
 
-func (j *jobUsecaseStat) CleanStudyStats(ctx context.Context, systemAdmin domain.SystemAdminModel, expirationDate time.Time) error {
+func (u *jobUsecaseStat) CleanStudyStats(ctx context.Context, systemAdmin domain.SystemAdminModel, expirationDate time.Time) error {
 	_, span := tracer.Start(ctx, "jobUsecaseStat.CleanStudyStats")
 	defer span.End()
 
-	if err := j.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
-		systemOwner, _, rf, err := j.getSystemOwnerAndRepositoryFactory(ctx, systemAdmin, rf)
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		systemOwner, _, rf, err := u.getSystemOwnerAndRepositoryFactory(ctx, systemAdmin, rf)
 		if err != nil {
 			return err
 		}
