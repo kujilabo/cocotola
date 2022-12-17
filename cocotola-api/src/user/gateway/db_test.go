@@ -43,8 +43,8 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 func setupOrganization(ctx context.Context, t *testing.T, ts testService) (domain.OrganizationID, service.Owner) {
 	bg := context.Background()
 	orgName := RandString(orgNameLength)
-	sysAd := service.NewSystemAdmin(ts.rf)
-	// assert.NoError(t, err)
+	sysAd, err := service.NewSystemAdmin(ctx, ts.rf)
+	assert.NoError(t, err)
 
 	firstOwnerAddParam, err := service.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	assert.NoError(t, err)

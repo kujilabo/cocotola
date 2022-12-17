@@ -89,7 +89,8 @@ func setupOrganization(ctx context.Context, t *testing.T, ts testService) (userD
 	orgName := RandString(orgNameLength)
 	userRf, err := ts.rf.NewUserRepositoryFactory(ctx)
 	require.NoError(t, err)
-	sysAd := userS.NewSystemAdmin(userRf)
+	sysAd, err := userS.NewSystemAdmin(ctx, userRf)
+	require.NoError(t, err)
 
 	firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("OWNER_ID", "OWNER_NAME", "")
 	require.NoError(t, err)

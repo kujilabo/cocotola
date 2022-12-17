@@ -8,7 +8,8 @@ import (
 type AppUserID uint
 
 type AppUserModel interface {
-	GetID() uint
+	Model
+	GetAppUserID() AppUserID
 	GetOrganizationID() OrganizationID
 	GetLoginID() string
 	GetUsername() string
@@ -38,22 +39,26 @@ func NewAppUserModel(model Model, organizationID OrganizationID, loginID, userna
 	return m, libD.Validator.Struct(m)
 }
 
-func (a *appUserModel) GetOrganizationID() OrganizationID {
-	return a.OrganizationID
+func (m *appUserModel) GetAppUserID() AppUserID {
+	return (AppUserID)(m.GetID())
 }
 
-func (a *appUserModel) GetLoginID() string {
-	return a.LoginID
+func (m *appUserModel) GetOrganizationID() OrganizationID {
+	return m.OrganizationID
 }
 
-func (a *appUserModel) GetUsername() string {
-	return a.Username
+func (m *appUserModel) GetLoginID() string {
+	return m.LoginID
 }
 
-func (a *appUserModel) GetRoles() []string {
-	return a.Roles
+func (m *appUserModel) GetUsername() string {
+	return m.Username
 }
 
-func (a *appUserModel) GetProperties() map[string]string {
-	return a.Properties
+func (m *appUserModel) GetRoles() []string {
+	return m.Roles
+}
+
+func (m *appUserModel) GetProperties() map[string]string {
+	return m.Properties
 }

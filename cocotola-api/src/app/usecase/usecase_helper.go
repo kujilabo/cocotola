@@ -16,7 +16,11 @@ func FindStudent(ctx context.Context, pf service.ProcessorFactory, rf service.Re
 		return nil, err
 	}
 
-	systemAdmin := userS.NewSystemAdmin(userRf)
+	systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+	if err != nil {
+		return nil, err
+	}
+
 	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationID(ctx, organizationID)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to FindSystemOwnerByOrganizationID. err: %w", err)

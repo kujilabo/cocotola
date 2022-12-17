@@ -6,6 +6,7 @@ type AppUserGroupID uint
 
 type AppUserGroupModel interface {
 	Model
+	GetAppUerGroupID() AppUserGroupID
 	GetOrganizationID() OrganizationID
 	GetKey() string
 	GetName() string
@@ -33,18 +34,22 @@ func NewAppUserGroup(model Model, organizationID OrganizationID, key, name, desc
 	return m, libD.Validator.Struct(m)
 }
 
-func (g *appUserGroupModel) GetOrganizationID() OrganizationID {
-	return g.OrganizationID
+func (m *appUserGroupModel) GetAppUerGroupID() AppUserGroupID {
+	return AppUserGroupID(m.GetID())
 }
 
-func (g *appUserGroupModel) GetKey() string {
-	return g.Key
+func (m *appUserGroupModel) GetOrganizationID() OrganizationID {
+	return m.OrganizationID
 }
 
-func (g *appUserGroupModel) GetName() string {
-	return g.Name
+func (m *appUserGroupModel) GetKey() string {
+	return m.Key
 }
 
-func (g *appUserGroupModel) GetDescription() string {
-	return g.Description
+func (m *appUserGroupModel) GetName() string {
+	return m.Name
+}
+
+func (m *appUserGroupModel) GetDescription() string {
+	return m.Description
 }
