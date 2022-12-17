@@ -22,63 +22,57 @@ type SystemAdmin interface {
 
 type systemAdmin struct {
 	domain.SystemAdminModel
-	rf RepositoryFactory
+	rf          RepositoryFactory
+	orgRepo     OrganizationRepository
+	appUserRepo AppUserRepository
 }
 
-func NewSystemAdmin(rf RepositoryFactory) SystemAdmin {
+func NewSystemAdmin(ctx context.Context, rf RepositoryFactory) (SystemAdmin, error) {
+	orgRepo, err := rf.NewOrganizationRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	appUserRepo, err := rf.NewAppUserRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return &systemAdmin{
 		SystemAdminModel: domain.NewSystemAdminModel(),
 		rf:               rf,
-	}
+		orgRepo:          orgRepo,
+		appUserRepo:      appUserRepo,
+	}, nil
 }
 
-func (s *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {
-	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return appUserRepo.FindSystemOwnerByOrganizationID(ctx, s, organizationID)
+func (m *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {
+	return m.appUserRepo.FindSystemOwnerByOrganizationID(ctx, m, organizationID)
 }
 
-func (s *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, organizationName string) (SystemOwner, error) {
-	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return appUserRepo.FindSystemOwnerByOrganizationName(ctx, s, organizationName)
+func (m *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, organizationName string) (SystemOwner, error) {
+	return m.appUserRepo.FindSystemOwnerByOrganizationName(ctx, m, organizationName)
 }
 
-func (s *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (Organization, error) {
-	orgRepo, err := s.rf.NewOrganizationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return orgRepo.FindOrganizationByName(ctx, s, name)
+func (m *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (Organization, error) {
+	return m.orgRepo.FindOrganizationByName(ctx, m, name)
 }
 
-func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAddParameter) (domain.OrganizationID, error) {
+func (m *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAddParameter) (domain.OrganizationID, error) {
 	logger := log.FromContext(ctx)
-	orgRepo, err := s.rf.NewOrganizationRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
+
 	// add organization
-	organizationID, err := orgRepo.AddOrganization(ctx, s, param)
+	organizationID, err := m.orgRepo.AddOrganization(ctx, m, param)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddOrganization. error: %w", err)
 	}
-	appUserRepo, err := s.rf.NewAppUserRepository(ctx)
-	if err != nil {
-		return 0, err
-	}
 
 	// add system owner
-	systemOwnerID, err := appUserRepo.AddSystemOwner(ctx, s, organizationID)
+	systemOwnerID, err := m.appUserRepo.AddSystemOwner(ctx, m, organizationID)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddSystemOwner. error: %w", err)
 	}
 
-	systemOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, s, param.GetName())
+	systemOwner, err := m.appUserRepo.FindSystemOwnerByOrganizationName(ctx, m, param.GetName())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. error: %w", err)
 	}
@@ -90,17 +84,17 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 	// }
 
 	// add owner
-	ownerID, err := appUserRepo.AddFirstOwner(ctx, systemOwner, param.GetFirstOwner())
+	ownerID, err := m.appUserRepo.AddFirstOwner(ctx, systemOwner, param.GetFirstOwner())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to AddFirstOwner. error: %w", err)
 	}
 
-	owner, err := appUserRepo.FindOwnerByLoginID(ctx, systemOwner, param.GetFirstOwner().GetLoginID())
+	owner, err := m.appUserRepo.FindOwnerByLoginID(ctx, systemOwner, param.GetFirstOwner().GetLoginID())
 	if err != nil {
 		return 0, liberrors.Errorf("failed to FindOwnerByLoginID. error: %w", err)
 	}
 
-	appUserGroupRepo, err := s.rf.NewAppUserGroupRepository(ctx)
+	appUserGroupRepo, err := m.rf.NewAppUserGroupRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -111,7 +105,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to AddPublicGroup. error: %w", err)
 	}
 
-	groupUserRepo, err := s.rf.NewGroupUserRepository(ctx)
+	groupUserRepo, err := m.rf.NewGroupUserRepository(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -120,7 +114,7 @@ func (s *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAdd
 		return 0, liberrors.Errorf("failed to AddGroupUser. error: %w", err)
 	}
 
-	spaceRepo, err := s.rf.NewSpaceRepository(ctx)
+	spaceRepo, err := m.rf.NewSpaceRepository(ctx)
 	if err != nil {
 		return 0, err
 	}

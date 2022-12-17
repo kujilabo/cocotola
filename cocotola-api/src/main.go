@@ -472,7 +472,7 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 			return err
 		}
 
-		systemAdmin := userS.NewSystemAdmin(userRf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
 		if err != nil {
 			return err
 		}
@@ -534,7 +534,10 @@ func initApp2_1(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc
 			return liberrors.Errorf("userRff. err: %w", err)
 		}
 
-		systemAdmin := userS.NewSystemAdmin(userRf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
+		}
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, "cocotola")
 		if err != nil {
@@ -581,7 +584,10 @@ func initApp2_2(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc
 			return liberrors.Errorf("userRff. err: %w", err)
 		}
 
-		systemAdmin := userS.NewSystemAdmin(userRf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
+		}
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
 		if err != nil {
@@ -627,7 +633,10 @@ func initApp2_3(ctx context.Context, db *gorm.DB, rff appG.RepositoryFactoryFunc
 			return err
 		}
 
-		systemAdmin := userS.NewSystemAdmin(userRf)
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
+		}
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
 		if err != nil {

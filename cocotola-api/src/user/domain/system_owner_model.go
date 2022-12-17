@@ -23,6 +23,6 @@ func NewSystemOwnerModel(appUser OwnerModel) (SystemOwnerModel, error) {
 	return m, libD.Validator.Struct(m)
 }
 
-func (s *systemOwnerModel) IsSystemOwnerModel() bool {
+func (m *systemOwnerModel) IsSystemOwnerModel() bool {
 	return true
 }
