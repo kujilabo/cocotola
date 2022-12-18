@@ -144,13 +144,14 @@ func toEnglishWordProblemAddParameter(param appS.ProblemAddParameter) (*englishW
 
 	audioID, err := strconv.Atoi(param.GetProperties()["audioId"])
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("audioId is not integer. audioId: %s, err: %w", param.GetProperties()["audioId"], err)
 	}
 
-	number, err := param.GetIntProperty("number")
-	if err != nil {
-		return nil, err
-	}
+	number := 1
+	// number, err := param.GetIntProperty("number")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	pos, err := strconv.Atoi(param.GetProperties()["pos"])
 	if err != nil {
@@ -233,10 +234,10 @@ func toEnglishWordProblemUpdateParameter(newVersion int, updatedBy uint, param a
 type englishWordProblemRepository struct {
 	db                *gorm.DB
 	synthesizerClient appS.SynthesizerClient
-	problemType       string
+	problemType       appD.ProblemTypeName
 }
 
-func NewEnglishWordProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType string) (appS.ProblemRepository, error) {
+func NewEnglishWordProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType appD.ProblemTypeName) (appS.ProblemRepository, error) {
 	return &englishWordProblemRepository{
 		db:                db,
 		synthesizerClient: synthesizerClient,

@@ -33,7 +33,7 @@ func ToProblemFindResponse(ctx context.Context, result service.ProblemSearchResu
 		problems[i] = &entity.Problem{
 			Model:       model,
 			Number:      p.GetNumber(),
-			ProblemType: p.GetProblemType(),
+			ProblemType: string(p.GetProblemType()),
 			Properties:  bytes,
 		}
 	}
@@ -62,7 +62,7 @@ func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchR
 			ID:          model.ID,
 			Version:     model.Version,
 			Number:      p.GetNumber(),
-			ProblemType: p.GetProblemType(),
+			ProblemType: string(p.GetProblemType()),
 			Properties:  bytes,
 		}
 	}
@@ -91,7 +91,7 @@ func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entit
 	e := &entity.Problem{
 		Model:       model,
 		Number:      problem.GetNumber(),
-		ProblemType: problem.GetProblemType(),
+		ProblemType: string(problem.GetProblemType()),
 		Properties:  bytes,
 	}
 	return e, libD.Validator.Struct(e)

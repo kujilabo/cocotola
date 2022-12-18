@@ -119,10 +119,10 @@ func toNewEnglishPhraseProblemParam(param appS.ProblemAddParameter) (*newEnglish
 type englishPhraseProblemRepository struct {
 	db                *gorm.DB
 	synthesizerClient appS.SynthesizerClient
-	problemType       string
+	problemType       appD.ProblemTypeName
 }
 
-func NewEnglishPhraseProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType string) (appS.ProblemRepository, error) {
+func NewEnglishPhraseProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType appD.ProblemTypeName) (appS.ProblemRepository, error) {
 	return &englishPhraseProblemRepository{
 		db:                db,
 		synthesizerClient: synthesizerClient,

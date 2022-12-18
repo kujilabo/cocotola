@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
@@ -12,7 +13,7 @@ import (
 type RepositoryFactory interface {
 	NewWorkbookRepository(ctx context.Context) WorkbookRepository
 
-	NewProblemRepository(ctx context.Context, problemType string) (ProblemRepository, error)
+	NewProblemRepository(ctx context.Context, problemType domain.ProblemTypeName) (ProblemRepository, error)
 
 	NewProblemTypeRepository(ctx context.Context) ProblemTypeRepository
 

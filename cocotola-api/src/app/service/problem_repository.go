@@ -14,6 +14,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrProblemAlreadyExists = errors.New("problem already exists")
@@ -59,7 +60,7 @@ func (p *problemAddParameter) GetStringProperty(name string) (string, error) {
 func (p *problemAddParameter) GetIntProperty(name string) (int, error) {
 	i, err := strconv.Atoi(p.Properties[name])
 	if err != nil {
-		return 0, err
+		return 0, liberrors.Errorf("%q property is not a integer. value: %s, err: %w", name, p.Properties[name], err)
 	}
 	return i, nil
 }

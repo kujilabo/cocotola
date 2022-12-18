@@ -67,7 +67,7 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	}
 
 	if err := s.registerAppUserCallback(ctx, organizationName, appUser); err != nil {
-		return nil, liberrors.Errorf("failed to registerStudentCallback. err: %w", err)
+		return nil, liberrors.Errorf("registerStudentCallback. err: %w", err)
 	}
 
 	tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, appUser, organization)

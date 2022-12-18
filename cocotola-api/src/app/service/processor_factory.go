@@ -1,29 +1,32 @@
 //go:generate mockery --output mock --name ProcessorFactory
 package service
 
-import liberrors "github.com/kujilabo/cocotola/lib/errors"
+import (
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
+)
 
 type ProcessorFactory interface {
-	NewProblemAddProcessor(processorType string) (ProblemAddProcessor, error)
+	NewProblemAddProcessor(problemType domain.ProblemTypeName) (ProblemAddProcessor, error)
 
-	NewProblemUpdateProcessor(processorType string) (ProblemUpdateProcessor, error)
+	NewProblemUpdateProcessor(problemType domain.ProblemTypeName) (ProblemUpdateProcessor, error)
 
-	NewProblemRemoveProcessor(processorType string) (ProblemRemoveProcessor, error)
+	NewProblemRemoveProcessor(problemType domain.ProblemTypeName) (ProblemRemoveProcessor, error)
 
-	NewProblemImportProcessor(processorType string) (ProblemImportProcessor, error)
+	NewProblemImportProcessor(problemType domain.ProblemTypeName) (ProblemImportProcessor, error)
 
-	NewProblemQuotaProcessor(processorType string) (ProblemQuotaProcessor, error)
+	NewProblemQuotaProcessor(problemType domain.ProblemTypeName) (ProblemQuotaProcessor, error)
 }
 
 type processorFactrory struct {
-	addProcessors    map[string]ProblemAddProcessor
-	updateProcessors map[string]ProblemUpdateProcessor
-	removeProcessors map[string]ProblemRemoveProcessor
-	importProcessors map[string]ProblemImportProcessor
-	quotaProcessors  map[string]ProblemQuotaProcessor
+	addProcessors    map[domain.ProblemTypeName]ProblemAddProcessor
+	updateProcessors map[domain.ProblemTypeName]ProblemUpdateProcessor
+	removeProcessors map[domain.ProblemTypeName]ProblemRemoveProcessor
+	importProcessors map[domain.ProblemTypeName]ProblemImportProcessor
+	quotaProcessors  map[domain.ProblemTypeName]ProblemQuotaProcessor
 }
 
-func NewProcessorFactory(addProcessors map[string]ProblemAddProcessor, updateProcessors map[string]ProblemUpdateProcessor, removeProcessors map[string]ProblemRemoveProcessor, importProcessors map[string]ProblemImportProcessor, quotaProcessors map[string]ProblemQuotaProcessor) ProcessorFactory {
+func NewProcessorFactory(addProcessors map[domain.ProblemTypeName]ProblemAddProcessor, updateProcessors map[domain.ProblemTypeName]ProblemUpdateProcessor, removeProcessors map[domain.ProblemTypeName]ProblemRemoveProcessor, importProcessors map[domain.ProblemTypeName]ProblemImportProcessor, quotaProcessors map[domain.ProblemTypeName]ProblemQuotaProcessor) ProcessorFactory {
 	return &processorFactrory{
 		addProcessors:    addProcessors,
 		updateProcessors: updateProcessors,
@@ -33,42 +36,42 @@ func NewProcessorFactory(addProcessors map[string]ProblemAddProcessor, updatePro
 	}
 }
 
-func (f *processorFactrory) NewProblemAddProcessor(processorType string) (ProblemAddProcessor, error) {
-	processor, ok := f.addProcessors[processorType]
+func (f *processorFactrory) NewProblemAddProcessor(problemType domain.ProblemTypeName) (ProblemAddProcessor, error) {
+	processor, ok := f.addProcessors[problemType]
 	if !ok {
-		return nil, liberrors.Errorf("NewProblemAddProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemAddProcessor not found. problemType: %s", problemType)
 	}
 	return processor, nil
 }
 
-func (f *processorFactrory) NewProblemUpdateProcessor(processorType string) (ProblemUpdateProcessor, error) {
-	processor, ok := f.updateProcessors[processorType]
+func (f *processorFactrory) NewProblemUpdateProcessor(problemType domain.ProblemTypeName) (ProblemUpdateProcessor, error) {
+	processor, ok := f.updateProcessors[problemType]
 	if !ok {
-		return nil, liberrors.Errorf("NewProblemUpdateProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemUpdateProcessor not found. problemType: %s", problemType)
 	}
 	return processor, nil
 }
 
-func (f *processorFactrory) NewProblemRemoveProcessor(processorType string) (ProblemRemoveProcessor, error) {
-	processor, ok := f.removeProcessors[processorType]
+func (f *processorFactrory) NewProblemRemoveProcessor(problemType domain.ProblemTypeName) (ProblemRemoveProcessor, error) {
+	processor, ok := f.removeProcessors[problemType]
 	if !ok {
-		return nil, liberrors.Errorf("NewProblemRemoveProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemRemoveProcessor not found. problemType: %s", problemType)
 	}
 	return processor, nil
 }
 
-func (f *processorFactrory) NewProblemImportProcessor(processorType string) (ProblemImportProcessor, error) {
-	processor, ok := f.importProcessors[processorType]
+func (f *processorFactrory) NewProblemImportProcessor(problemType domain.ProblemTypeName) (ProblemImportProcessor, error) {
+	processor, ok := f.importProcessors[problemType]
 	if !ok {
-		return nil, liberrors.Errorf("NewProblemImportProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemImportProcessor not found. problemType: %s", problemType)
 	}
 	return processor, nil
 }
 
-func (f *processorFactrory) NewProblemQuotaProcessor(processorType string) (ProblemQuotaProcessor, error) {
-	processor, ok := f.quotaProcessors[processorType]
+func (f *processorFactrory) NewProblemQuotaProcessor(problemType domain.ProblemTypeName) (ProblemQuotaProcessor, error) {
+	processor, ok := f.quotaProcessors[problemType]
 	if !ok {
-		return nil, liberrors.Errorf("NewProblemQuotaProcessor not found. processorType: %s", processorType)
+		return nil, liberrors.Errorf("NewProblemQuotaProcessor not found. problemType: %s", problemType)
 	}
 	return processor, nil
 }

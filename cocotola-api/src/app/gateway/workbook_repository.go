@@ -61,7 +61,7 @@ func stringMapToJSON(m map[string]string) (string, error) {
 	return string(b), nil
 }
 
-func (e *workbookEntity) toWorkbookModel(rf service.RepositoryFactory, pf service.ProcessorFactory, operator userD.AppUserModel, problemType string, privs userD.Privileges) (domain.WorkbookModel, error) {
+func (e *workbookEntity) toWorkbookModel(rf service.RepositoryFactory, pf service.ProcessorFactory, operator userD.AppUserModel, problemType domain.ProblemTypeName, privs userD.Privileges) (domain.WorkbookModel, error) {
 	model, err := userD.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
 		return nil, err
@@ -89,10 +89,10 @@ type workbookRepository struct {
 	db           *gorm.DB
 	rf           service.RepositoryFactory
 	pf           service.ProcessorFactory
-	problemTypes []domain.ProblemType
+	problemTypes ProblemTypes
 }
 
-func newWorkbookRepository(ctx context.Context, driverName string, rf service.RepositoryFactory, pf service.ProcessorFactory, db *gorm.DB, problemTypes []domain.ProblemType) service.WorkbookRepository {
+func newWorkbookRepository(ctx context.Context, driverName string, pf service.ProcessorFactory, db *gorm.DB, rf service.RepositoryFactory, problemTypes ProblemTypes) service.WorkbookRepository {
 	return &workbookRepository{
 		driverName:   driverName,
 		db:           db,
@@ -100,24 +100,6 @@ func newWorkbookRepository(ctx context.Context, driverName string, rf service.Re
 		pf:           pf,
 		problemTypes: problemTypes,
 	}
-}
-
-func (r *workbookRepository) toProblemType(problemTypeID uint) string {
-	for _, m := range r.problemTypes {
-		if m.GetID() == problemTypeID {
-			return m.GetName()
-		}
-	}
-	return ""
-}
-
-func (r *workbookRepository) toProblemTypeID(problemType string) uint {
-	for _, m := range r.problemTypes {
-		if m.GetName() == problemType {
-			return m.GetID()
-		}
-	}
-	return 0
 }
 
 func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator domain.StudentModel, param service.WorkbookSearchCondition) (service.WorkbookSearchResult, error) {
@@ -151,7 +133,11 @@ func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator
 	results := make([]domain.WorkbookModel, len(workbooks))
 	priv := userD.NewPrivileges([]userD.RBACAction{domain.PrivilegeRead})
 	for i, e := range workbooks {
-		w, err := e.toWorkbookModel(r.rf, r.pf, operator, r.toProblemType(e.ProblemTypeID), priv)
+		problemType, err := r.problemTypes.ToProblemType(e.ProblemTypeID)
+		if err != nil {
+			return nil, err
+		}
+		w, err := e.toWorkbookModel(r.rf, r.pf, operator, problemType, priv)
 		if err != nil {
 			return nil, liberrors.Errorf("toWorkbookModel. err: %w", err)
 		}
@@ -246,10 +232,16 @@ func (r *workbookRepository) FindWorkbookByID(ctx context.Context, operator doma
 	logger := log.FromContext(ctx)
 	logger.Infof("ownerId: %d, operatorId: %d", workbookEntity.OwnerID, operator.GetID())
 
-	workbookModel, err := workbookEntity.toWorkbookModel(r.rf, r.pf, operator, r.toProblemType(workbookEntity.ProblemTypeID), priv)
+	problemType, err := r.problemTypes.ToProblemType(workbookEntity.ProblemTypeID)
 	if err != nil {
 		return nil, err
 	}
+
+	workbookModel, err := workbookEntity.toWorkbookModel(r.rf, r.pf, operator, problemType, priv)
+	if err != nil {
+		return nil, err
+	}
+
 	return service.NewWorkbook(ctx, r.rf, r.pf, workbookModel)
 }
 
@@ -286,10 +278,16 @@ func (r *workbookRepository) FindWorkbookByName(ctx context.Context, operator us
 	logger := log.FromContext(ctx)
 	logger.Infof("ownerId: %d, operatorId: %d", workbookEntity.OwnerID, operator.GetID())
 
-	workbookModel, err := workbookEntity.toWorkbookModel(r.rf, r.pf, operator, r.toProblemType(workbookEntity.ProblemTypeID), priv)
+	problemType, err := r.problemTypes.ToProblemType(workbookEntity.ProblemTypeID)
 	if err != nil {
 		return nil, err
 	}
+
+	workbookModel, err := workbookEntity.toWorkbookModel(r.rf, r.pf, operator, problemType, priv)
+	if err != nil {
+		return nil, err
+	}
+
 	return service.NewWorkbook(ctx, r.rf, r.pf, workbookModel)
 }
 
@@ -316,8 +314,8 @@ func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.App
 	_, span := tracer.Start(ctx, "workbookRepository.AddWorkbook")
 	defer span.End()
 
-	problemTypeID := r.toProblemTypeID(param.GetProblemType())
-	if problemTypeID == 0 {
+	problemTypeID, err := r.problemTypes.ToProblemTypeID(param.GetProblemType())
+	if err != nil {
 		return 0, liberrors.Errorf("unsupported problemType. problemType: %s", param.GetProblemType())
 	}
 	propertiesJSON, err := stringMapToJSON(param.GetProperties())

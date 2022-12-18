@@ -9,32 +9,35 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
+	"github.com/kujilabo/cocotola/lib/log"
 )
 
 type StudentUsecaseStudy interface {
 
 	// study
-	FindResults(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string) ([]domain.StudyRecordWithProblemID, error)
+	FindResults(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType domain.StudyTypeName) ([]domain.StudyRecordWithProblemID, error)
 
-	GetCompletionRate(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (map[string]int, error)
+	GetCompletionRate(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (map[domain.StudyTypeName]int, error)
 
 	// FindAllProblemsByWorkbookID(ctx context.Context, organizationID, operatorID, workbookID uint, studyTypeID domain.StudyTypeID) (domain.WorkbookWithProblems, error)
-	SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, mastered bool) error
+	SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType domain.StudyTypeName, problemID domain.ProblemID, result, mastered bool) error
 }
 
 type studentUsecaseStudy struct {
-	transaction service.Transaction
-	pf          service.ProcessorFactory
+	transaction  service.Transaction
+	pf           service.ProcessorFactory
+	studyMonitor service.StudyMonitor
 }
 
-func NewStudentUsecaseStudy(transaction service.Transaction, pf service.ProcessorFactory) StudentUsecaseStudy {
+func NewStudentUsecaseStudy(transaction service.Transaction, pf service.ProcessorFactory, studyMonitor service.StudyMonitor) StudentUsecaseStudy {
 	return &studentUsecaseStudy{
-		transaction: transaction,
-		pf:          pf,
+		transaction:  transaction,
+		pf:           pf,
+		studyMonitor: studyMonitor,
 	}
 }
 
-func (s *studentUsecaseStudy) FindResults(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string) ([]domain.StudyRecordWithProblemID, error) {
+func (s *studentUsecaseStudy) FindResults(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType domain.StudyTypeName) ([]domain.StudyRecordWithProblemID, error) {
 	var results []domain.StudyRecordWithProblemID
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, err := s.findStudent(ctx, rf, organizationID, operatorID)
@@ -58,8 +61,8 @@ func (s *studentUsecaseStudy) FindResults(ctx context.Context, organizationID us
 	return results, nil
 }
 
-func (s *studentUsecaseStudy) GetCompletionRate(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (map[string]int, error) {
-	var results map[string]int
+func (s *studentUsecaseStudy) GetCompletionRate(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (map[domain.StudyTypeName]int, error) {
+	var results map[domain.StudyTypeName]int
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, err := s.findStudent(ctx, rf, organizationID, operatorID)
 		if err != nil {
@@ -82,7 +85,9 @@ func (s *studentUsecaseStudy) GetCompletionRate(ctx context.Context, organizatio
 	return results, nil
 }
 
-func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType string, problemID domain.ProblemID, result, mastered bool) error {
+func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, studyType domain.StudyTypeName, problemID domain.ProblemID, result, mastered bool) error {
+	logger := log.FromContext(ctx)
+	var problemType domain.ProblemTypeName
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, err := s.findStudent(ctx, rf, organizationID, operatorID)
 		if err != nil {
@@ -92,6 +97,8 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 		if err != nil {
 			return err
 		}
+
+		problemType = workbook.GetProblemType()
 		recordbook, err := student.FindRecordbook(ctx, workbookID, studyType)
 		if err != nil {
 			return liberrors.Errorf("failed to FindRecordbook. err: %w", err)
@@ -103,6 +110,12 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 	}); err != nil {
 		return err
 	}
+
+	studyEvent := service.NewStudyEvent(organizationID, operatorID, service.StudyEventTypeAnswer, problemType, studyType, problemID)
+	if err := s.studyMonitor.NotifyObservers(ctx, studyEvent); err != nil {
+		logger.Errorf("NotifyObservers. err: %v", err)
+	}
+
 	return nil
 }
 

@@ -229,10 +229,10 @@ func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy u
 type englishSentenceProblemRepository struct {
 	db                *gorm.DB
 	synthesizerClient appS.SynthesizerClient
-	problemType       string
+	problemType       appD.ProblemTypeName
 }
 
-func NewEnglishSentenceProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType string) (appS.ProblemRepository, error) {
+func NewEnglishSentenceProblemRepository(db *gorm.DB, synthesizerClient appS.SynthesizerClient, problemType appD.ProblemTypeName) (appS.ProblemRepository, error) {
 	return &englishSentenceProblemRepository{
 		db:                db,
 		synthesizerClient: synthesizerClient,

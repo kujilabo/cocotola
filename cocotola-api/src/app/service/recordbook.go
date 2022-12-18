@@ -18,17 +18,17 @@ type Recordbook interface {
 
 	GetResultsSortedLevel(ctx context.Context) ([]domain.StudyRecordWithProblemID, error)
 
-	SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, mastered bool) error
+	SetResult(ctx context.Context, problemType domain.ProblemTypeName, problemID domain.ProblemID, result, mastered bool) error
 }
 
 type recordbook struct {
 	rf         RepositoryFactory
 	student    Student
 	workbookID domain.WorkbookID `validate:"required"`
-	studyType  string
+	studyType  domain.StudyTypeName
 }
 
-func NewRecordbook(rf RepositoryFactory, student Student, workbookID domain.WorkbookID, studyType string) (Recordbook, error) {
+func NewRecordbook(rf RepositoryFactory, student Student, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (Recordbook, error) {
 	m := &recordbook{
 		rf:         rf,
 		student:    student,
@@ -106,18 +106,22 @@ func (m *recordbook) GetResultsSortedLevel(ctx context.Context) ([]domain.StudyR
 	return problems2, nil
 }
 
-func (m *recordbook) SetResult(ctx context.Context, problemType string, problemID domain.ProblemID, result, mastered bool) error {
-	repo := m.rf.NewRecordbookRepository(ctx)
+func (m *recordbook) SetResult(ctx context.Context, problemType domain.ProblemTypeName, problemID domain.ProblemID, result, mastered bool) error {
+	recordbookRepo := m.rf.NewRecordbookRepository(ctx)
+	if err := recordbookRepo.SetResult(ctx, m.GetStudent(), m.workbookID, m.studyType, problemType, problemID, result, mastered); err != nil {
+		return liberrors.Errorf("recordbookRepo.SetResult. err: %w", err)
+	}
 
-	if err := repo.SetResult(ctx, m.GetStudent(), m.workbookID, m.studyType, problemType, problemID, result, mastered); err != nil {
-		return liberrors.Errorf("failed to SetResult. err: %w", err)
+	studyRecordRepo := m.rf.NewStudyRecordRepository(ctx)
+	if err := studyRecordRepo.AddRecord(ctx, m.GetStudent(), m.workbookID, problemType, m.studyType, problemID, mastered); err != nil {
+		return liberrors.Errorf("studyRecordRepo.AddRecord. err: %w", err)
 	}
 
 	return nil
 }
 
 type RecordbookSummary interface {
-	GetCompletionRate(ctx context.Context) (map[string]int, error)
+	GetCompletionRate(ctx context.Context) (map[domain.StudyTypeName]int, error)
 }
 
 type recordbookSummary struct {
@@ -143,7 +147,7 @@ func NewRecordbookSummary(rf RepositoryFactory, student Student, workbookID doma
 
 	return m, libD.Validator.Struct(m)
 }
-func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[string]int, error) {
+func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[domain.StudyTypeName]int, error) {
 	rateMax := 100
 	repo := m.rf.NewRecordbookRepository(ctx)
 
@@ -162,7 +166,7 @@ func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[string]i
 		return nil, liberrors.Errorf("failed to SetResult. err: %w", err)
 	}
 
-	completionRateMap := map[string]int{}
+	completionRateMap := map[domain.StudyTypeName]int{}
 	for studyType, numberOfMasteredProblems := range numberOfMasteredProblemsMap {
 		if numberOfProblems == 0 {
 			completionRateMap[studyType] = 0

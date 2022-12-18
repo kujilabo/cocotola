@@ -8,7 +8,7 @@ import (
 	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
-const EnglishPhraseProblemType = "english_phrase"
+const EnglishPhraseProblemType = appD.ProblemTypeName("english_phrase")
 
 type EnglishPhraseProblemModel interface {
 	appD.ProblemModel

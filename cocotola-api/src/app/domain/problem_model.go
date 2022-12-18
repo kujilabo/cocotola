@@ -14,18 +14,18 @@ type ProblemID uint
 type ProblemModel interface {
 	userD.Model
 	GetNumber() int
-	GetProblemType() string
+	GetProblemType() ProblemTypeName
 	GetProperties(ctx context.Context) map[string]interface{}
 }
 
 type problemModel struct {
 	userD.Model
 	Number      int                    `validate:"required"`
-	ProblemType string                 `validate:"required"`
+	ProblemType ProblemTypeName        `validate:"required"`
 	Properties  map[string]interface{} `validate:"required"`
 }
 
-func NewProblemModel(model userD.Model, number int, problemType string, properties map[string]interface{}) (ProblemModel, error) {
+func NewProblemModel(model userD.Model, number int, problemType ProblemTypeName, properties map[string]interface{}) (ProblemModel, error) {
 	m := &problemModel{
 		Model:       model,
 		Number:      number,
@@ -40,7 +40,7 @@ func (m *problemModel) GetNumber() int {
 	return m.Number
 }
 
-func (m *problemModel) GetProblemType() string {
+func (m *problemModel) GetProblemType() ProblemTypeName {
 	return m.ProblemType
 }
 

@@ -21,7 +21,7 @@ type ProblemEvent interface {
 	GetOrganizationID() userD.OrganizationID
 	GetAppUserID() userD.AppUserID
 	GetProblemEventType() ProblemEventType
-	GetProblemType() string
+	GetProblemType() domain.ProblemTypeName
 	GetProblemIDs() []domain.ProblemID
 }
 
@@ -29,11 +29,11 @@ type problemEvent struct {
 	OrganizationID   userD.OrganizationID
 	AppUserID        userD.AppUserID
 	ProblemEventType ProblemEventType
-	ProblemType      string
+	ProblemType      domain.ProblemTypeName
 	ProblemIDs       []domain.ProblemID
 }
 
-func NewProblemEvent(organizationID userD.OrganizationID, appUserID userD.AppUserID, problemEventType ProblemEventType, problemType string, problemIDs []domain.ProblemID) ProblemEvent {
+func NewProblemEvent(organizationID userD.OrganizationID, appUserID userD.AppUserID, problemEventType ProblemEventType, problemType domain.ProblemTypeName, problemIDs []domain.ProblemID) ProblemEvent {
 	return &problemEvent{
 		OrganizationID:   organizationID,
 		AppUserID:        appUserID,
@@ -54,7 +54,7 @@ func (p *problemEvent) GetAppUserID() userD.AppUserID {
 func (p *problemEvent) GetProblemEventType() ProblemEventType {
 	return p.ProblemEventType
 }
-func (p *problemEvent) GetProblemType() string {
+func (p *problemEvent) GetProblemType() domain.ProblemTypeName {
 	return p.ProblemType
 }
 func (p *problemEvent) GetProblemIDs() []domain.ProblemID {
@@ -79,28 +79,29 @@ func NewProblemMonitor() ProblemMonitor {
 	return &problemMonitor{}
 }
 
-func (p *problemMonitor) Attach(observer ProblemObserver) error {
-	for _, o := range p.observers {
+func (m *problemMonitor) Attach(observer ProblemObserver) error {
+	for _, o := range m.observers {
 		if o == observer {
 			return errors.New("observer already exists")
 		}
 	}
-	p.observers = append(p.observers, observer)
+
+	m.observers = append(m.observers, observer)
 	return nil
 }
 
-func (p *problemMonitor) Detach(observer ProblemObserver) error {
-	for i, o := range p.observers {
+func (m *problemMonitor) Detach(observer ProblemObserver) error {
+	for i, o := range m.observers {
 		if o == observer {
-			p.observers = append(p.observers[:i], p.observers[i+1:]...)
+			m.observers = append(m.observers[:i], m.observers[i+1:]...)
 			return nil
 		}
 	}
 	return errors.New("observer not found")
 }
 
-func (p *problemMonitor) NotifyObservers(ctx context.Context, event ProblemEvent) error {
-	for _, o := range p.observers {
+func (m *problemMonitor) NotifyObservers(ctx context.Context, event ProblemEvent) error {
+	for _, o := range m.observers {
 		go func(ctx context.Context, o ProblemObserver) {
 			ctx, cancel := context.WithTimeout(ctx, observerTimeoutSec*time.Second)
 			logger := log.FromContext(ctx)

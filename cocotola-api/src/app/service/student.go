@@ -30,9 +30,9 @@ type Student interface {
 
 	RemoveWorkbook(ctx context.Context, id domain.WorkbookID, version int) error
 
-	CheckQuota(ctx context.Context, problemType string, name QuotaName) error
+	CheckQuota(ctx context.Context, problemType domain.ProblemTypeName, name QuotaName) error
 
-	FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error)
+	FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (Recordbook, error)
 
 	FindRecordbookSummary(ctx context.Context, workbookID domain.WorkbookID) (RecordbookSummary, error)
 
@@ -147,7 +147,7 @@ func (s *student) RemoveWorkbook(ctx context.Context, workbookID domain.Workbook
 	return workbook.RemoveWorkbook(ctx, s, version)
 }
 
-func (s *student) CheckQuota(ctx context.Context, problemType string, name QuotaName) error {
+func (s *student) CheckQuota(ctx context.Context, problemType domain.ProblemTypeName, name QuotaName) error {
 	processor, err := s.pf.NewProblemQuotaProcessor(problemType)
 	if err != nil {
 		return liberrors.Errorf("s.pf.NewProblemQuotaProcessor. err: %w", err)
@@ -155,11 +155,12 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 
 	userQuotaRepo := s.rf.NewUserQuotaRepository(ctx)
 
+	problemTypeName := (string)(problemType)
 	switch name {
 	case QuotaNameSize:
 		unit := processor.GetUnitForSizeQuota()
 		limit := processor.GetLimitForSizeQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemType+"_size", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemTypeName+"_size", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(size). err: %w", err)
 		}
@@ -172,7 +173,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	case QuotaNameUpdate:
 		unit := processor.GetUnitForUpdateQuota()
 		limit := processor.GetLimitForUpdateQuota()
-		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemType+"_update", unit, limit)
+		isExceeded, err := userQuotaRepo.IsExceeded(ctx, s.GetOrganizationID(), s.GetAppUserID(), problemTypeName+"_update", unit, limit)
 		if err != nil {
 			return liberrors.Errorf("userQuotaRepo.IsExceeded(update). err: %w", err)
 		}
@@ -187,7 +188,7 @@ func (s *student) CheckQuota(ctx context.Context, problemType string, name Quota
 	}
 }
 
-func (s *student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (Recordbook, error) {
+func (s *student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (Recordbook, error) {
 	return NewRecordbook(s.rf, s, workbookID, studyType)
 }
 

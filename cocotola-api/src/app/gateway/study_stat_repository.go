@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
@@ -25,7 +25,7 @@ type studyStatEntity struct {
 }
 
 func (e *studyStatEntity) TableName() string {
-	return "study_history"
+	return "study_stat"
 }
 
 type studyStatRepository struct {
@@ -40,10 +40,10 @@ func newStudyStatRepository(ctx context.Context, db *gorm.DB, rf service.Reposit
 	}
 }
 
-func (r *studyStatRepository) AggregateResults(ctx context.Context, operator domain.SystemOwnerModel, targetDate time.Time, userID domain.AppUserID) error {
+func (r *studyStatRepository) AggregateResults(ctx context.Context, operator userD.SystemOwnerModel, targetDate time.Time, userID userD.AppUserID) error {
 	studyRecordRepo := r.rf.NewStudyRecordRepository(ctx)
 
-	results, err := studyRecordRepo.CountAnsweredProblems(ctx, userID, targetDate)
+	results, err := studyRecordRepo.CountAnsweredProblems(ctx, operator, userID, targetDate)
 	if err != nil {
 		return err
 	}
@@ -58,6 +58,7 @@ func (r *studyStatRepository) AggregateResults(ctx context.Context, operator dom
 			StudyTypeID:    result.StudyTypeID,
 			Answered:       result.Answered,
 			Mastered:       result.Mastered,
+			RecordDate:     targetDate,
 		}
 		// Upsert
 		if result := r.db.Clauses(clause.OnConflict{
@@ -77,7 +78,7 @@ func (r *studyStatRepository) AggregateResults(ctx context.Context, operator dom
 	return nil
 }
 
-func (r *studyStatRepository) CleanStudyStats(ctx context.Context, operator domain.SystemOwnerModel, expirationDate time.Time) error {
+func (r *studyStatRepository) CleanStudyStats(ctx context.Context, operator userD.SystemOwnerModel, expirationDate time.Time) error {
 
 	studyStatEntity := studyStatEntity{}
 	if result := r.db.

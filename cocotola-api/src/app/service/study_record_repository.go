@@ -10,7 +10,7 @@ import (
 )
 
 type StudyRecordRepository interface {
-	AddRecord(ctx context.Context, operator userD.SystemOwnerModel, appUserID userD.AppUserID, workbookID domain.WorkbookID, problemTypeID uint, studyTypeID uint, problemID domain.ProblemID, mastered bool) error
+	AddRecord(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, problemType domain.ProblemTypeName, studyType domain.StudyTypeName, problemID domain.ProblemID, mastered bool) error
 
-	CountAnsweredProblems(ctx context.Context, targetUserID userD.AppUserID, targetDate time.Time) (*CountAnsweredResults, error)
+	CountAnsweredProblems(ctx context.Context, operator userD.SystemOwnerModel, targetUserID userD.AppUserID, targetDate time.Time) (*CountAnsweredResults, error)
 }
