@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "csv_reader.go",
         "init.go",
+        "master_data.go",
         "problem_quota_handler.go",
         "problem_type_repository.go",
         "recordbook_repository.go",

@@ -3,6 +3,7 @@ package gateway
 import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type ProblemTypes interface {
@@ -24,7 +25,7 @@ func (r *problemTypes) ToProblemTypeID(problemType domain.ProblemTypeName) (uint
 			return m.GetID(), nil
 		}
 	}
-	return 0, libD.ErrInvalidArgument
+	return 0, liberrors.Errorf("unsupported problemType. problemType: %s, err: %w", problemType, libD.ErrInvalidArgument)
 }
 
 func (r *problemTypes) ToProblemType(problemTypeID uint) (domain.ProblemTypeName, error) {
@@ -33,7 +34,7 @@ func (r *problemTypes) ToProblemType(problemTypeID uint) (domain.ProblemTypeName
 			return m.GetName(), nil
 		}
 	}
-	return "", libD.ErrInvalidArgument
+	return "", liberrors.Errorf("unsupported problemTypeID. problemTypeID: %d, err: %w", problemTypeID, libD.ErrInvalidArgument)
 }
 
 type StudyTypes interface {
@@ -56,7 +57,11 @@ func (r *studyTypes) ToStudyTypeID(studyType domain.StudyTypeName) (uint, error)
 			return m.GetID(), nil
 		}
 	}
-	return 0, libD.ErrInvalidArgument
+	names := make([]string, 0)
+	for _, data := range r.data {
+		names = append(names, string(data.GetName()))
+	}
+	return 0, liberrors.Errorf("unsupported studyType. studyType: %s, studyTypes: %v, err: %w", studyType, names, libD.ErrInvalidArgument)
 }
 
 func (r *studyTypes) ToStudyType(studyTypeID uint) (domain.StudyTypeName, error) {
@@ -66,7 +71,7 @@ func (r *studyTypes) ToStudyType(studyTypeID uint) (domain.StudyTypeName, error)
 		}
 	}
 
-	return "", libD.ErrInvalidArgument
+	return "", liberrors.Errorf("unsupported studyTypeID. studyTypeID: %d, err: %w", studyTypeID, libD.ErrInvalidArgument)
 }
 
 func (r *studyTypes) Values() []domain.StudyType {

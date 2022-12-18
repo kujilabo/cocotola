@@ -56,13 +56,17 @@ func Test_statRepository_FindStat(t *testing.T) {
 		// }
 		assert.Equal(t, stat.GetUserID(), userD.AppUserID(user1.GetID()))
 		// yesterday
-		assert.Equal(t, stat.GetHistory().Results[6].Date.Format(time.RFC3339), today.AddDate(0, 0, -1).Format(time.RFC3339))
-		assert.Equal(t, stat.GetHistory().Results[6].Answered, 21)
-		assert.Equal(t, stat.GetHistory().Results[6].Mastered, 41)
+		assert.Equal(t, stat.GetHistory().Results[6].Date.Format(time.RFC3339), today.AddDate(0, 0, 0).Format(time.RFC3339))
+		assert.Equal(t, stat.GetHistory().Results[6].Answered, 0)
+		assert.Equal(t, stat.GetHistory().Results[6].Mastered, 0)
 		// two days ago
-		assert.Equal(t, stat.GetHistory().Results[5].Date.Format(time.RFC3339), today.AddDate(0, 0, -2).Format(time.RFC3339))
-		assert.Equal(t, stat.GetHistory().Results[5].Answered, 12)
-		assert.Equal(t, stat.GetHistory().Results[5].Mastered, 22)
+		assert.Equal(t, stat.GetHistory().Results[5].Date.Format(time.RFC3339), today.AddDate(0, 0, -1).Format(time.RFC3339))
+		assert.Equal(t, stat.GetHistory().Results[5].Answered, 21)
+		assert.Equal(t, stat.GetHistory().Results[5].Mastered, 41)
+		// two days ago
+		assert.Equal(t, stat.GetHistory().Results[4].Date.Format(time.RFC3339), today.AddDate(0, 0, -2).Format(time.RFC3339))
+		assert.Equal(t, stat.GetHistory().Results[4].Answered, 12)
+		assert.Equal(t, stat.GetHistory().Results[4].Mastered, 22)
 	}
 	testDB(t, fn)
 }

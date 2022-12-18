@@ -20,6 +20,7 @@ go_library(
         "stat.go",
         "stat_repository.go",
         "student.go",
+        "study_observer.go",
         "study_record_repository.go",
         "study_stat_repository.go",
         "study_type_repository.go",

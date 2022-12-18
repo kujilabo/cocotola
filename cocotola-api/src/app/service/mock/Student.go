@@ -46,11 +46,11 @@ func (_m *Student) AddWorkbookToPersonalSpace(ctx context.Context, parameter ser
 }
 
 // CheckQuota provides a mock function with given fields: ctx, problemType, name
-func (_m *Student) CheckQuota(ctx context.Context, problemType string, name service.QuotaName) error {
+func (_m *Student) CheckQuota(ctx context.Context, problemType domain.ProblemTypeName, name service.QuotaName) error {
 	ret := _m.Called(ctx, problemType, name)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, service.QuotaName) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ProblemTypeName, service.QuotaName) error); ok {
 		r0 = rf(ctx, problemType, name)
 	} else {
 		r0 = ret.Error(0)
@@ -60,11 +60,11 @@ func (_m *Student) CheckQuota(ctx context.Context, problemType string, name serv
 }
 
 // FindRecordbook provides a mock function with given fields: ctx, workbookID, studyType
-func (_m *Student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType string) (service.Recordbook, error) {
+func (_m *Student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (service.Recordbook, error) {
 	ret := _m.Called(ctx, workbookID, studyType)
 
 	var r0 service.Recordbook
-	if rf, ok := ret.Get(0).(func(context.Context, domain.WorkbookID, string) service.Recordbook); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.WorkbookID, domain.StudyTypeName) service.Recordbook); ok {
 		r0 = rf(ctx, workbookID, studyType)
 	} else {
 		if ret.Get(0) != nil {
@@ -73,7 +73,7 @@ func (_m *Student) FindRecordbook(ctx context.Context, workbookID domain.Workboo
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.WorkbookID, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.WorkbookID, domain.StudyTypeName) error); ok {
 		r1 = rf(ctx, workbookID, studyType)
 	} else {
 		r1 = ret.Error(1)

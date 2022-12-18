@@ -19,7 +19,6 @@ go_library(
     deps = [
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
-        "//lib/domain",
         "//lib/errors",
         "//lib/gateway",
         "//lib/passwordhelper",

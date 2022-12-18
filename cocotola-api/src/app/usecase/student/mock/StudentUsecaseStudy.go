@@ -20,11 +20,11 @@ type StudentUsecaseStudy struct {
 }
 
 // FindResults provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, studyType
-func (_m *StudentUsecaseStudy) FindResults(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, studyType string) ([]appdomain.StudyRecordWithProblemID, error) {
+func (_m *StudentUsecaseStudy) FindResults(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, studyType appdomain.StudyTypeName) ([]appdomain.StudyRecordWithProblemID, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, studyType)
 
 	var r0 []appdomain.StudyRecordWithProblemID
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, string) []appdomain.StudyRecordWithProblemID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.StudyTypeName) []appdomain.StudyRecordWithProblemID); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, studyType)
 	} else {
 		if ret.Get(0) != nil {
@@ -33,7 +33,7 @@ func (_m *StudentUsecaseStudy) FindResults(ctx context.Context, organizationID d
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.StudyTypeName) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, workbookID, studyType)
 	} else {
 		r1 = ret.Error(1)
@@ -43,15 +43,15 @@ func (_m *StudentUsecaseStudy) FindResults(ctx context.Context, organizationID d
 }
 
 // GetCompletionRate provides a mock function with given fields: ctx, organizationID, operatorID, workbookID
-func (_m *StudentUsecaseStudy) GetCompletionRate(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID) (map[string]int, error) {
+func (_m *StudentUsecaseStudy) GetCompletionRate(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID) (map[appdomain.StudyTypeName]int, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID)
 
-	var r0 map[string]int
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID) map[string]int); ok {
+	var r0 map[appdomain.StudyTypeName]int
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID) map[appdomain.StudyTypeName]int); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[string]int)
+			r0 = ret.Get(0).(map[appdomain.StudyTypeName]int)
 		}
 	}
 
@@ -66,11 +66,11 @@ func (_m *StudentUsecaseStudy) GetCompletionRate(ctx context.Context, organizati
 }
 
 // SetResult provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, studyType, problemID, result, mastered
-func (_m *StudentUsecaseStudy) SetResult(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, studyType string, problemID appdomain.ProblemID, result bool, mastered bool) error {
+func (_m *StudentUsecaseStudy) SetResult(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, studyType appdomain.StudyTypeName, problemID appdomain.ProblemID, result bool, mastered bool) error {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, studyType, problemID, result, mastered)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, string, appdomain.ProblemID, bool, bool) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.StudyTypeName, appdomain.ProblemID, bool, bool) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, studyType, problemID, result, mastered)
 	} else {
 		r0 = ret.Error(0)

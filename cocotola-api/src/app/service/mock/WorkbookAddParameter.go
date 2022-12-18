@@ -45,14 +45,14 @@ func (_m *WorkbookAddParameter) GetName() string {
 }
 
 // GetProblemType provides a mock function with given fields:
-func (_m *WorkbookAddParameter) GetProblemType() string {
+func (_m *WorkbookAddParameter) GetProblemType() domain.ProblemTypeName {
 	ret := _m.Called()
 
-	var r0 string
-	if rf, ok := ret.Get(0).(func() string); ok {
+	var r0 domain.ProblemTypeName
+	if rf, ok := ret.Get(0).(func() domain.ProblemTypeName); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(string)
+		r0 = ret.Get(0).(domain.ProblemTypeName)
 	}
 
 	return r0

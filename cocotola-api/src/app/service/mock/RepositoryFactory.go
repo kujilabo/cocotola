@@ -7,6 +7,8 @@ import (
 
 	appservice "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 
+	domain "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
+
 	mock "github.com/stretchr/testify/mock"
 
 	service "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
@@ -45,11 +47,11 @@ func (_m *RepositoryFactory) NewJobRepositoryFactory(ctx context.Context) (servi
 }
 
 // NewProblemRepository provides a mock function with given fields: ctx, problemType
-func (_m *RepositoryFactory) NewProblemRepository(ctx context.Context, problemType string) (appservice.ProblemRepository, error) {
+func (_m *RepositoryFactory) NewProblemRepository(ctx context.Context, problemType domain.ProblemTypeName) (appservice.ProblemRepository, error) {
 	ret := _m.Called(ctx, problemType)
 
 	var r0 appservice.ProblemRepository
-	if rf, ok := ret.Get(0).(func(context.Context, string) appservice.ProblemRepository); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ProblemTypeName) appservice.ProblemRepository); ok {
 		r0 = rf(ctx, problemType)
 	} else {
 		if ret.Get(0) != nil {
@@ -58,7 +60,7 @@ func (_m *RepositoryFactory) NewProblemRepository(ctx context.Context, problemTy
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.ProblemTypeName) error); ok {
 		r1 = rf(ctx, problemType)
 	} else {
 		r1 = ret.Error(1)

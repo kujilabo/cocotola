@@ -44,11 +44,11 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 	// problemTypes := []domain.ProblemType{englishWord}
 	// studyTypes := []domain.StudyType{memorization, dictation}
 
-	problemAddProcessor := map[string]service.ProblemAddProcessor{}
-	problemUpdateProcessor := map[string]service.ProblemUpdateProcessor{}
-	problemRemoveProcessor := map[string]service.ProblemRemoveProcessor{}
-	problemImportProcessor := map[string]service.ProblemImportProcessor{}
-	problemQuotaProcessor := map[string]service.ProblemQuotaProcessor{}
+	problemAddProcessor := map[domain.ProblemTypeName]service.ProblemAddProcessor{}
+	problemUpdateProcessor := map[domain.ProblemTypeName]service.ProblemUpdateProcessor{}
+	problemRemoveProcessor := map[domain.ProblemTypeName]service.ProblemRemoveProcessor{}
+	problemImportProcessor := map[domain.ProblemTypeName]service.ProblemImportProcessor{}
+	problemQuotaProcessor := map[domain.ProblemTypeName]service.ProblemQuotaProcessor{}
 
 	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
 		return jobG.NewRepositoryFactory(ctx, db)
@@ -71,7 +71,7 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 		require.NoError(t, err)
 
 		problemRepository := new(service_mock.ProblemRepository)
-		problemRepositories := map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error){
+		problemRepositories := map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error){
 			englishWordName: func(context.Context, *gorm.DB) (service.ProblemRepository, error) {
 				return problemRepository, nil
 			},

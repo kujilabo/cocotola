@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	studentU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student"
@@ -23,7 +22,7 @@ import (
 	"github.com/kujilabo/cocotola/lib/controller/middleware"
 )
 
-type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType domain.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error)
+type NewIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error)
 
 type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error
 
