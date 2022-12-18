@@ -160,11 +160,11 @@ func (_m *StudentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, o
 }
 
 // ImportProblems provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, newIterator
-func (_m *StudentUsecaseProblem) ImportProblems(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, newIterator func(appdomain.WorkbookID, string) (service.ProblemAddParameterIterator, error)) error {
+func (_m *StudentUsecaseProblem) ImportProblems(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, newIterator func(appdomain.WorkbookID, appdomain.ProblemTypeName) (service.ProblemAddParameterIterator, error)) error {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, newIterator)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, func(appdomain.WorkbookID, string) (service.ProblemAddParameterIterator, error)) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, func(appdomain.WorkbookID, appdomain.ProblemTypeName) (service.ProblemAddParameterIterator, error)) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, newIterator)
 	} else {
 		r0 = ret.Error(0)

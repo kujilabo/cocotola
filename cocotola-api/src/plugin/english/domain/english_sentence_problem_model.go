@@ -7,7 +7,7 @@ import (
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 )
 
-const EnglishSentenceProblemType = "english_sentence"
+const EnglishSentenceProblemType = appD.ProblemTypeName("english_sentence")
 
 type EnglishSentenceProblemModel interface {
 	appD.ProblemModel

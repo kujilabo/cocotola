@@ -9,7 +9,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
@@ -38,66 +37,29 @@ func (e *recordbookEntity) TableName() string {
 }
 
 type recordbookRepository struct {
-	rf           service.RepositoryFactory
 	db           *gorm.DB
-	problemTypes []domain.ProblemType
-	studyTypes   []domain.StudyType
+	rf           service.RepositoryFactory
+	problemTypes ProblemTypes
+	studyTypes   StudyTypes
 }
 
-func newRecordbookRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB, problemTypes []domain.ProblemType, studyTypes []domain.StudyType) service.RecordbookRepository {
+func newRecordbookRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory, problemTypes ProblemTypes, studyTypes StudyTypes) service.RecordbookRepository {
 	if db == nil {
 		panic(errors.New("db is nil"))
 	}
 	return &recordbookRepository{
-		rf:           rf,
 		db:           db,
+		rf:           rf,
 		problemTypes: problemTypes,
 		studyTypes:   studyTypes,
 	}
 }
 
-// func (r *studyResultRepository) toStudyType(studyTypeID uint) string {
-// 	for _, m := range r.studyTypes {
-// 		if m.GetID() == studyTypeID {
-// 			return m.GetName()
-// 		}
-// 	}
-// 	return ""
-// }
-
-func (r *recordbookRepository) toProblemTypeID(problemType string) (uint, error) {
-	for _, m := range r.problemTypes {
-		if m.GetName() == problemType {
-			return m.GetID(), nil
-		}
-	}
-	return 0, libD.ErrInvalidArgument
-}
-
-func (r *recordbookRepository) toStudyTypeID(studyType string) (uint, error) {
-	for _, m := range r.studyTypes {
-		if m.GetName() == studyType {
-			return m.GetID(), nil
-		}
-	}
-	return 0, libD.ErrInvalidArgument
-}
-
-func (r *recordbookRepository) toStudyType(studyTypeID uint) (string, error) {
-	for _, m := range r.studyTypes {
-		if m.GetID() == studyTypeID {
-			return m.GetName(), nil
-		}
-	}
-
-	return "", libD.ErrInvalidArgument
-}
-
-func (r *recordbookRepository) FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string) (map[domain.ProblemID]domain.StudyRecord, error) {
+func (r *recordbookRepository) FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (map[domain.ProblemID]domain.StudyRecord, error) {
 	_, span := tracer.Start(ctx, "recordbookRepository.FindStudyResults")
 	defer span.End()
 
-	studyTypeID, err := r.toStudyTypeID(studyType)
+	studyTypeID, err := r.studyTypes.ToStudyTypeID(studyType)
 	if err != nil {
 		return nil, liberrors.Errorf("unsupported studyType. studyType: %s", studyType)
 	}
@@ -123,16 +85,16 @@ func (r *recordbookRepository) FindStudyRecords(ctx context.Context, operator do
 	return results, nil
 }
 
-func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult, mastered bool) error {
+func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName, problemType domain.ProblemTypeName, problemID domain.ProblemID, studyResult, mastered bool) error {
 	ctx, span := tracer.Start(ctx, "recordbookRepository.SetResult")
 	defer span.End()
 
-	studyTypeID, err := r.toStudyTypeID(studyType)
+	studyTypeID, err := r.studyTypes.ToStudyTypeID(studyType)
 	if err != nil {
 		return liberrors.Errorf("unsupported studyType. studyType: %s, err: %w", studyType, err)
 	}
 
-	problemTypeID, err := r.toProblemTypeID(problemType)
+	problemTypeID, err := r.problemTypes.ToProblemTypeID(problemType)
 	if err != nil {
 		return liberrors.Errorf("unsupported problemType. problemType: %s, err:%w", problemType, err)
 	}
@@ -260,7 +222,7 @@ func (r *recordbookRepository) setMastered(ctx context.Context, operator domain.
 	return nil
 }
 
-func (r *recordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
+func (r *recordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[domain.StudyTypeName]int, error) {
 	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
 	defer span.End()
 
@@ -282,11 +244,11 @@ func (r *recordbookRepository) CountMasteredProblems(ctx context.Context, operat
 		return nil, result.Error
 	}
 
-	resultMap := make(map[string]int)
-	for _, studyType1 := range r.studyTypes {
+	resultMap := make(map[domain.StudyTypeName]int)
+	for _, studyType1 := range r.studyTypes.Values() {
 		resultMap[studyType1.GetName()] = 0
 		for _, result := range results {
-			studyType2, err := r.toStudyType(uint(result.StudyTypeID))
+			studyType2, err := r.studyTypes.ToStudyType(uint(result.StudyTypeID))
 			if err != nil {
 				return nil, err
 			}

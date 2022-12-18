@@ -29,6 +29,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller"
+	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appG "github.com/kujilabo/cocotola/cocotola-api/src/app/gateway"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
@@ -56,11 +57,12 @@ import (
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/log"
+	"github.com/kujilabo/cocotola/lib/timeutil"
 )
 
 const readHeaderTimeout = time.Duration(30) * time.Second
 
-const jobIntervalSec = 5
+const jobIntervalSec = 300
 
 // type newIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error)
 
@@ -113,7 +115,7 @@ func main() {
 
 	pf, problemRepositories, problemImportProcessor := initPf(synthesizer, translatorClient, tatoebaClient)
 
-	newIterator := func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error) {
+	newIterator := func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error) {
 		processor, ok := problemImportProcessor[problemType]
 		if ok {
 			return processor.CreateCSVReader(ctx, workbookID, reader)
@@ -144,11 +146,11 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	if *env == "local" {
+	if appEnv == "local" {
 		initLocalEnv(ctx, jobTransaction, appTransaction)
 	}
 
-	result := run(context.Background(), cfg, appTransaction, db, pf, rff, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
+	result := run(context.Background(), cfg, appTransaction, pf, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
 
 	time.Sleep(gracefulShutdownTime2)
 	logrus.Info("exited")
@@ -191,7 +193,7 @@ func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff use
 	return jobTransaction, authTransaction, appTransaction, nil
 }
 
-func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
+func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, pf appS.ProcessorFactory, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -200,7 +202,7 @@ func run(ctx context.Context, cfg *config.Config, transaction service.Transactio
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg, db, pf, rff, authTransaction, jobTransaction, appTransaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return appServer(ctx, cfg, pf, authTransaction, jobTransaction, appTransaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
 	})
 	eg.Go(func() error {
 		return jobServer(ctx, cfg, jobTransaction, appTransaction)
@@ -223,7 +225,51 @@ func run(ctx context.Context, cfg *config.Config, transaction service.Transactio
 	return 0
 }
 
-func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.ProcessorFactory, rff appG.RepositoryFactoryFunc, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
+type studyStatUpdater struct {
+	systemOwnerModel userD.SystemOwnerModel
+	appTransaction   appS.Transaction
+}
+
+func (o *studyStatUpdater) Update(ctx context.Context, studyNotification service.StudyEvent) error {
+	logrus.Warn("-===========Update========")
+	return o.appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		studyRepo := rf.NewStudyStatRepository(ctx)
+		today := timeutil.Today()
+		if err := studyRepo.AggregateResults(ctx, o.systemOwnerModel, today, studyNotification.GetAppUserID()); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func getSystemOwnerModel(ctx context.Context, appTransaction appS.Transaction, orgName string) (userD.SystemOwnerModel, error) {
+	var systemOwnerModel userD.SystemOwnerModel
+	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		userRf, err := rf.NewUserRepositoryFactory(ctx)
+		if err != nil {
+			return err
+		}
+
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return err
+		}
+
+		appUserRepo := userRf.NewAppUserRepository(ctx)
+
+		tmpSystemOwnerModel, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, systemAdmin, orgName)
+		if err != nil {
+			return err
+		}
+		systemOwnerModel = tmpSystemOwnerModel
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+	return systemOwnerModel, nil
+}
+
+func appServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
@@ -239,22 +285,30 @@ func appServer(ctx context.Context, cfg *config.Config, db *gorm.DB, pf appS.Pro
 	googleAuthClient := authG.NewGoogleAuthClient(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL, time.Duration(cfg.Auth.APITimeoutSec)*time.Second)
 
 	registerAppUserCallback := func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error {
-		rf, err := rff(ctx, db)
-		if err != nil {
-			return err
-		}
-		userRf, err := rf.NewUserRepositoryFactory(ctx)
-		if err != nil {
-			return err
-		}
-		return callback(ctx, cfg.App.TestUserEmail, pf, rf, userRf, organizationName, appUser)
+		return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+			return callback(ctx, cfg.App.TestUserEmail, pf, rf, organizationName, appUser)
+		})
+	}
+
+	systemOwnerModel, err := getSystemOwnerModel(ctx, appTransaction, "cocotola")
+	if err != nil {
+		return err
+	}
+	problemMonitor := service.NewProblemMonitor()
+	studyMonitor := service.NewStudyMonitor()
+	studyStatUpdater := studyStatUpdater{
+		systemOwnerModel: systemOwnerModel,
+		appTransaction:   appTransaction,
+	}
+	if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
+		return err
 	}
 
 	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback)
 	guestUserUsecase := authU.NewGuestUserUsecase(authTransaction, authTokenManager)
 	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(appTransaction, pf)
-	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(appTransaction, pf)
-	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(appTransaction, pf)
+	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(appTransaction, pf, problemMonitor)
+	studentUseCaseStudy := studentU.NewStudentUsecaseStudy(appTransaction, pf, studyMonitor)
 	studentUsecaseAudio := studentU.NewStudentUsecaseAudio(appTransaction, pf, synthesizerClient)
 	studentUsecaseStat := studentU.NewStudentUsecaseStat(appTransaction, pf)
 
@@ -360,30 +414,30 @@ func jobServer(ctx context.Context, cfg *config.Config, jobTransaction jobS.Tran
 	}
 }
 
-func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient) (appS.ProcessorFactory, map[string]func(context.Context, *gorm.DB) (appS.ProblemRepository, error), map[string]appS.ProblemImportProcessor) {
+func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient) (appS.ProcessorFactory, map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (appS.ProblemRepository, error), map[appD.ProblemTypeName]appS.ProblemImportProcessor) {
 
 	englishWordProblemProcessor := pluginEnglishS.NewEnglishWordProblemProcessor(synthesizerClient, translatorClient, tatoebaClient, pluginEnglishGateway.NewEnglishWordProblemAddParameterCSVReader)
 	englishPhraseProblemProcessor := pluginEnglishS.NewEnglishPhraseProblemProcessor(synthesizerClient, translatorClient)
 	englishSentenceProblemProcessor := pluginEnglishS.NewEnglishSentenceProblemProcessor(synthesizerClient, translatorClient, pluginEnglishGateway.NewEnglishSentenceProblemAddParameterCSVReader)
 
-	problemAddProcessor := map[string]appS.ProblemAddProcessor{
+	problemAddProcessor := map[domain.ProblemTypeName]appS.ProblemAddProcessor{
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
 		pluginEnglishDomain.EnglishPhraseProblemType:   englishPhraseProblemProcessor,
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
-	problemUpdateProcessor := map[string]appS.ProblemUpdateProcessor{
+	problemUpdateProcessor := map[domain.ProblemTypeName]appS.ProblemUpdateProcessor{
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
-	problemRemoveProcessor := map[string]appS.ProblemRemoveProcessor{
+	problemRemoveProcessor := map[domain.ProblemTypeName]appS.ProblemRemoveProcessor{
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
 		pluginEnglishDomain.EnglishPhraseProblemType:   englishPhraseProblemProcessor,
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
-	problemImportProcessor := map[string]appS.ProblemImportProcessor{
+	problemImportProcessor := map[domain.ProblemTypeName]appS.ProblemImportProcessor{
 		pluginEnglishDomain.EnglishWordProblemType: englishWordProblemProcessor,
 	}
-	problemQuotaProcessor := map[string]appS.ProblemQuotaProcessor{
+	problemQuotaProcessor := map[domain.ProblemTypeName]appS.ProblemQuotaProcessor{
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemProcessor,
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemProcessor,
 	}
@@ -402,7 +456,7 @@ func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCom
 
 	pf := appS.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
-	problemRepositories := map[string]func(context.Context, *gorm.DB) (appS.ProblemRepository, error){
+	problemRepositories := map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (appS.ProblemRepository, error){
 		pluginEnglishDomain.EnglishWordProblemType:     englishWordProblemRepositoryFunc,
 		pluginEnglishDomain.EnglishPhraseProblemType:   englishPhraseProblemRepositoryFunc,
 		pluginEnglishDomain.EnglishSentenceProblemType: englishSentenceProblemRepositoryFunc,
@@ -663,7 +717,7 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 	return nil
 }
 
-func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactory, repo appS.RepositoryFactory, userRepo userS.RepositoryFactory, organizationName string, appUser userD.AppUserModel) error {
+func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactory, rf appS.RepositoryFactory, organizationName string, appUser userD.AppUserModel) error {
 	logger := log.FromContext(ctx)
 	logger.Infof("callback. loginID: %s", appUser.GetLoginID())
 
@@ -673,7 +727,7 @@ func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactor
 			return liberrors.Errorf("NewStudentModel. err: %w", err)
 		}
 
-		student, err := appS.NewStudent(ctx, pf, repo, studentModel)
+		student, err := appS.NewStudent(ctx, pf, rf, studentModel)
 		if err != nil {
 			return liberrors.Errorf("NewStudent. err: %w", err)
 		}

@@ -11,6 +11,7 @@ import (
 
 	jobD "github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	jobS "github.com/kujilabo/cocotola/cocotola-api/src/job/service"
+	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
 
@@ -109,8 +110,6 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 
 	makeJobFunc := func(targetDate time.Time) func(context.Context) error {
 		return func(ctx context.Context) error {
-			pageNo := 1
-			pageSize := userFetchSize
 			return u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 				systemOwner, userRf, rf, err := u.getSystemOwnerAndRepositoryFactory(ctx, systemAdmin, rf)
 				if err != nil {
@@ -121,23 +120,13 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 
 				userRepo := userRf.NewAppUserRepository(ctx)
 
-				for {
-					userIDs, err := userRepo.FindAppUserIDs(ctx, systemOwner, pageNo, pageSize)
-					if err != nil {
+				if err := u.doSomethingForAllUsersWithAppUserID(ctx, userRepo, systemOwner, func(ctx context.Context, userID userD.AppUserID) error {
+					if err := studyStatRepo.AggregateResults(ctx, systemOwner, targetDate, userID); err != nil {
 						return err
 					}
-
-					if len(userIDs) == 0 {
-						break
-					}
-
-					for _, userID := range userIDs {
-						if err := studyStatRepo.AggregateResults(ctx, systemOwner, targetDate, userID); err != nil {
-							return err
-						}
-					}
-
-					pageNo++
+					return nil
+				}); err != nil {
+					return err
 				}
 
 				return nil
@@ -160,6 +149,31 @@ func (u *jobUsecaseStat) AggregateStudyResultsOfAllUsers(ctx context.Context, sy
 		if err := u.jobService.StartJob(ctx, job); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (u *jobUsecaseStat) doSomethingForAllUsersWithAppUserID(ctx context.Context, userRepo userS.AppUserRepository, systemOwner userD.SystemOwnerModel, fn func(ctx context.Context, userID userD.AppUserID) error) error {
+	pageNo := 1
+	pageSize := userFetchSize
+	for {
+		userIDs, err := userRepo.FindAppUserIDs(ctx, systemOwner, pageNo, pageSize)
+		if err != nil {
+			return err
+		}
+
+		if len(userIDs) == 0 {
+			break
+		}
+
+		for _, userID := range userIDs {
+			if err := fn(ctx, userID); err != nil {
+				return err
+			}
+		}
+
+		pageNo++
 	}
 
 	return nil

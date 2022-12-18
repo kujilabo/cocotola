@@ -2,6 +2,7 @@ package english_word
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -373,6 +374,12 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 	param, err := appS.NewWorkbookAddParameter(pluginEnglishDomain.EnglishWordProblemType, workbookName, appD.Lang2JA, "", workbookProperties)
 	if err != nil {
 		return liberrors.Errorf("failed to NewWorkbookAddParameter. err: %w", err)
+	}
+
+	if _, err := student.FindWorkbookByName(ctx, workbookName); err == nil {
+		return nil
+	} else if !errors.Is(err, appS.ErrWorkbookNotFound) {
+		return err
 	}
 
 	workbookID, err := student.AddWorkbookToPersonalSpace(ctx, param)

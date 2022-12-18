@@ -79,7 +79,7 @@ func (m *workbookSearchResult) GetResults() []domain.WorkbookModel {
 }
 
 type WorkbookAddParameter interface {
-	GetProblemType() string
+	GetProblemType() domain.ProblemTypeName
 	GetName() string
 	GetLang2() domain.Lang2
 	GetQuestionText() string
@@ -87,14 +87,14 @@ type WorkbookAddParameter interface {
 }
 
 type workbookAddParameter struct {
-	ProblemType  string
+	ProblemType  domain.ProblemTypeName
 	Name         string
 	Lang2        domain.Lang2
 	QuestionText string
 	Properties   map[string]string
 }
 
-func NewWorkbookAddParameter(problemType string, name string, lang2 domain.Lang2, questionText string, properties map[string]string) (WorkbookAddParameter, error) {
+func NewWorkbookAddParameter(problemType domain.ProblemTypeName, name string, lang2 domain.Lang2, questionText string, properties map[string]string) (WorkbookAddParameter, error) {
 	m := &workbookAddParameter{
 		ProblemType:  problemType,
 		Name:         name,
@@ -106,7 +106,7 @@ func NewWorkbookAddParameter(problemType string, name string, lang2 domain.Lang2
 	return m, libD.Validator.Struct(m)
 }
 
-func (p *workbookAddParameter) GetProblemType() string {
+func (p *workbookAddParameter) GetProblemType() domain.ProblemTypeName {
 	return p.ProblemType
 }
 

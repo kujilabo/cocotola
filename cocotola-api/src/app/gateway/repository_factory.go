@@ -21,12 +21,12 @@ type repositoryFactory struct {
 	driverName          string
 	userRff             userG.RepositoryFactoryFunc
 	pf                  service.ProcessorFactory
-	problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)
-	problemTypes        []domain.ProblemType
-	studyTypes          []domain.StudyType
+	problemRepositories map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error)
+	problemTypes        ProblemTypes
+	studyTypes          StudyTypes
 }
 
-func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemRepositories map[string]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemRepositories map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
 	if db == nil {
 		panic(errors.New("db is nil"))
 	}
@@ -49,16 +49,16 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, j
 		userRff:             userRff,
 		pf:                  pf,
 		problemRepositories: problemRepositories,
-		problemTypes:        problemTypes,
-		studyTypes:          studyTypes,
+		problemTypes:        NewProblemTypes(problemTypes),
+		studyTypes:          NewStudyTypes(studyTypes),
 	}, nil
 }
 
 func (f *repositoryFactory) NewWorkbookRepository(ctx context.Context) service.WorkbookRepository {
-	return newWorkbookRepository(ctx, f.driverName, f, f.pf, f.db, f.problemTypes)
+	return newWorkbookRepository(ctx, f.driverName, f.pf, f.db, f, f.problemTypes)
 }
 
-func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemType string) (service.ProblemRepository, error) {
+func (f *repositoryFactory) NewProblemRepository(ctx context.Context, problemType domain.ProblemTypeName) (service.ProblemRepository, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("problemType: %s", problemType)
 	problemRepository, ok := f.problemRepositories[problemType]
@@ -78,11 +78,11 @@ func (f *repositoryFactory) NewStudyTypeRepository(ctx context.Context) service.
 }
 
 func (f *repositoryFactory) NewStudyRecordRepository(ctx context.Context) service.StudyRecordRepository {
-	return newStudyRecordRepository(ctx, f, f.db)
+	return newStudyRecordRepository(ctx, f.db, f, f.problemTypes, f.studyTypes)
 }
 
 func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) service.RecordbookRepository {
-	return newRecordbookRepository(ctx, f, f.db, f.problemTypes, f.studyTypes)
+	return newRecordbookRepository(ctx, f.db, f, f.problemTypes, f.studyTypes)
 }
 
 func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) service.UserQuotaRepository {

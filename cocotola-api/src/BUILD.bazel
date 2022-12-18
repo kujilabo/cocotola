@@ -34,6 +34,7 @@ go_library(
         "//lib/errors",
         "//lib/gateway",
         "//lib/log",
+        "//lib/timeutil",
         "@com_github_gin_gonic_gin//:gin",
         "@com_github_go_co_op_gocron//:gocron",
         "@com_github_golang_jwt_jwt//:jwt",

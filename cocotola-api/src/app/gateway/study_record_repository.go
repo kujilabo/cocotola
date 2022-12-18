@@ -34,18 +34,31 @@ func (e *studyRecordEntity) TableName() string {
 }
 
 type studyRecordRepository struct {
-	rf service.RepositoryFactory
-	db *gorm.DB
+	db           *gorm.DB
+	rf           service.RepositoryFactory
+	problemTypes ProblemTypes
+	studyTypes   StudyTypes
 }
 
-func newStudyRecordRepository(ctx context.Context, rf service.RepositoryFactory, db *gorm.DB) service.StudyRecordRepository {
+func newStudyRecordRepository(ctx context.Context, db *gorm.DB, rf service.RepositoryFactory, problemTypes ProblemTypes, studyTypes StudyTypes) service.StudyRecordRepository {
 	return &studyRecordRepository{
-		rf: rf,
-		db: db,
+		db:           db,
+		rf:           rf,
+		problemTypes: problemTypes,
+		studyTypes:   studyTypes,
 	}
 }
 
-func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.SystemOwnerModel, appUserID userD.AppUserID, workbookID domain.WorkbookID, problemTypeID uint, studyTypeID uint, problemID domain.ProblemID, mastered bool) error {
+func (r *studyRecordRepository) AddRecord(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, problemType domain.ProblemTypeName, studyType domain.StudyTypeName, problemID domain.ProblemID, mastered bool) error {
+
+	problemTypeID, err := r.problemTypes.ToProblemTypeID(problemType)
+	if err != nil {
+		return err
+	}
+	studyTypeID, err := r.studyTypes.ToStudyTypeID(studyType)
+	if err != nil {
+		return err
+	}
 
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
@@ -53,7 +66,7 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	entity := studyRecordEntity{
 		ID:             libD.NewULID(),
 		OrganizationID: uint(operator.GetOrganizationID()),
-		AppUserID:      uint(appUserID),
+		AppUserID:      uint(operator.GetAppUserID()),
 		WorkbookID:     uint(workbookID),
 		ProblemTypeID:  problemTypeID,
 		StudyTypeID:    studyTypeID,
@@ -81,7 +94,7 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator userD.Sy
 	return nil
 }
 
-func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, targetUserID userD.AppUserID, targetDate time.Time) (*service.CountAnsweredResults, error) {
+func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, operator userD.SystemOwnerModel, targetUserID userD.AppUserID, targetDate time.Time) (*service.CountAnsweredResults, error) {
 	dateFormat := "2006-01-02"
 	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
 	defer span.End()

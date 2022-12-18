@@ -3,9 +3,11 @@ package domain
 
 import libD "github.com/kujilabo/cocotola/lib/domain"
 
+type StudyTypeName string
+
 type StudyType interface {
 	GetID() uint
-	GetName() string
+	GetName() StudyTypeName
 }
 
 type studyType struct {
@@ -26,6 +28,6 @@ func (m *studyType) GetID() uint {
 	return m.ID
 }
 
-func (m *studyType) GetName() string {
-	return m.Name
+func (m *studyType) GetName() StudyTypeName {
+	return StudyTypeName(m.Name)
 }

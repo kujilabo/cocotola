@@ -17,15 +17,15 @@ type RecordbookRepository struct {
 }
 
 // CountMasteredProblems provides a mock function with given fields: ctx, operator, workbookID
-func (_m *RecordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error) {
+func (_m *RecordbookRepository) CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[domain.StudyTypeName]int, error) {
 	ret := _m.Called(ctx, operator, workbookID)
 
-	var r0 map[string]int
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID) map[string]int); ok {
+	var r0 map[domain.StudyTypeName]int
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID) map[domain.StudyTypeName]int); ok {
 		r0 = rf(ctx, operator, workbookID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(map[string]int)
+			r0 = ret.Get(0).(map[domain.StudyTypeName]int)
 		}
 	}
 
@@ -40,11 +40,11 @@ func (_m *RecordbookRepository) CountMasteredProblems(ctx context.Context, opera
 }
 
 // FindStudyRecords provides a mock function with given fields: ctx, operator, workbookID, studyType
-func (_m *RecordbookRepository) FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string) (map[domain.ProblemID]domain.StudyRecord, error) {
+func (_m *RecordbookRepository) FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (map[domain.ProblemID]domain.StudyRecord, error) {
 	ret := _m.Called(ctx, operator, workbookID, studyType)
 
 	var r0 map[domain.ProblemID]domain.StudyRecord
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID, string) map[domain.ProblemID]domain.StudyRecord); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID, domain.StudyTypeName) map[domain.ProblemID]domain.StudyRecord); ok {
 		r0 = rf(ctx, operator, workbookID, studyType)
 	} else {
 		if ret.Get(0) != nil {
@@ -53,7 +53,7 @@ func (_m *RecordbookRepository) FindStudyRecords(ctx context.Context, operator d
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.WorkbookID, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.WorkbookID, domain.StudyTypeName) error); ok {
 		r1 = rf(ctx, operator, workbookID, studyType)
 	} else {
 		r1 = ret.Error(1)
@@ -63,11 +63,11 @@ func (_m *RecordbookRepository) FindStudyRecords(ctx context.Context, operator d
 }
 
 // SetResult provides a mock function with given fields: ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered
-func (_m *RecordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult bool, mastered bool) error {
+func (_m *RecordbookRepository) SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName, problemType domain.ProblemTypeName, problemID domain.ProblemID, studyResult bool, mastered bool) error {
 	ret := _m.Called(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID, string, string, domain.ProblemID, bool, bool) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID, domain.StudyTypeName, domain.ProblemTypeName, domain.ProblemID, bool, bool) error); ok {
 		r0 = rf(ctx, operator, workbookID, studyType, problemType, problemID, studyResult, mastered)
 	} else {
 		r0 = ret.Error(0)

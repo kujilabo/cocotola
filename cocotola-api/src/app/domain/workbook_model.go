@@ -15,7 +15,7 @@ type WorkbookModel interface {
 	GetOwnerID() userD.AppUserID
 	GetName() string
 	GetLang2() Lang2
-	GetProblemType() string
+	GetProblemType() ProblemTypeName
 	GetQuestionText() string
 	GetProperties() map[string]string
 	HasPrivilege(privilege userD.RBACAction) bool
@@ -28,12 +28,12 @@ type workbookModel struct {
 	privileges   userD.Privileges `validate:"required"`
 	Name         string           `validate:"required"`
 	Lang2        Lang2            `validate:"required,len=2"`
-	ProblemType  string           `validate:"required"`
+	ProblemType  ProblemTypeName  `validate:"required"`
 	QuestionText string
 	Properties   map[string]string
 }
 
-func NewWorkbookModel(model userD.Model, spaceID userD.SpaceID, ownerID userD.AppUserID, privileges userD.Privileges, name string, lang2 Lang2, problemType string, questsionText string, properties map[string]string) (WorkbookModel, error) {
+func NewWorkbookModel(model userD.Model, spaceID userD.SpaceID, ownerID userD.AppUserID, privileges userD.Privileges, name string, lang2 Lang2, problemType ProblemTypeName, questsionText string, properties map[string]string) (WorkbookModel, error) {
 	m := &workbookModel{
 		Model:        model,
 		spaceID:      spaceID,
@@ -69,7 +69,7 @@ func (m *workbookModel) GetLang2() Lang2 {
 	return m.Lang2
 }
 
-func (m *workbookModel) GetProblemType() string {
+func (m *workbookModel) GetProblemType() ProblemTypeName {
 	return m.ProblemType
 }
 

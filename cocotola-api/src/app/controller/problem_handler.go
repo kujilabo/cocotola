@@ -46,10 +46,10 @@ type ProblemHandler interface {
 
 type problemHandler struct {
 	studentUsecaseProblem studentU.StudentUsecaseProblem
-	newIterator           func(ctx context.Context, workbookID domain.WorkbookID, problemType string, reader io.Reader) (service.ProblemAddParameterIterator, error)
+	newIterator           func(ctx context.Context, workbookID domain.WorkbookID, problemType domain.ProblemTypeName, reader io.Reader) (service.ProblemAddParameterIterator, error)
 }
 
-func NewProblemHandler(studentUsecaseProblem studentU.StudentUsecaseProblem, newIterator func(ctx context.Context, workbookID domain.WorkbookID, problemType string, reader io.Reader) (service.ProblemAddParameterIterator, error)) (ProblemHandler, error) {
+func NewProblemHandler(studentUsecaseProblem studentU.StudentUsecaseProblem, newIterator func(ctx context.Context, workbookID domain.WorkbookID, problemType domain.ProblemTypeName, reader io.Reader) (service.ProblemAddParameterIterator, error)) (ProblemHandler, error) {
 	if studentUsecaseProblem == nil {
 		return nil, liberrors.Errorf("studentUsecaseProblem is nil. err: %w", libD.ErrInvalidArgument)
 	}
@@ -374,7 +374,7 @@ func (h *problemHandler) ImportProblems(c *gin.Context) {
 		}
 		defer multipartFile.Close()
 
-		newIterator := func(workbookID domain.WorkbookID, problemType string) (service.ProblemAddParameterIterator, error) {
+		newIterator := func(workbookID domain.WorkbookID, problemType domain.ProblemTypeName) (service.ProblemAddParameterIterator, error) {
 			return h.newIterator(ctx, workbookID, problemType, multipartFile)
 		}
 

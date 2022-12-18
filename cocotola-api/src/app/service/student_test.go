@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	problemType1          = "PROBLEM_TYPE_1"
-	problemType2          = "PROBLEM_TYPE_2"
+	problemType1          = domain.ProblemTypeName("PROBLEM_TYPE_1")
+	problemType2          = domain.ProblemTypeName("PROBLEM_TYPE_2")
 	studentLoginIDLength  = 20
 	studentUsernameLength = 20
 )
@@ -150,7 +150,7 @@ func Test_student_CheckQuota(t *testing.T) {
 	ctx := context.Background()
 
 	type args struct {
-		problemType string
+		problemType domain.ProblemTypeName
 		name        service.QuotaName
 	}
 	tests := []struct {
@@ -214,7 +214,7 @@ func Test_student_CheckQuota(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pf, rf, _, _, userQuotaRepo, problemQuotaProcessor := student_Init(t, ctx)
-			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
+			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, string(tt.args.problemType)+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
 			problemQuotaProcessor.On("GetUnitForSizeQuota").Return(service.QuotaUnitPersitance)
 			problemQuotaProcessor.On("GetLimitForSizeQuota").Return(tt.quotaLimit)
 			problemQuotaProcessor.On("GetUnitForUpdateQuota").Return(service.QuotaUnitDay)
@@ -225,7 +225,7 @@ func Test_student_CheckQuota(t *testing.T) {
 			student, err := service.NewStudent(ctx, pf, rf, studentModel)
 			require.NoError(t, err)
 			require.NotNil(t, student)
-			err = student.CheckQuota(ctx, tt.args.problemType, tt.args.name)
+			err = student.CheckQuota(ctx, (tt.args.problemType), tt.args.name)
 			if err == nil && tt.err != nil {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			} else if err != nil && tt.err == nil {
@@ -233,7 +233,7 @@ func Test_student_CheckQuota(t *testing.T) {
 			} else if err != nil && tt.err != nil && !errors.Is(err, tt.err) {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			}
-			userQuotaRepo.AssertCalled(t, "IsExceeded", mock.Anything, mock.Anything, mock.Anything, tt.args.problemType+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit)
+			userQuotaRepo.AssertCalled(t, "IsExceeded", mock.Anything, mock.Anything, mock.Anything, string(tt.args.problemType)+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit)
 			userQuotaRepo.AssertNumberOfCalls(t, "IsExceeded", 1)
 		})
 	}

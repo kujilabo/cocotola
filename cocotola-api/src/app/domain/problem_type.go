@@ -2,9 +2,11 @@ package domain
 
 import libD "github.com/kujilabo/cocotola/lib/domain"
 
+type ProblemTypeName string
+
 type ProblemType interface {
 	GetID() uint
-	GetName() string
+	GetName() ProblemTypeName
 }
 
 type problemType struct {
@@ -25,6 +27,6 @@ func (m *problemType) GetID() uint {
 	return m.ID
 }
 
-func (m *problemType) GetName() string {
-	return m.Name
+func (m *problemType) GetName() ProblemTypeName {
+	return ProblemTypeName(m.Name)
 }

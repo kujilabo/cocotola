@@ -60,7 +60,7 @@ func (h *recordbookHandler) FindRecordbook(c *gin.Context) {
 			c.Status(http.StatusBadRequest)
 			return nil
 		}
-		studyType := helper.GetStringFromPath(c, "studyType")
+		studyType := domain.StudyTypeName(helper.GetStringFromPath(c, "studyType"))
 
 		result, err := h.studentUsecaseStudy.FindResults(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType)
 		if err != nil {
@@ -88,7 +88,7 @@ func (h *recordbookHandler) SetStudyResult(c *gin.Context) {
 			c.Status(http.StatusBadRequest)
 			return nil
 		}
-		studyType := helper.GetStringFromPath(c, "studyType")
+		studyType := domain.StudyTypeName(helper.GetStringFromPath(c, "studyType"))
 		problemID, err := helper.GetUintFromPath(c, "problemID")
 		if err != nil {
 			return liberrors.Errorf("helper.GetUintFromPath. err: %w", err)

@@ -34,8 +34,9 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 	dateFormat := "2006-01-02"
 
-	startDate := today.AddDate(0, 0, -hisotrySize)
-	endDate := today.AddDate(0, 0, -1)
+	startDate := today.AddDate(0, 0, -hisotrySize+1)
+	// endDate := today.AddDate(0, 0,-1)
+	endDate := today.AddDate(0, 0, 0)
 	var entities []statEntity
 	if result := r.db.Debug().Select("app_user_id, record_date, sum(answered) as answered, sum(mastered) as mastered").
 		Table("study_stat").

@@ -34,7 +34,7 @@ type StudentUsecaseProblem interface {
 
 	RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2) error
 
-	ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType string) (service.ProblemAddParameterIterator, error)) error
+	ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType domain.ProblemTypeName) (service.ProblemAddParameterIterator, error)) error
 }
 
 type studentUsecaseProblem struct {
@@ -43,9 +43,11 @@ type studentUsecaseProblem struct {
 	problemMonitor service.ProblemMonitor
 }
 
-func NewStudentUsecaseProblem(transaction service.Transaction, pf service.ProcessorFactory) StudentUsecaseProblem {
+func NewStudentUsecaseProblem(transaction service.Transaction, pf service.ProcessorFactory, problemMonitor service.ProblemMonitor) StudentUsecaseProblem {
 	return &studentUsecaseProblem{
-		pf: pf,
+		transaction:    transaction,
+		pf:             pf,
+		problemMonitor: problemMonitor,
 	}
 }
 
@@ -229,11 +231,11 @@ func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationI
 	return nil
 }
 
-func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType string) (service.ProblemAddParameterIterator, error)) error {
+func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType domain.ProblemTypeName) (service.ProblemAddParameterIterator, error)) error {
 	logger := log.FromContext(ctx)
 	logger.Debug("ProblemService.ImportProblems")
 
-	var problemType string
+	var problemType domain.ProblemTypeName
 	{
 		if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 			_, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)

@@ -22,9 +22,9 @@ type CountAnsweredResults struct {
 }
 
 type RecordbookRepository interface {
-	FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string) (map[domain.ProblemID]domain.StudyRecord, error)
+	FindStudyRecords(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (map[domain.ProblemID]domain.StudyRecord, error)
 
-	SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType string, problemType string, problemID domain.ProblemID, studyResult, mastered bool) error
+	SetResult(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID, studyType domain.StudyTypeName, problemType domain.ProblemTypeName, problemID domain.ProblemID, studyResult, mastered bool) error
 
-	CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[string]int, error)
+	CountMasteredProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (map[domain.StudyTypeName]int, error)
 }

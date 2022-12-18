@@ -19,7 +19,7 @@ func ToWorkbookSearchResponse(result service.WorkbookSearchResult) (*entity.Work
 			Model:        model,
 			Name:         w.GetName(),
 			Lang2:        w.GetLang2().String(),
-			ProblemType:  w.GetProblemType(),
+			ProblemType:  string(w.GetProblemType()),
 			QuestionText: w.GetQuestionText(),
 		}
 	}
@@ -41,7 +41,7 @@ func ToWorkbookHTTPEntity(workbook domain.WorkbookModel) (entity.WorkbookRespons
 		},
 		Name:         workbook.GetName(),
 		Lang2:        workbook.GetLang2().String(),
-		ProblemType:  workbook.GetProblemType(),
+		ProblemType:  string(workbook.GetProblemType()),
 		QuestionText: workbook.GetQuestionText(),
 	}
 
@@ -49,7 +49,7 @@ func ToWorkbookHTTPEntity(workbook domain.WorkbookModel) (entity.WorkbookRespons
 }
 
 func ToWorkbookAddParameter(param *entity.WorkbookAddParameter) (service.WorkbookAddParameter, error) {
-	return service.NewWorkbookAddParameter(param.ProblemType, param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
+	return service.NewWorkbookAddParameter(domain.ProblemTypeName(param.ProblemType), param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
 		"audioEnabled": "false",
 	})
 }
