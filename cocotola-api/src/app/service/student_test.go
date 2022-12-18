@@ -225,7 +225,7 @@ func Test_student_CheckQuota(t *testing.T) {
 			student, err := service.NewStudent(ctx, pf, rf, studentModel)
 			require.NoError(t, err)
 			require.NotNil(t, student)
-			err = student.CheckQuota(ctx, domain.ProblemTypeName(tt.args.problemType), tt.args.name)
+			err = student.CheckQuota(ctx, (tt.args.problemType), tt.args.name)
 			if err == nil && tt.err != nil {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			} else if err != nil && tt.err == nil {

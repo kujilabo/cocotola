@@ -89,12 +89,12 @@ func (r *recordbookRepository) SetResult(ctx context.Context, operator domain.St
 	ctx, span := tracer.Start(ctx, "recordbookRepository.SetResult")
 	defer span.End()
 
-	studyTypeID, err := r.studyTypes.ToStudyTypeID(domain.StudyTypeName(studyType))
+	studyTypeID, err := r.studyTypes.ToStudyTypeID(studyType)
 	if err != nil {
 		return liberrors.Errorf("unsupported studyType. studyType: %s, err: %w", studyType, err)
 	}
 
-	problemTypeID, err := r.problemTypes.ToProblemTypeID(domain.ProblemTypeName(problemType))
+	problemTypeID, err := r.problemTypes.ToProblemTypeID(problemType)
 	if err != nil {
 		return liberrors.Errorf("unsupported problemType. problemType: %s, err:%w", problemType, err)
 	}
