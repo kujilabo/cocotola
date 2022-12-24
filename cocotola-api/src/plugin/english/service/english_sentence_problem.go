@@ -4,6 +4,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 const EnglishSentenceProblemType = "english_sentence"
@@ -24,5 +25,9 @@ func NewEnglishSentenceProblem(problemModel domain.EnglishSentenceProblemModel, 
 		ProblemFeature:              problem,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }

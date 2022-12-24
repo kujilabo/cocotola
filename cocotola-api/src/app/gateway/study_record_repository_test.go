@@ -1,3 +1,5 @@
+//go:build m
+
 package gateway_test
 
 import (
@@ -13,10 +15,11 @@ import (
 )
 
 func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
+	t.Parallel()
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
 
-	fn := func(ctx context.Context, ts testService) {
+	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)

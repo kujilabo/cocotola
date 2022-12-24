@@ -55,7 +55,7 @@ func (s *studentUsecaseStudy) FindResults(ctx context.Context, organizationID us
 		results = tmpResults
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindResults. err: %w", err)
 	}
 
 	return results, nil
@@ -79,7 +79,7 @@ func (s *studentUsecaseStudy) GetCompletionRate(ctx context.Context, organizatio
 		results = tmpResults
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("GetCompletionRate. err: %w", err)
 	}
 
 	return results, nil
@@ -95,7 +95,7 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 		}
 		workbook, err := student.FindWorkbookByID(ctx, workbookID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("student.FindWorkbookByID. err: %w", err)
 		}
 
 		problemType = workbook.GetProblemType()
@@ -108,7 +108,7 @@ func (s *studentUsecaseStudy) SetResult(ctx context.Context, organizationID user
 		}
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf("SetResult. err: %w", err)
 	}
 
 	studyEvent := service.NewStudyEvent(organizationID, operatorID, service.StudyEventTypeAnswer, problemType, studyType, problemID)

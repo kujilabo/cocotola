@@ -1,3 +1,4 @@
+//go:build s
 package controller_test
 
 import (
@@ -59,6 +60,7 @@ func initAudioRouter(t *testing.T, studentUsecaseAudio studentU.StudentUsecaseAu
 }
 
 func Test_FindAudioByID_OK(t *testing.T) {
+	t.Parallel()
 	logrus.SetLevel(logrus.WarnLevel)
 
 	// given

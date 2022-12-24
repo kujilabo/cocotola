@@ -14,6 +14,7 @@ import (
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
@@ -28,15 +29,20 @@ type translationResponse struct {
 func (r *translationResponse) toModel() (domain.Translation, error) {
 	pos, err := domain.NewWordPos(r.Pos)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewWordPos. err: %w", err)
 	}
 
 	lang2, err := appD.NewLang2(r.Lang2)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 	}
 
-	return domain.NewTranslation(r.Text, pos, lang2, r.Translated, r.Provider)
+	translation, err := domain.NewTranslation(r.Text, pos, lang2, r.Translated, r.Provider)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return translation, nil
 }
 
 type translationFindResponse struct {
@@ -48,7 +54,7 @@ func (r *translationFindResponse) toModel() ([]domain.Translation, error) {
 	for i, r := range r.Results {
 		m, err := r.toModel()
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("r.toModel. err: %w", err)
 		}
 		translationList[i] = m
 	}
@@ -81,7 +87,7 @@ func (c *translatorHTTPClient) DictionaryLookup(ctx context.Context, fromLang, t
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "dictionary", "lookup")
@@ -91,23 +97,23 @@ func (c *translatorHTTPClient) DictionaryLookup(ctx context.Context, fromLang, t
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := translationFindResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -119,7 +125,7 @@ func (c *translatorHTTPClient) DictionaryLookupWithPos(ctx context.Context, from
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "dictionary", "lookup")
@@ -130,23 +136,23 @@ func (c *translatorHTTPClient) DictionaryLookupWithPos(ctx context.Context, from
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := translationResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -158,7 +164,7 @@ func (c *translatorHTTPClient) FindTranslationsByFirstLetter(ctx context.Context
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "find")
@@ -168,28 +174,28 @@ func (c *translatorHTTPClient) FindTranslationsByFirstLetter(ctx context.Context
 
 	paramBytes, err := json.Marshal(paramMap)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), bytes.NewBuffer(paramBytes))
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := translationFindResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -201,30 +207,30 @@ func (c *translatorHTTPClient) FindTranslationByTextAndPos(ctx context.Context, 
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "text", text, "pos", strconv.Itoa(int(pos)))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(" c.errorHandle. err: %w", err)
 	}
 
 	response := translationResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -236,30 +242,30 @@ func (c *translatorHTTPClient) FindTranslationsByText(ctx context.Context, lang2
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "text", text)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := translationFindResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -271,7 +277,7 @@ func (c *translatorHTTPClient) AddTranslation(ctx context.Context, param service
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return err
+		return liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	paramMap := map[string]interface{}{
@@ -283,23 +289,23 @@ func (c *translatorHTTPClient) AddTranslation(ctx context.Context, param service
 
 	paramBytes, err := json.Marshal(paramMap)
 	if err != nil {
-		return err
+		return liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(paramBytes))
 	if err != nil {
-		return err
+		return liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return err
+		return liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return err
+		return liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	return nil
@@ -311,7 +317,7 @@ func (c *translatorHTTPClient) UpdateTranslation(ctx context.Context, lang2 appD
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return err
+		return liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "text", text, "pos", strconv.Itoa(int(pos)))
@@ -321,23 +327,23 @@ func (c *translatorHTTPClient) UpdateTranslation(ctx context.Context, lang2 appD
 
 	paramBytes, err := json.Marshal(paramMap)
 	if err != nil {
-		return err
+		return liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), bytes.NewBuffer(paramBytes))
 	if err != nil {
-		return err
+		return liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return err
+		return liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return err
+		return liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	return nil
@@ -349,25 +355,25 @@ func (c *translatorHTTPClient) RemoveTranslation(ctx context.Context, lang2 appD
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return err
+		return liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "text", text, "pos", strconv.Itoa(int(pos)))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, u.String(), nil)
 	if err != nil {
-		return err
+		return liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return err
+		return liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return err
+		return liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	return nil

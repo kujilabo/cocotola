@@ -32,7 +32,7 @@ func (s *guestUserUsecase) RetrieveGuestToken(ctx context.Context, organizationN
 	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
 		systemAdmin, err := userS.NewSystemAdmin(ctx, rf)
 		if err != nil {
-			return err
+			return liberrors.Errorf(" userS.NewSystemAdmin. err: %w", err)
 		}
 
 		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
@@ -62,13 +62,13 @@ func (s *guestUserUsecase) RetrieveGuestToken(ctx context.Context, organizationN
 
 		tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, guest, organization)
 		if err != nil {
-			return err
+			return liberrors.Errorf("s.authTokenManager.CreateTokenSet. err: %w", err)
 		}
 
 		tokenSet = tokenSetTmp
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("RetrieveGuestToken. err: %w", err)
 	}
 	return tokenSet, nil
 }

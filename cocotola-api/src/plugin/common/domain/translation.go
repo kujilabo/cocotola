@@ -4,6 +4,7 @@ package domain
 import (
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type Translation interface {
@@ -31,7 +32,11 @@ func NewTranslation(text string, pos WordPos, lang2 appD.Lang2, translated, prov
 		Provider:   provider,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (t *translation) GetText() string {

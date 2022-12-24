@@ -5,6 +5,7 @@ import (
 	"time"
 
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type Model interface {
@@ -34,7 +35,12 @@ func NewModel(id uint, version int, createdAt, updatedAt time.Time, createdBy, u
 		CreatedBy: createdBy,
 		UpdatedBy: updatedBy,
 	}
-	return m, libD.Validator.Struct(m)
+
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *model) GetID() uint {

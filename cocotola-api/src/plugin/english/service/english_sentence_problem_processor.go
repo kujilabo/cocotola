@@ -70,7 +70,7 @@ func toEnglishSentenceProblemAddParemeter(param appS.ProblemAddParameter) (*engl
 
 	lang2, err := appD.NewLang2(param.GetProperties()["lang2"])
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	m := &englishSentenceProblemAddParemeter{
@@ -79,7 +79,11 @@ func toEnglishSentenceProblemAddParemeter(param appS.ProblemAddParameter) (*engl
 		Translated: param.GetProperties()["translated"],
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type EnglishSentenceProblemProcessor interface {
@@ -175,7 +179,7 @@ func (p *englishSentenceProblemProcessor) UpdateProblemProperty(ctx context.Cont
 			return liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
 		}
 		if err := problemRepo.UpdateProblemProperty(ctx, operator, id, param); err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		return nil
 	}

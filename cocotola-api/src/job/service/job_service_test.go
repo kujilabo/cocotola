@@ -1,3 +1,4 @@
+//go:build s
 package service_test
 
 import (
@@ -33,6 +34,7 @@ func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFacto
 }
 
 func Test_StartJob_timedout(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 
 	var wg sync.WaitGroup
@@ -75,6 +77,7 @@ func Test_StartJob_timedout(t *testing.T) {
 }
 
 func Test_StartJob_completed(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 
 	var wg sync.WaitGroup

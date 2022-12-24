@@ -39,7 +39,11 @@ func NewProblemAddParameter(workbookID domain.WorkbookID, properties map[string]
 		Properties: properties,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *problemAddParameter) GetWorkbookID() domain.WorkbookID {
@@ -81,7 +85,11 @@ func NewProblemSelectParameter1(WorkbookID domain.WorkbookID, problemID domain.P
 		ProblemID:  problemID,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *problemSelectParameter1) GetWorkbookID() domain.WorkbookID {
@@ -110,7 +118,11 @@ func NewProblemSelectParameter2(WorkbookID domain.WorkbookID, problemID domain.P
 		Version:    version,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *problemSelectParameter2) GetWorkbookID() domain.WorkbookID {
@@ -139,7 +151,11 @@ func NewProblemUpdateParameter(properties map[string]string) (ProblemUpdateParam
 		Properties: properties,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *problemUpdateParameter) GetProperties() map[string]string {
@@ -155,7 +171,7 @@ func (p *problemUpdateParameter) GetStringProperty(name string) (string, error) 
 func (p *problemUpdateParameter) GetIntProperty(name string) (int, error) {
 	i, err := strconv.Atoi(p.Properties[name])
 	if err != nil {
-		return 0, err
+		return 0, liberrors.Errorf("strconv.Atoi. err: %w", err)
 	}
 	return i, nil
 }
@@ -176,7 +192,11 @@ func NewProblemPropertyUpdateParameter(key, value string) (ProblemPropertyUpdate
 		Value: value,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *problemPropertyUpdateParameter) GetKey() string {
@@ -209,7 +229,11 @@ func NewProblemSearchCondition(workbookID domain.WorkbookID, pageNo, pageSize in
 		Keyword:    keyword,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (c *problemSearchCondition) GetWorkbookID() domain.WorkbookID {
@@ -244,7 +268,11 @@ func NewProblemIDsCondition(workbookID domain.WorkbookID, ids []domain.ProblemID
 		IDs:        ids,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (c *problemIDsCondition) GetWorkbookID() domain.WorkbookID {
@@ -271,7 +299,11 @@ func NewProblemSearchResult(totalCount int, results []domain.ProblemModel) (Prob
 		Results:    results,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *problemSearchResult) GetTotalCount() int {

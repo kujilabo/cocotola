@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type problemQuotaHandler struct {
@@ -30,7 +31,7 @@ func (p *problemQuotaHandler) Update(ctx context.Context, event service.ProblemE
 		problemTypeName := string(problemType)
 		processor, err := p.pf.NewProblemQuotaProcessor(problemType)
 		if err != nil {
-			return err
+			return liberrors.Errorf(" p.pf.NewProblemQuotaProcessor. err: %w", err)
 		}
 
 		userQuotaRepo := p.rf.NewUserQuotaRepository(ctx)
@@ -40,7 +41,7 @@ func (p *problemQuotaHandler) Update(ctx context.Context, event service.ProblemE
 			limit := processor.GetLimitForSizeQuota()
 			isExceeded, err := userQuotaRepo.Increment(ctx, organizationID, appUserID, problemTypeName+"_size", unit, limit, value)
 			if err != nil {
-				return err
+				return liberrors.Errorf("userQuotaRepo.Increment. err: %w", err)
 			}
 
 			if isExceeded {
@@ -52,7 +53,7 @@ func (p *problemQuotaHandler) Update(ctx context.Context, event service.ProblemE
 			limit := processor.GetLimitForUpdateQuota()
 			isExceeded, err := userQuotaRepo.Increment(ctx, organizationID, appUserID, problemTypeName+"_update", unit, limit, value)
 			if err != nil {
-				return err
+				return liberrors.Errorf("userQuotaRepo.Increment. err: %w", err)
 			}
 
 			if isExceeded {

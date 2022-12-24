@@ -13,6 +13,7 @@ import (
 	controllerhelper "github.com/kujilabo/cocotola/cocotola-api/src/user/controller/helper"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/lib/controller/helper"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
@@ -54,12 +55,12 @@ func (h *audioHandler) FindAudioByID(c *gin.Context) {
 
 		result, err := h.studentUsecaseAudio.FindAudioByID(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), domain.ProblemID(problemID), domain.AudioID(audioID))
 		if err != nil {
-			return err
+			return liberrors.Errorf("domain.AudioID. err: %w", err)
 		}
 
 		response, err := converter.ToAudioResponse(ctx, result)
 		if err != nil {
-			return err
+			return liberrors.Errorf("converter.ToAudioResponse. err: %w", err)
 		}
 
 		c.JSON(http.StatusOK, response)

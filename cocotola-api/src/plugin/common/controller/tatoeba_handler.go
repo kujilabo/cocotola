@@ -74,7 +74,7 @@ func (h *tatoebaHandler) ImportSentences(c *gin.Context) {
 				c.Status(http.StatusBadRequest)
 				return nil
 			}
-			return err
+			return liberrors.Errorf("c.FormFile. err: %w", err)
 		}
 
 		multipartFile, err := file.Open()
@@ -104,7 +104,7 @@ func (h *tatoebaHandler) ImportLinks(c *gin.Context) {
 				c.Status(http.StatusBadRequest)
 				return nil
 			}
-			return err
+			return liberrors.Errorf("c.FormFile. err: %w", err)
 		}
 
 		multipartFile, err := file.Open()
@@ -114,7 +114,7 @@ func (h *tatoebaHandler) ImportLinks(c *gin.Context) {
 		defer multipartFile.Close()
 
 		if err := h.tatoebaClient.ImportSentences(ctx, multipartFile); err != nil {
-			return err
+			return liberrors.Errorf("h.tatoebaClient.ImportSentences. err: %w", err)
 		}
 
 		c.Status(http.StatusOK)

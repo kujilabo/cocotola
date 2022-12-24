@@ -5,6 +5,7 @@ import (
 
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type Model struct {
@@ -26,7 +27,11 @@ func NewModel(model userD.Model) (Model, error) {
 		UpdatedBy: model.GetUpdatedBy(),
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return Model{}, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type WorkbookResponseHTTPEntity struct {

@@ -28,7 +28,13 @@ func (e *jobStatusEntity) TableName() string {
 }
 
 func (e *jobStatusEntity) toJobStatus() (service.JobStatus, error) {
-	return service.NewJobStatus(domain.JobStatusID(e.ID), domain.JobName(e.JobName), e.JobParameter, e.ExpirationDatetime, e.CreatedAt)
+	jobStatus, err := service.NewJobStatus(domain.JobStatusID(e.ID), domain.JobName(e.JobName), e.JobParameter, e.ExpirationDatetime, e.
+		CreatedAt)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return jobStatus, nil
 }
 
 type jobStatusRepository struct {
@@ -67,7 +73,7 @@ func (r *jobStatusRepository) AddJobStatus(ctx context.Context, job service.Job)
 	}
 
 	if result := r.db.Create(&entity); result.Error != nil {
-		return "", libG.ConvertDuplicatedError(result.Error, service.ErrJobStatusAlreadyExists)
+		return "", liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrJobStatusAlreadyExists))
 	}
 
 	return domain.JobStatusID(id), nil

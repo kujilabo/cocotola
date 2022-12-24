@@ -9,6 +9,7 @@ import (
 	studentU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/student"
 	controllerhelper "github.com/kujilabo/cocotola/cocotola-api/src/user/controller/helper"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
@@ -48,7 +49,7 @@ func (h *statHandler) GetStat(c *gin.Context) {
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
 		stat, err := h.studentUsecaseStat.GetStat(ctx, organizationID, operatorID)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		results := make([]Result, 0)

@@ -1,3 +1,4 @@
+//go:build m
 package gateway_test
 
 import (
@@ -72,6 +73,7 @@ import (
 // }
 
 func Test_appUserRepository_AddAppUser(t *testing.T) {
+	t.Parallel()
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, owner := setupOrganization(ctx, t, ts)

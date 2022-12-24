@@ -1,3 +1,5 @@
+//go:build s
+
 package converter
 
 import (
@@ -14,6 +16,7 @@ import (
 )
 
 func TestToWorkbookSearchResponse(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		result service.WorkbookSearchResult
 	}
@@ -79,7 +82,9 @@ func TestToWorkbookSearchResponse(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := ToWorkbookSearchResponse(tt.args.result)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ToWorkbookSearchResponse() error = %v, wantErr %v", err, tt.wantErr)

@@ -1,6 +1,9 @@
 package domain
 
-import libD "github.com/kujilabo/cocotola/lib/domain"
+import (
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
+)
 
 type AppUserGroupID uint
 
@@ -31,7 +34,11 @@ func NewAppUserGroup(model Model, organizationID OrganizationID, key, name, desc
 		Description:    description,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *appUserGroupModel) GetAppUerGroupID() AppUserGroupID {

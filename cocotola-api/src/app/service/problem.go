@@ -4,6 +4,7 @@ package service
 import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type ProblemFeature interface {
@@ -21,12 +22,16 @@ type problem struct {
 }
 
 func NewProblem(synthesizerClient SynthesizerClient, problemModel domain.ProblemModel) (Problem, error) {
-	s := &problem{
+	m := &problem{
 		ProblemModel:      problemModel,
 		synthesizerClient: synthesizerClient,
 	}
 
-	return s, libD.Validator.Struct(s)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 // func (s *problem) FindAudioByAudioID(ctx context.Context, audioID domain.AudioID) (Audio, error) {

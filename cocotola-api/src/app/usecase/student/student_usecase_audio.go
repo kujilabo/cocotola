@@ -37,12 +37,12 @@ func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID 
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
 
 		problem, err := workbook.FindProblemByID(ctx, student, problemID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindProblemByID. err: %w", err)
 		}
 
 		savedAudioID, ok := (problem.GetProperties(ctx)["audioId"]).(domain.AudioID)
@@ -60,13 +60,13 @@ func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID 
 
 		tmpResult, err := s.synthesizerClient.FindAudioByAudioID(ctx, audioID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("s.synthesizerClient.FindAudioByAudioID. err: %w", err)
 		}
 
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindAudioByID. err: %w", err)
 	}
 
 	return result, nil
@@ -79,7 +79,7 @@ func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, rf ser
 	}
 	workbookService, err := studentService.FindWorkbookByID(ctx, workbookID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, liberrors.Errorf("studentService.FindWorkbookByID. err: %w", err)
 	}
 	return studentService, workbookService, nil
 }

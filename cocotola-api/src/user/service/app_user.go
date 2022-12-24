@@ -36,13 +36,27 @@ func NewAppUser(ctx context.Context, rf RepositoryFactory, appUserModel domain.A
 		spaceRepo:    spaceRepo,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *appUser) GetDefaultSpace(ctx context.Context) (Space, error) {
-	return m.spaceRepo.FindDefaultSpace(ctx, m)
+	space, err := m.spaceRepo.FindDefaultSpace(ctx, m)
+	if err != nil {
+		return nil, liberrors.Errorf("m.spaceRepo.FindDefaultSpace. err: %w", err)
+	}
+
+	return space, nil
 }
 
 func (m *appUser) GetPersonalSpace(ctx context.Context) (Space, error) {
-	return m.spaceRepo.FindPersonalSpace(ctx, m)
+	space, err := m.spaceRepo.FindPersonalSpace(ctx, m)
+	if err != nil {
+		return nil, liberrors.Errorf("m.spaceRepo.FindPersonalSpace. err: %w", err)
+	}
+
+	return space, nil
 }

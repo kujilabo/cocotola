@@ -4,6 +4,8 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
+
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 func ReadCSV(fileReader io.Reader, fn func(i int, line []string) error) error {
@@ -16,7 +18,7 @@ func ReadCSV(fileReader io.Reader, fn func(i int, line []string) error) error {
 			break
 		}
 		if err != nil {
-			return err
+			return liberrors.Errorf("csvReader.Read. err: %w", err)
 		}
 
 		if err := fn(i, line); err != nil {

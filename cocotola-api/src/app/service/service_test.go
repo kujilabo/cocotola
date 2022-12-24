@@ -1,3 +1,4 @@
+//go:build s
 package service_test
 
 import (

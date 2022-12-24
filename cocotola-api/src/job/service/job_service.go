@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
@@ -29,22 +30,22 @@ func (s *jobService) registerStartedRecord(ctx context.Context, job Job) (domain
 		jobHistoryRepo := rf.NewJobHistoryRepository(ctx)
 		tmpJobStatusID, err := jobStatusRepo.AddJobStatus(ctx, job)
 		if err != nil {
-			return err
+			return liberrors.Errorf("jobStatusRepo.AddJobStatus. err: %w", err)
 		}
 
 		param, err := NewJobHistoryAddParameter(tmpJobStatusID, job.GetName(), job.GetJobParameter(), "started")
 		if err != nil {
-			return err
+			return liberrors.Errorf("NewJobHistoryAddParameter. err: %w", err)
 		}
 
 		if err := jobHistoryRepo.AddJobHistory(ctx, param); err != nil {
-			return err
+			return liberrors.Errorf("jobHistoryRepo.AddJobHistory. err: %w", err)
 		}
 
 		jobStatusID = tmpJobStatusID
 		return nil
 	}); err != nil {
-		return "", err
+		return "", liberrors.Errorf("registerStartedRecord. err: %w", err)
 	}
 
 	return jobStatusID, nil
@@ -56,21 +57,21 @@ func (s *jobService) registerStoppedRecord(ctx context.Context, job Job, jobStat
 		jobHistoryRepo := rf.NewJobHistoryRepository(ctx)
 
 		if err := jobStatusRepo.RemoveJobStatus(ctx, jobStatusID); err != nil {
-			return err
+			return liberrors.Errorf("jobStatusRepo.RemoveJobStatus. err: %w", err)
 		}
 
 		param, err := NewJobHistoryAddParameter(jobStatusID, job.GetName(), job.GetJobParameter(), status)
 		if err != nil {
-			return err
+			return liberrors.Errorf("NewJobHistoryAddParameter. err: %w", err)
 		}
 
 		if err := jobHistoryRepo.AddJobHistory(ctx, param); err != nil {
-			return err
+			return liberrors.Errorf("jobHistoryRepo.AddJobHistory. err: %w", err)
 		}
 
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf("registerStoppedRecord. err: %w", err)
 	}
 
 	return nil
@@ -91,7 +92,7 @@ func (s *jobService) registerFailedRecord(ctx context.Context, job Job, jobStatu
 func (s *jobService) StartJob(ctx context.Context, job Job) error {
 	jobStatusID, err := s.registerStartedRecord(ctx, job)
 	if err != nil {
-		return err
+		return liberrors.Errorf("registerStartedRecord. err: %w", err)
 	}
 
 	go func() {

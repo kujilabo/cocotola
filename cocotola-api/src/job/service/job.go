@@ -23,7 +23,9 @@ type job struct {
 	Func                       func(context.Context) error
 }
 
-func NewJob(name domain.JobName, timeout time.Duration, allowedConcurrentExecution bool, fn func(context.Context) error) (Job, error) {
+type JobFunc func(context.Context) error
+
+func NewJob(name domain.JobName, timeout time.Duration, allowedConcurrentExecution bool, fn JobFunc) (Job, error) {
 	return &job{
 		Name:                       name,
 		Timeout:                    timeout,

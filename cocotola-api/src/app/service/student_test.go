@@ -1,3 +1,5 @@
+//go:build s
+
 package service_test
 
 import (
@@ -62,6 +64,7 @@ func student_Init(t *testing.T, ctx context.Context) (
 }
 
 func Test_student_GetDefaultSpace(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	pf, rf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
@@ -82,6 +85,7 @@ func Test_student_GetDefaultSpace(t *testing.T) {
 }
 
 func Test_student_GetPersonalSpace(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	pf, rf, spaceRepo, _, _, _ := student_Init(t, ctx)
 
@@ -102,6 +106,7 @@ func Test_student_GetPersonalSpace(t *testing.T) {
 }
 
 func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	pf, rf, spaceRepo, workbookRepo, _, _ := student_Init(t, ctx)
 
@@ -128,6 +133,7 @@ func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 }
 
 func Test_student_FindWorkbookByID(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	pf, rf, _, workbookRepo, _, _ := student_Init(t, ctx)
 
@@ -147,6 +153,7 @@ func Test_student_FindWorkbookByID(t *testing.T) {
 }
 
 func Test_student_CheckQuota(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 
 	type args struct {
@@ -212,7 +219,9 @@ func Test_student_CheckQuota(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			pf, rf, _, _, userQuotaRepo, problemQuotaProcessor := student_Init(t, ctx)
 			userQuotaRepo.On("IsExceeded", mock.Anything, mock.Anything, mock.Anything, string(tt.args.problemType)+tt.problemTypeSuffix, tt.quotaUnit, tt.quotaLimit).Return(tt.isExceeded, nil)
 			problemQuotaProcessor.On("GetUnitForSizeQuota").Return(service.QuotaUnitPersitance)
@@ -225,7 +234,7 @@ func Test_student_CheckQuota(t *testing.T) {
 			student, err := service.NewStudent(ctx, pf, rf, studentModel)
 			require.NoError(t, err)
 			require.NotNil(t, student)
-			err = student.CheckQuota(ctx, (tt.args.problemType), tt.args.name)
+			err = student.CheckQuota(ctx, tt.args.problemType, tt.args.name)
 			if err == nil && tt.err != nil {
 				t.Errorf("student.CheckQuota() error = %v, err %v", err, tt.err)
 			} else if err != nil && tt.err == nil {

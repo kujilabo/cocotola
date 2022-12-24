@@ -1,3 +1,4 @@
+//go:build s
 package service_test
 
 import (
@@ -54,6 +55,7 @@ func testNewTranslation(pos pluginD.WordPos, translated string) *pluginDM.Transl
 }
 
 func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	operator, workbookModel, rf, problemRepo, processor, _, _, _ := englishWordProblemProcessor_Init(t)
 
@@ -97,6 +99,7 @@ func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *
 }
 
 func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	operator, workbookModel, rf, problemRepo, processor, _, translatorClient, _ := englishWordProblemProcessor_Init(t)
 
@@ -152,6 +155,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 }
 
 func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
+	t.Parallel()
 	ctx := context.Background()
 	operator, workbookModel, rf, problemRepo, processor, _, _, _ := englishWordProblemProcessor_Init(t)
 
@@ -201,6 +205,7 @@ func testNewProblemAddParameter_EnglishWord(properties map[string]string) appS.P
 }
 
 func TestNewEnglishWordProblemAddParemeter(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		param appS.ProblemAddParameter
 	}
@@ -285,7 +290,9 @@ func TestNewEnglishWordProblemAddParemeter(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := service.NewEnglishWordProblemAddParemeter(tt.args.param)
 			if tt.wantErr == nil {
 				assert.NoError(t, err)

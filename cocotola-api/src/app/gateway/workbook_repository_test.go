@@ -1,3 +1,5 @@
+//go:build m
+
 package gateway_test
 
 import (
@@ -13,9 +15,10 @@ import (
 )
 
 func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
-	fn := func(ctx context.Context, ts testService) {
+	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
@@ -102,9 +105,10 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 }
 
 func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
-	fn := func(ctx context.Context, ts testService) {
+	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo := ts.rf.NewWorkbookRepository(ctx)
@@ -166,9 +170,10 @@ func Test_workbookRepository_FindWorkbookByName(t *testing.T) {
 }
 
 func Test_workbookRepository_FindWorkbookByID_priv(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
-	fn := func(ctx context.Context, ts testService) {
+	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo := ts.rf.NewWorkbookRepository(ctx)

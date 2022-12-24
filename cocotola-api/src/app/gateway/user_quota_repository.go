@@ -12,12 +12,6 @@ import (
 	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
-var jst *time.Location
-
-func init() {
-	jst = time.Now().Local().Location()
-}
-
 type userQuotaEntity struct {
 	ID             string
 	OrganizationID uint

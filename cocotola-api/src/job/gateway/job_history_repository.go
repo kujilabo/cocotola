@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"gorm.io/gorm"
 )
 
@@ -23,7 +24,12 @@ func (e *jobHistoryEntity) TableName() string {
 }
 
 func (e *jobHistoryEntity) toModel() (service.JobHistory, error) {
-	return service.NewJobHistory()
+	jobHistory, err := service.NewJobHistory()
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return jobHistory, nil
 }
 
 type jobHistoryRepository struct {

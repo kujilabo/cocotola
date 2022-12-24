@@ -39,7 +39,7 @@ func (r *engliushWordProblemAddParameterCSVReader) Next() (appS.ProblemAddParame
 	var line []string
 	line, err := r.reader.Read()
 	if errors.Is(err, io.EOF) {
-		return nil, err
+		return nil, liberrors.Errorf("r.reader.Read. err: %w", err)
 	}
 	if err != nil {
 		return nil, liberrors.Errorf("failed to reader.Read. err: %w", err)

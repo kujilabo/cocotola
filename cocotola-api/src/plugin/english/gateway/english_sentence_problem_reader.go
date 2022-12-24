@@ -7,6 +7,7 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type englishSentenceProblemAddParameterCSVReader struct {
@@ -29,11 +30,11 @@ func (r *englishSentenceProblemAddParameterCSVReader) Next() (appS.ProblemAddPar
 	var line []string
 	line, err := r.reader.Read()
 	if errors.Is(err, io.EOF) {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	properties := map[string]string{
@@ -45,7 +46,7 @@ func (r *englishSentenceProblemAddParameterCSVReader) Next() (appS.ProblemAddPar
 
 	param, err := appS.NewProblemAddParameter(r.workbookID /*r.num,*/, properties)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	r.num++

@@ -1,3 +1,5 @@
+//go:build m
+
 package gateway_test
 
 import (
@@ -18,7 +20,11 @@ func emptyFunc(ctx context.Context) error {
 	return nil
 }
 
+func TestMain(m *testing.M) {
+}
+
 func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_true(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
@@ -43,8 +49,7 @@ func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_true(t
 }
 
 func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_false(t *testing.T) {
-	// logrus.SetLevel(logrus.DebugLevel)
-
+	t.Parallel()
 	fn := func(ctx context.Context, ts testService) {
 		setupJob(t, ts)
 		defer teardownJob(t, ts)
@@ -66,6 +71,7 @@ func Test_jobStatusRepository_AddJobStatus_allowedConcurrencyExecution_is_false(
 }
 
 func Test_jobStatusRepository_RemoveExpiredJobStatus(t *testing.T) {
+	t.Parallel()
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		setupJob(t, ts)

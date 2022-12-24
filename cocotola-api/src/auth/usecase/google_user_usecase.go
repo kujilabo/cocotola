@@ -36,11 +36,21 @@ func NewGoogleUserUsecase(transaction service.Transaction, googleAuthClient serv
 }
 
 func (s *googleUserUsecase) RetrieveAccessToken(ctx context.Context, code string) (*service.GoogleAuthResponse, error) {
-	return s.googleAuthClient.RetrieveAccessToken(ctx, code)
+	resp, err := s.googleAuthClient.RetrieveAccessToken(ctx, code)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return resp, nil
 }
 
 func (s *googleUserUsecase) RetrieveUserInfo(ctx context.Context, googleAuthResponse *service.GoogleAuthResponse) (*service.GoogleUserInfo, error) {
-	return s.googleAuthClient.RetrieveUserInfo(ctx, googleAuthResponse)
+	info, err := s.googleAuthClient.RetrieveUserInfo(ctx, googleAuthResponse)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return info, nil
 }
 
 func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo *service.GoogleUserInfo, googleAuthResponse *service.GoogleAuthResponse, organizationName string) (*service.TokenSet, error) {
@@ -51,19 +61,19 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
 		systemAdmin, err := userS.NewSystemAdmin(ctx, rf)
 		if err != nil {
-			return err
+			return liberrors.Errorf("userS.NewSystemAdmin. err: %w", err)
 		}
 
 		tmpOrganization, tmpAppUser, err := s.registerAppUser(ctx, systemAdmin, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
 		if err != nil && !errors.Is(err, userS.ErrAppUserAlreadyExists) {
-			return err
+			return liberrors.Errorf("s.registerAppUser. err: %w", err)
 		}
 
 		organization = tmpOrganization
 		appUser = tmpAppUser
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("RegisterAppUser. err: %w", err)
 	}
 
 	if err := s.registerAppUserCallback(ctx, organizationName, appUser); err != nil {
@@ -72,7 +82,7 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 
 	tokenSetTmp, err := s.authTokenManager.CreateTokenSet(ctx, appUser, organization)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("s.authTokenManager.CreateTokenSet. err: %w", err)
 	}
 	tokenSet = tokenSetTmp
 	return tokenSet, nil
@@ -105,7 +115,7 @@ func (s *googleUserUsecase) registerAppUser(ctx context.Context, systemAdmin use
 
 		if !errors.Is(err, userS.ErrAppUserNotFound) {
 			logger.Infof("Unsupported %v", err)
-			return err
+			return liberrors.Errorf("systemOwner.FindAppUserByLoginID. err: %w", err)
 		}
 
 		logger.Infof("Add student. %+v", appUser1)
@@ -141,7 +151,7 @@ func (s *googleUserUsecase) registerAppUser(ctx context.Context, systemAdmin use
 		if errors.Is(err, userS.ErrAppUserAlreadyExists) {
 			return organization, appUser, nil
 		} else {
-			return nil, nil, err
+			return nil, nil, liberrors.Errorf("registerAppUser. err: %w", err)
 		}
 	}
 	return organization, appUser, nil

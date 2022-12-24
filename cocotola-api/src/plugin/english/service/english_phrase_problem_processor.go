@@ -38,7 +38,11 @@ func toEnglishPhraseProblemAddParemeter(param appS.ProblemAddParameter) (*englis
 		Translated: param.GetProperties()["translated"],
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type EnglishPhraseProblemProcessor interface {
@@ -74,7 +78,7 @@ func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo app
 
 	audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
 	}
 
 	problemID, err := p.addSingleProblem(ctx, operator, problemRepo, param, extractedParam, appD.AudioID(audio.GetAudioModel().GetID()))
@@ -82,7 +86,7 @@ func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo app
 		return nil, nil, nil, liberrors.Errorf("failed to addSingleProblem: extractedParam: %+v, err: %w", extractedParam, err)
 	}
 
-	return []appD.ProblemID{problemID}, nil, nil, err
+	return []appD.ProblemID{problemID}, nil, nil, nil
 }
 
 func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, operator appD.StudentModel, problemRepo appS.ProblemRepository, param appS.ProblemAddParameter, extractedParam *englishPhraseProblemAddParemeter, audioID appD.AudioID) (appD.ProblemID, error) {
@@ -118,7 +122,7 @@ func (p *englishPhraseProblemProcessor) RemoveProblem(ctx context.Context, repo 
 	}
 
 	if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf("problemRepo.RemoveProblem. err: %w", err)
 	}
 
 	return nil, nil, []appD.ProblemID{id.GetProblemID()}, nil

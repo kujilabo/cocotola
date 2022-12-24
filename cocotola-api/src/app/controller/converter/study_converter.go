@@ -6,6 +6,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 // func ToStudyResponse(ctx context.Context, recordbook domain.Recordbook) (*entity.RecordbookResponse, error) {
@@ -45,7 +46,12 @@ func ToProblemWithLevelList(ctx context.Context, problems []domain.StudyRecordWi
 	e := &entity.StudyRecords{
 		Records: list,
 	}
-	return e, libD.Validator.Struct(e)
+
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToIntValue(ctx context.Context, value int) *entity.IntValue {

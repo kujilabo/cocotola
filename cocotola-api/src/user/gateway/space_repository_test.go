@@ -1,3 +1,4 @@
+//go:build m
 package gateway_test
 
 import (
@@ -14,6 +15,7 @@ import (
 )
 
 func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(ctx context.Context, ts testService) {
@@ -65,6 +67,7 @@ func Test_spaceRepository_FindDefaultSpace(t *testing.T) {
 }
 
 func Test_spaceRepository_FindPersonalSpace(t *testing.T) {
+	t.Parallel()
 
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)

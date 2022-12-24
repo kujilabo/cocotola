@@ -13,7 +13,12 @@ import (
 )
 
 func ToProblemSearchCondition(ctx context.Context, param *entity.ProblemFindParameter, workbookID domain.WorkbookID) (service.ProblemSearchCondition, error) {
-	return service.NewProblemSearchCondition(workbookID, param.PageNo, param.PageSize, param.Keyword)
+	condition, err := service.NewProblemSearchCondition(workbookID, param.PageNo, param.PageSize, param.Keyword)
+	if err != nil {
+		return nil, liberrors.Errorf("new Model. err: %w", err)
+	}
+
+	return condition, nil
 }
 
 func ToProblemFindResponse(ctx context.Context, result service.ProblemSearchResult) (*entity.ProblemFindResponse, error) {
@@ -42,7 +47,11 @@ func ToProblemFindResponse(ctx context.Context, result service.ProblemSearchResu
 		TotalCount: result.GetTotalCount(),
 		Results:    problems,
 	}
-	return e, libD.Validator.Struct(e)
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchResult) (*entity.ProblemFindAllResponse, error) {
@@ -50,12 +59,12 @@ func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchR
 	for i, p := range result.GetResults() {
 		bytes, err := json.Marshal(p.GetProperties(ctx))
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 		}
 
 		model, err := entity.NewModel(p)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("entity.NewMode. err: %w", err)
 		}
 
 		problems[i] = &entity.SimpleProblem{
@@ -71,7 +80,11 @@ func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchR
 		TotalCount: result.GetTotalCount(),
 		Results:    problems,
 	}
-	return e, libD.Validator.Struct(e)
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entity.Problem, error) {
@@ -80,12 +93,12 @@ func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entit
 
 	bytes, err := json.Marshal(problem.GetProperties(ctx))
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	model, err := entity.NewModel(problem)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("entity.NewModel. err: %w", err)
 	}
 
 	e := &entity.Problem{
@@ -94,7 +107,12 @@ func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entit
 		ProblemType: string(problem.GetProblemType()),
 		Properties:  bytes,
 	}
-	return e, libD.Validator.Struct(e)
+
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToProblemIDsCondition(ctx context.Context, param *entity.ProblemIDsParameter, workbookID domain.WorkbookID) (service.ProblemIDsCondition, error) {
@@ -102,24 +120,39 @@ func ToProblemIDsCondition(ctx context.Context, param *entity.ProblemIDsParamete
 	for _, id := range param.IDs {
 		ids = append(ids, domain.ProblemID(id))
 	}
-	return service.NewProblemIDsCondition(workbookID, ids)
+	domainParam, err := service.NewProblemIDsCondition(workbookID, ids)
+	if err != nil {
+		return nil, liberrors.Errorf("service.NewProblemIDsCondition. err: %w", err)
+	}
+
+	return domainParam, nil
 
 }
 
 func ToProblemAddParameter(workbookID domain.WorkbookID, param *entity.ProblemAddParameter) (service.ProblemAddParameter, error) {
 	var properties map[string]string
 	if err := json.Unmarshal(param.Properties, &properties); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("Unmarshal. err: %w", err)
 	}
 
-	return service.NewProblemAddParameter(workbookID /*param.Number, */, properties)
+	domainParam, err := service.NewProblemAddParameter(workbookID /*param.Number, */, properties)
+	if err != nil {
+		return nil, liberrors.Errorf("service.NewProblemAddParameter. err: %w", err)
+	}
+
+	return domainParam, nil
 }
 
 func ToProblemUpdateParameter(param *entity.ProblemUpdateParameter) (service.ProblemUpdateParameter, error) {
 	var properties map[string]string
 	if err := json.Unmarshal(param.Properties, &properties); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("Unmarshal. err: %w", err)
 	}
 
-	return service.NewProblemUpdateParameter( /*param.Number, */ properties)
+	domainParam, err := service.NewProblemUpdateParameter( /*param.Number, */ properties)
+	if err != nil {
+		return nil, liberrors.Errorf("service.NewProblemUpdateParameter. err: %w", err)
+	}
+
+	return domainParam, nil
 }

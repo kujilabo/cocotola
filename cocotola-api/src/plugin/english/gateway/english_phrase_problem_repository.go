@@ -5,7 +5,6 @@ import (
 	"errors"
 	"math"
 	"strconv"
-	"time"
 
 	"gorm.io/gorm"
 
@@ -21,12 +20,7 @@ import (
 )
 
 type englishPhraseProblemEntity struct {
-	ID             uint
-	Version        int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	CreatedBy      uint
-	UpdatedBy      uint
+	SinmpleModelEntity
 	OrganizationID uint
 	WorkbookID     uint
 	Number         int
@@ -43,7 +37,7 @@ func (e *englishPhraseProblemEntity) TableName() string {
 func (e *englishPhraseProblemEntity) toProblem(synthesizerClient appS.SynthesizerClient) (service.EnglishPhraseProblem, error) {
 	model, err := userD.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("userD.NewModel. err: %w", err)
 	}
 
 	properties := make(map[string]interface{})
@@ -53,25 +47,30 @@ func (e *englishPhraseProblemEntity) toProblem(synthesizerClient appS.Synthesize
 
 	problemModel, err := appD.NewProblemModel(model, e.Number, domain.EnglishPhraseProblemType, properties)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appD.NewProblemModel. err: %w", err)
 	}
 
 	problem, err := appS.NewProblem(synthesizerClient, problemModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appD.NewProblem. err: %w", err)
 	}
 
 	lang2, err := appD.NewLang2(e.Lang2)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 	}
 
 	englishPhraseProblemModel, err := domain.NewEnglishPhraseProblemModel(problemModel, appD.AudioID(e.AudioID), e.Text, lang2, e.Translated)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewEnglishPhraseProblemModel. err: %w", err)
 	}
 
-	return service.NewEnglishPhraseProblem(englishPhraseProblemModel, problem)
+	phraseProblem, err := service.NewEnglishPhraseProblem(englishPhraseProblemModel, problem)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return phraseProblem, nil
 }
 
 func fromEnglishPhraseProblemProperties(properties map[string]string) (string, string, string) {
@@ -86,7 +85,7 @@ func toEnglishPhraseProblemProperties(lang2, text, translated string) map[string
 	}
 }
 
-type newEnglishPhraseProblemParam struct {
+type englishPhraseProblemAddParameter struct {
 	Number     int
 	AudioID    uint
 	Lang2      string
@@ -94,26 +93,32 @@ type newEnglishPhraseProblemParam struct {
 	Translated string
 }
 
-func toNewEnglishPhraseProblemParam(param appS.ProblemAddParameter) (*newEnglishPhraseProblemParam, error) {
+func toNewEnglishPhraseProblemParam(param appS.ProblemAddParameter) (*englishPhraseProblemAddParameter, error) {
 	audioID, err := strconv.Atoi(param.GetProperties()["audioId"])
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("strconv.Atoi. err: %w", err)
 	}
 
-	number, err := param.GetIntProperty("number")
-	if err != nil {
-		return nil, err
-	}
+	number := 1
+	// number, err := param.GetIntProperty("number")
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	lang2, text, translated := fromEnglishPhraseProblemProperties(param.GetProperties())
-	m := &newEnglishPhraseProblemParam{
+	m := &englishPhraseProblemAddParameter{
 		Number:     number,
 		AudioID:    uint(audioID),
 		Lang2:      lang2,
 		Text:       text,
 		Translated: translated,
 	}
-	return m, libD.Validator.Struct(m)
+
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type englishPhraseProblemRepository struct {
@@ -165,7 +170,12 @@ func (r *englishPhraseProblemRepository) FindProblems(ctx context.Context, opera
 		return nil, errors.New("overflow")
 	}
 
-	return appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return foundProblems, nil
 }
 
 func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) (appS.ProblemSearchResult, error) {
@@ -203,7 +213,12 @@ func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, op
 		return nil, errors.New("overflow")
 	}
 
-	return appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return foundProblems, nil
 }
 
 func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator appD.StudentModel, param appS.ProblemIDsCondition) (appS.ProblemSearchResult, error) {
@@ -230,12 +245,17 @@ func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Co
 	for i, e := range problemEntities {
 		p, err := e.toProblem(r.synthesizerClient)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("e.toProblem. err: %w", err)
 		}
 		problems[i] = p
 	}
 
-	return appS.NewProblemSearchResult(0, problems)
+	foundProblems, err := appS.NewProblemSearchResult(0, problems)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return foundProblems, nil
 }
 
 func (r *englishPhraseProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter1) (appS.Problem, error) {
@@ -256,7 +276,12 @@ func (r *englishPhraseProblemRepository) FindProblemByID(ctx context.Context, op
 		return nil, result.Error
 	}
 
-	return problemEntity.toProblem(r.synthesizerClient)
+	problem, err := problemEntity.toProblem(r.synthesizerClient)
+	if err != nil {
+		return nil, err
+	}
+
+	return problem, nil
 }
 
 func (r *englishPhraseProblemRepository) FindProblemIDs(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) ([]appD.ProblemID, error) {
@@ -306,16 +331,18 @@ func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operato
 
 	problemParam, err := toNewEnglishPhraseProblemParam(param)
 	if err != nil {
-		return 0, err
+		return 0, liberrors.Errorf("toNewEnglishPhraseProblemParam. err: %w", err)
 	}
 	englishPhraseProblem := englishPhraseProblemEntity{
-		Version:        1,
-		CreatedBy:      operator.GetID(),
-		UpdatedBy:      operator.GetID(),
+		SinmpleModelEntity: SinmpleModelEntity{
+			Version:   1,
+			CreatedBy: operator.GetID(),
+			UpdatedBy: operator.GetID(),
+		},
 		OrganizationID: uint(operator.GetOrganizationID()),
 		WorkbookID:     uint(param.GetWorkbookID()),
 		AudioID:        problemParam.AudioID,
-		Number:         problemParam.Number, // param.GetNumber(),
+		Number:         problemParam.Number,
 		Text:           problemParam.Text,
 		Lang2:          problemParam.Lang2,
 		Translated:     problemParam.Translated,
@@ -323,7 +350,7 @@ func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operato
 
 	logger.Infof("englishPhraseProblemRepository.AddProblem. lang2: %s, text: %s", problemParam.Lang2, problemParam.Text)
 	if result := r.db.Create(&englishPhraseProblem); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, appS.ErrProblemAlreadyExists)
+		return 0, liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, appS.ErrProblemAlreadyExists))
 	}
 
 	return appD.ProblemID(englishPhraseProblem.ID), nil

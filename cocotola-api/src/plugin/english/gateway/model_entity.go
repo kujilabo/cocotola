@@ -2,9 +2,6 @@ package gateway
 
 import (
 	"time"
-
-	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type SinmpleModelEntity struct {
@@ -16,14 +13,14 @@ type SinmpleModelEntity struct {
 	UpdatedBy uint
 }
 
-func (e *SinmpleModelEntity) toModel() (domain.Model, error) {
-	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
-	if err != nil {
-		return nil, liberrors.Errorf("domain.NewModel. err: %w", err)
-	}
+// func (e *SinmpleModelEntity) toModel() (domain.Model, error) {
+// 	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
+// 	if err != nil {
+// 		return nil, liberrors.Errorf(". err: %w", err)
+// 	}
 
-	return model, nil
-}
+// 	return model, nil
+// }
 
 type JunctionModelEntity struct {
 	CreatedAt time.Time

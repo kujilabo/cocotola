@@ -1,11 +1,16 @@
+//go:build m
+
 package gateway_test
 
 import (
+	"context"
 	"crypto/rand"
 	"math/big"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/sqls"
+	userG "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway"
 	testlibG "github.com/kujilabo/cocotola/test-lib/gateway"
+	"github.com/sirupsen/logrus"
 )
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -14,6 +19,15 @@ func init() {
 	testlibG.InitMySQL(sqls.SQL, "127.0.0.1", 3307)
 	testlibG.InitSQLite(sqls.SQL)
 
+	ctx := context.Background()
+	for driverName, db := range testlibG.ListDB() {
+		logrus.Debugf("%s\n", driverName)
+		rbacRepo := userG.NewRBACRepository(ctx, db)
+		err := rbacRepo.Init()
+		if err != nil {
+			panic(err)
+		}
+	}
 	// userS.InitSystemAdmin(userRfFunc)
 }
 

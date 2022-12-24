@@ -379,7 +379,7 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 	if _, err := student.FindWorkbookByName(ctx, workbookName); err == nil {
 		return nil
 	} else if !errors.Is(err, appS.ErrWorkbookNotFound) {
-		return err
+		return liberrors.Errorf("student.FindWorkbookByName. err: %w", err)
 	}
 
 	workbookID, err := student.AddWorkbookToPersonalSpace(ctx, param)

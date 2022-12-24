@@ -8,7 +8,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/gateway"
-
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
@@ -92,7 +92,7 @@ func tracerProvider(url string) (*sdktrace.TracerProvider, error) {
 	// Create the Jaeger exporter
 	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("jaeger.New. err: %w", err)
 	}
 	tp := sdktrace.NewTracerProvider(
 		// Always be sure to batch in production.

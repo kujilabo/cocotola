@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/job/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrJobHistoryNotFound = errors.New("JobHistory not found")
@@ -43,7 +44,11 @@ func NewJobHistoryAddParameter(jobStatusID domain.JobStatusID, jobName domain.Jo
 		Status:       status,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *jobHistoryAddParameter) GetJobStatusID() domain.JobStatusID {

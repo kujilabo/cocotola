@@ -12,6 +12,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrWorkbookNotFound = errors.New("workbook not found")
@@ -37,7 +38,11 @@ func NewWorkbookSearchCondition(pageNo, pageSize int, spaceIDs []userD.SpaceID) 
 		SpaceIDs: spaceIDs,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *workbookSearchCondition) GetPageNo() int {
@@ -68,7 +73,11 @@ func NewWorkbookSearchResult(totalCount int, results []domain.WorkbookModel) (Wo
 		Results:    results,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 func (m *workbookSearchResult) GetTotalCount() int {
 	return m.TotalCount
@@ -103,7 +112,11 @@ func NewWorkbookAddParameter(problemType domain.ProblemTypeName, name string, la
 		Properties:   properties,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *workbookAddParameter) GetProblemType() domain.ProblemTypeName {
@@ -142,7 +155,11 @@ func NewWorkbookUpdateParameter(name, questionText string) (WorkbookUpdateParame
 		QuestionText: questionText,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *workbookUpdateParameter) GetName() string {

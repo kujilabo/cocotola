@@ -3,6 +3,7 @@ package domain
 
 import (
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type AppUserID uint
@@ -36,7 +37,11 @@ func NewAppUserModel(model Model, organizationID OrganizationID, loginID, userna
 		Properties:     properties,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *appUserModel) GetAppUserID() AppUserID {

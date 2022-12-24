@@ -64,7 +64,7 @@ func (h *recordbookHandler) FindRecordbook(c *gin.Context) {
 
 		result, err := h.studentUsecaseStudy.FindResults(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), studyType)
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseStudy.FindResults. err: %w", err)
 		}
 
 		response, err := converter.ToProblemWithLevelList(ctx, result)
@@ -137,7 +137,7 @@ func (h *recordbookHandler) GetCompletionRate(c *gin.Context) {
 
 		results, err := h.studentUsecaseStudy.GetCompletionRate(ctx, organizationID, operatorID, domain.WorkbookID(workbookID))
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseStudy.GetCompletionRate. err: %w", err)
 		}
 
 		logger.Infof("FindRecordbook. response: %+v", results)

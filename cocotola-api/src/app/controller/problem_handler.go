@@ -112,7 +112,7 @@ func (h *problemHandler) FindAllProblems(c *gin.Context) {
 
 		result, err := h.studentUsecaseProblem.FindAllProblemsByWorkbookID(ctx, organizationID, operatorID, domain.WorkbookID(workbookID))
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseProblem.FindAllProblemsByWorkbookID. err: %w", err)
 		}
 
 		response, err := converter.ToProblemFindAllResponse(ctx, result)
@@ -145,12 +145,12 @@ func (h *problemHandler) FindProblemsByProblemIDs(c *gin.Context) {
 
 		parameter, err := converter.ToProblemIDsCondition(ctx, &param, domain.WorkbookID(workbookID))
 		if err != nil {
-			return err
+			return liberrors.Errorf("converter.ToProblemIDsCondition. err: %w", err)
 		}
 
 		result, err := h.studentUsecaseProblem.FindProblemsByProblemIDs(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), parameter)
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseProblem.FindProblemsByProblemIDs. err: %w", err)
 		}
 
 		response, err := converter.ToProblemFindResponse(ctx, result)
@@ -177,7 +177,7 @@ func (h *problemHandler) FindProblemByID(c *gin.Context) {
 
 		result, err := h.studentUsecaseProblem.FindProblemByID(ctx, organizationID, operatorID, id)
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseProblem.FindProblemByID. err: %w", err)
 		}
 
 		response, err := converter.ToProblemResponse(ctx, result)
@@ -238,7 +238,7 @@ func (h *problemHandler) AddProblem(c *gin.Context) {
 
 		parameter, err := converter.ToProblemAddParameter(domain.WorkbookID(workbookID), &param)
 		if err != nil {
-			return err
+			return liberrors.Errorf("converter.ToProblemAddParameter. err: %w", err)
 		}
 
 		problemID, err := h.studentUsecaseProblem.AddProblem(ctx, organizationID, operatorID, parameter)
@@ -364,7 +364,7 @@ func (h *problemHandler) ImportProblems(c *gin.Context) {
 				c.Status(http.StatusBadRequest)
 				return nil
 			}
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		logger.Infof("fileName: %s", file.Filename)

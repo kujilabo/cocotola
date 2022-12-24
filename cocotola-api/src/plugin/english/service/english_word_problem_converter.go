@@ -45,7 +45,7 @@ func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]app
 		translation, err := c.translatorClient.DictionaryLookupWithPos(ctx, appD.Lang2EN, c.param.Lang2, c.param.Text, c.param.Pos)
 		if err != nil {
 			if !errors.Is(err, pluginS.ErrTranslationNotFound) {
-				return nil, err
+				return nil, liberrors.Errorf(". err: %w", err)
 			}
 		} else {
 			translated = translation.GetTranslated()
@@ -87,7 +87,7 @@ func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]a
 
 	translated, err := c.translatorClient.DictionaryLookup(ctx, appD.Lang2EN, c.param.Lang2, c.param.Text)
 	if errors.Is(err, pluginS.ErrTranslationNotFound) {
-		return nil, err
+		return nil, liberrors.Errorf("c.translatorClient.DictionaryLookup. err: %w", err)
 	}
 
 	if len(translated) == 0 || err != nil {

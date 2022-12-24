@@ -6,6 +6,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 func ToAudioResponse(ctx context.Context, audio service.Audio) (*entity.AudioResponse, error) {
@@ -17,5 +18,9 @@ func ToAudioResponse(ctx context.Context, audio service.Audio) (*entity.AudioRes
 		Content: audioModel.GetContent(),
 	}
 
-	return e, libD.Validator.Struct(e)
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }

@@ -56,16 +56,16 @@ func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, or
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
 		tmpResult, err := workbook.FindProblems(ctx, student, param)
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindProblems. err: %w", err)
 		}
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindProblemsByWorkbookID. err: %w", err)
 	}
 	return result, nil
 }
@@ -79,12 +79,12 @@ func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context,
 		}
 		tmpResult, err := workbook.FindAllProblems(ctx, student)
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindAllProblems. err: %w", err)
 		}
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindAllProblemsByWorkbookID. err: %w", err)
 	}
 	return result, nil
 }
@@ -98,12 +98,12 @@ func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, or
 		}
 		tmpResult, err := workbook.FindProblemsByProblemIDs(ctx, student, param)
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindProblemsByProblemIDs. err: %w", err)
 		}
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindProblemsByProblemIDs. err: %w", err)
 	}
 	return result, nil
 }
@@ -117,12 +117,12 @@ func (s *studentUsecaseProblem) FindProblemByID(ctx context.Context, organizatio
 		}
 		tmpResult, err := workbook.FindProblemByID(ctx, student, id.GetProblemID())
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindProblemByID. err: %w", err)
 		}
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindProblemByID. err: %w", err)
 	}
 	return result, nil
 }
@@ -136,12 +136,12 @@ func (s *studentUsecaseProblem) FindProblemIDs(ctx context.Context, organization
 		}
 		tmpResult, err := workbook.FindProblemIDs(ctx, student)
 		if err != nil {
-			return err
+			return liberrors.Errorf("workbook.FindProblemIDs. err: %w", err)
 		}
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("FindProblemIDs. err: %w", err)
 	}
 	return result, nil
 }
@@ -161,7 +161,7 @@ func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID u
 		result = tmpResult
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("AddProblem. err: %w", err)
 	}
 	logger.Debug("problem id: %d", result)
 	return result, nil
@@ -174,11 +174,11 @@ func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationI
 			return liberrors.Errorf("s.findStudentAndWorkbook. err: %w", err)
 		}
 		if err := s.updateProblem(ctx, student, workbook, id, param); err != nil {
-			return liberrors.Errorf("failed to UpdateProblem. err: %w", err)
+			return liberrors.Errorf("s.updateProblem. err: %w", err)
 		}
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf("UpdateProblem. err: %w", err)
 	}
 	return nil
 }
@@ -194,7 +194,7 @@ func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organ
 		}
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf("UpdateProblemProperty. err: %w", err)
 	}
 	return nil
 }
@@ -226,7 +226,7 @@ func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationI
 
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf("RemoveProblem. err: %w", err)
 	}
 	return nil
 }
@@ -245,12 +245,12 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 			problemType = workbook.GetProblemType()
 			return nil
 		}); err != nil {
-			return err
+			return liberrors.Errorf("GetProblemType. err: %w", err)
 		}
 	}
 	iterator, err := newIterator(workbookID, problemType)
 	if err != nil {
-		return err
+		return liberrors.Errorf("newIterator. err: %w", err)
 	}
 
 	for {
@@ -259,7 +259,7 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 			break
 		}
 		if err != nil {
-			return err
+			return liberrors.Errorf("iterator.Next. err: %w", err)
 		}
 		if param == nil {
 			continue
@@ -286,7 +286,7 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 
 			return nil
 		}); err != nil {
-			return err
+			return liberrors.Errorf("addProblem. err: %w", err)
 		}
 	}
 	return nil
@@ -295,11 +295,11 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 func (s *studentUsecaseProblem) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
 	student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
 	if err != nil {
-		return nil, nil, liberrors.Errorf("failed to findStudent. err: %w", err)
+		return nil, nil, liberrors.Errorf("FindStudent. err: %w", err)
 	}
 	workbook, err := student.FindWorkbookByID(ctx, workbookID)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, liberrors.Errorf("FindWorkbookByID. err: %w", err)
 	}
 	return student, workbook, nil
 }

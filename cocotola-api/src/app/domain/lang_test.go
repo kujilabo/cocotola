@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewLang2(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		args          string
@@ -37,7 +38,9 @@ func TestNewLang2(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := NewLang2(tt.args)
 			if !tt.wantErr {
 				assert.NoError(t, err)
