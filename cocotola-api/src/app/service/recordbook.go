@@ -36,7 +36,11 @@ func NewRecordbook(rf RepositoryFactory, student Student, workbookID domain.Work
 		studyType:  studyType,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *recordbook) GetStudent() Student {
@@ -145,7 +149,11 @@ func NewRecordbookSummary(rf RepositoryFactory, student Student, workbookID doma
 		workbookID: workbookID,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 func (m *recordbookSummary) GetCompletionRate(ctx context.Context) (map[domain.StudyTypeName]int, error) {
 	rateMax := 100

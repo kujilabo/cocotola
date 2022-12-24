@@ -1,3 +1,4 @@
+//go:build m
 package gateway_test
 
 import (

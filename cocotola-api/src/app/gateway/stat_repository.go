@@ -7,6 +7,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"gorm.io/gorm"
 )
 
@@ -83,7 +84,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 
 	model, err := domain.NewStatModel(operatorID, history)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewStatModel. err: %w", err)
 	}
 
 	return model, nil

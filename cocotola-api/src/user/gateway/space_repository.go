@@ -9,6 +9,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -32,15 +33,20 @@ func (e *spaceEntity) TableName() string {
 func (e *spaceEntity) toSpace() (service.Space, error) {
 	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewModel. err: %w", err)
 	}
 
 	spaceModel, err := domain.NewSpaceModel(model, domain.OrganizationID(e.OrganizationID), e.Type, e.Key, e.Name, e.Description)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewSpaceModel. err: %w", err)
 	}
 
-	return service.NewSpace(spaceModel)
+	space, err := service.NewSpace(spaceModel)
+	if err != nil {
+		return nil, liberrors.Errorf("service.NewSpace. err: %w", err)
+	}
+
+	return space, nil
 }
 
 type spaceRepository struct {
@@ -132,7 +138,7 @@ func (r *spaceRepository) AddDefaultSpace(ctx context.Context, operator domain.S
 		Description:    "",
 	}
 	if result := r.db.Create(&space); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists)
+		return 0, liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists))
 	}
 	return space.ID, nil
 }
@@ -155,7 +161,7 @@ func (r *spaceRepository) AddPersonalSpace(ctx context.Context, operator domain.
 	}
 
 	if result := r.db.Create(&space); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists)
+		return 0, liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists))
 	}
 	return domain.SpaceID(space.ID), nil
 }
@@ -178,7 +184,7 @@ func (r *spaceRepository) AddSystemSpace(ctx context.Context, operator domain.Sy
 	}
 
 	if result := r.db.Create(&space); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists)
+		return 0, liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrSpaceAlreadyExists))
 	}
 	return domain.SpaceID(space.ID), nil
 }

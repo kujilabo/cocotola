@@ -11,6 +11,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 const conf = `[request_definition]
@@ -46,27 +47,35 @@ func NewRBACRepository(ctx context.Context, db *gorm.DB) service.RBACRepository 
 func (r *rbacRepository) Init() error {
 	a, err := gormadapter.NewAdapterByDB(r.db)
 	if err != nil {
-		return err
+		return liberrors.Errorf("gormadapter.NewAdapterByDB. err: %w", err)
 	}
+
 	m, err := model.NewModelFromString(conf)
 	if err != nil {
-		return err
+		return liberrors.Errorf("model.NewModelFromString. err: %w", err)
 	}
-	return a.SavePolicy(m)
+
+	if err := a.SavePolicy(m); err != nil {
+		return liberrors.Errorf(". err: %w", err)
+	}
+
+	return nil
 }
 
 func (r *rbacRepository) initEnforcer() (*casbin.Enforcer, error) {
 	a, err := gormadapter.NewAdapterByDB(r.db)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("gormadapter.NewAdapterByDB. err: %w", err)
 	}
+
 	m, err := model.NewModelFromString(conf)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("model.NewModelFromString. err: %w", err)
 	}
+
 	e, err := casbin.NewEnforcer(m, a)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("casbin.NewEnforcer. err: %w", err)
 	}
 
 	return e, nil
@@ -75,11 +84,11 @@ func (r *rbacRepository) initEnforcer() (*casbin.Enforcer, error) {
 func (r *rbacRepository) AddNamedPolicy(subject domain.RBACRole, object domain.RBACObject, action domain.RBACAction) error {
 	e, err := r.initEnforcer()
 	if err != nil {
-		return err
+		return liberrors.Errorf("r.initEnforcer. err: %w", err)
 	}
 
 	if _, err := e.AddNamedPolicy("p", string(subject), string(object), string(action)); err != nil {
-		return err
+		return liberrors.Errorf("e.AddNamedPolicy. err: %w", err)
 	}
 
 	return nil
@@ -88,14 +97,14 @@ func (r *rbacRepository) AddNamedPolicy(subject domain.RBACRole, object domain.R
 func (r *rbacRepository) AddNamedGroupingPolicy(subject domain.RBACUser, object domain.RBACRole) error {
 	e, err := r.initEnforcer()
 	if err != nil {
-		return err
+		return liberrors.Errorf("r.initEnforcer. err: %w", err)
 	}
 	if e == nil {
 		return errors.Errorf("Nil")
 	}
 
 	if _, err := e.AddNamedGroupingPolicy("g", string(subject), string(object)); err != nil {
-		return err
+		return liberrors.Errorf("e.AddNamedGroupingPolicy. err: %w", err)
 	}
 
 	return nil
@@ -111,10 +120,10 @@ func (r *rbacRepository) NewEnforcerWithRolesAndUsers(roles []domain.RBACRole, u
 	}
 	e, err := r.initEnforcer()
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("r.initEnforcer. err: %w", err)
 	}
 	if err := e.LoadFilteredPolicy(gormadapter.Filter{V0: subjects}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("e.LoadFilteredPolicy. err: %w", err)
 	}
 	return e, nil
 }

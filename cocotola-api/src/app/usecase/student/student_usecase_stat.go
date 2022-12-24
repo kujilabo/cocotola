@@ -34,18 +34,18 @@ func (s *studentUsecaseStat) GetStat(ctx context.Context, organizationID userD.O
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, err := s.findStudent(ctx, rf, organizationID, operatorID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("s.findStudent. err: %w", err)
 		}
 
 		stat, err := student.GetStat(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf("student.GetStat. err: %w", err)
 		}
 
 		result = stat
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("GetStatt. err: %w", err)
 	}
 
 	return result, nil

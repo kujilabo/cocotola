@@ -5,10 +5,16 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 func ToTatoebaSentenceSearchCondition(ctx context.Context, param *entity.TatoebaSentenceFindParameter) (service.TatoebaSentenceSearchCondition, error) {
-	return service.NewTatoebaSentenceSearchCondition(param.PageNo, param.PageSize, param.Keyword, param.Random)
+	condition, err := service.NewTatoebaSentenceSearchCondition(param.PageNo, param.PageSize, param.Keyword, param.Random)
+	if err != nil {
+		return nil, liberrors.Errorf("service.NewTatoebaSentenceSearchCondition. err: %w", err)
+	}
+
+	return condition, nil
 }
 
 func ToTatoebaSentenceResponse(ctx context.Context, result *service.TatoebaSentencePairSearchResult) (*entity.TatoebaSentenceFindResponse, error) {

@@ -8,6 +8,7 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrTatoebaSentenceAlreadyExists = errors.New("tatoebaSentence already exists")
@@ -37,7 +38,11 @@ func NewTatoebaSentence(sentenceNumber int, lang2 appD.Lang2, text, author strin
 		UpdatedAt:      updatedAt,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *tatoebaSentence) GetSentenceNumber() int {
@@ -76,7 +81,11 @@ func NewTatoebaSentencePair(src, dst TatoebaSentence) (TatoebaSentencePair, erro
 		Dst: dst,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *tatoebaSentencePair) GetSrc() TatoebaSentence {
@@ -109,7 +118,11 @@ func NewTatoebaSentenceSearchCondition(pageNo, pageSize int, keyword string, ran
 		Random:   random,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (c *tatoebaSentenceSearchCondition) GetPageNo() int {

@@ -1,3 +1,4 @@
+//go:build s
 package controller_test
 
 import (
@@ -77,6 +78,7 @@ func testNewTatoebaSentence(sentenceaNumber int, lang2 appD.Lang2, text string, 
 }
 
 func Test_FindSentencePairs_OK(t *testing.T) {
+	t.Parallel()
 	// given
 	tatoebaClient := new(service_mock.TatoebaClient)
 	// -

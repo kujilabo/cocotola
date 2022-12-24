@@ -1,3 +1,4 @@
+//go:build s
 package domain
 
 import (
@@ -8,6 +9,7 @@ import (
 )
 
 func TestNewAudio(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		id           uint
 		lang2        Lang2
@@ -60,7 +62,9 @@ func TestNewAudio(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := NewAudioModel(tt.args.id, tt.args.lang2, tt.args.text, tt.args.audioContent)
 			if !tt.wantErr {
 				assert.NoError(t, err)

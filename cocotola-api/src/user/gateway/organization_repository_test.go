@@ -1,3 +1,4 @@
+//go:build m
 package gateway_test
 
 import (
@@ -15,6 +16,7 @@ import (
 const invalidOrgID = 99999
 
 func TestGetOrganization(t *testing.T) {
+	t.Parallel()
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, _ := setupOrganization(ctx, t, ts)
@@ -45,6 +47,7 @@ func TestGetOrganization(t *testing.T) {
 }
 
 func TestFindOrganizationByName(t *testing.T) {
+	t.Parallel()
 	fn := func(ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, _ := setupOrganization(ctx, t, ts)

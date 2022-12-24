@@ -1,3 +1,4 @@
+//go:build m
 package gateway_test
 
 import (
@@ -10,6 +11,7 @@ import (
 )
 
 func Test_xxx_FindByText(t *testing.T) {
+	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
 
 	for driverName, db := range testlibG.ListDB() {

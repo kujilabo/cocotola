@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/config"
 	authG "github.com/kujilabo/cocotola/cocotola-api/src/auth/gateway"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"

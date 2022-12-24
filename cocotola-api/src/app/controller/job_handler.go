@@ -6,6 +6,7 @@ import (
 	jobU "github.com/kujilabo/cocotola/cocotola-api/src/app/usecase/job"
 	controllerhelper "github.com/kujilabo/cocotola/cocotola-api/src/user/controller/helper"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
@@ -32,7 +33,7 @@ func (h *jobHandler) AggregateStudyResultsOfAllUsers(c *gin.Context) {
 
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
 		if err := h.jobUsecaseStat.AggregateStudyResultsOfAllUsers(ctx, systemAdminModel); err != nil {
-			return err
+			return liberrors.Errorf(" h.jobUsecaseStat.AggregateStudyResultsOfAllUsers. err: %w", err)
 		}
 		return nil
 	}, h.errorHandle)

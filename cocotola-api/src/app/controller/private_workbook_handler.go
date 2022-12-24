@@ -59,12 +59,12 @@ func (h *privateWorkbookHandler) FindWorkbooks(c *gin.Context) {
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
 		result, err := h.studentUsecaseWorkbook.FindWorkbooks(ctx, organizationID, operatorID)
 		if err != nil {
-			return err
+			return liberrors.Errorf("h.studentUsecaseWorkbook.FindWorkbooks. err: %w", err)
 		}
 
 		response, err := converter.ToWorkbookSearchResponse(result)
 		if err != nil {
-			return err
+			return liberrors.Errorf("converter.ToWorkbookSearchResponse. err: %w", err)
 		}
 		c.JSON(http.StatusOK, response)
 		return nil
@@ -174,8 +174,7 @@ func (h *privateWorkbookHandler) UpdateWorkbook(c *gin.Context) {
 		}
 
 		if err := h.studentUsecaseWorkbook.UpdateWorkbook(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), version, parameter); err != nil {
-			logger.WithError(err).Errorf("failed to UpdateWorkbook. err: %v", err)
-			return err
+			return liberrors.Errorf("h.studentUsecaseWorkbook.UpdateWorkbook. err: %w", err)
 		}
 
 		c.JSON(http.StatusOK, controllerhelper.IDResponse{ID: workbookID})
@@ -202,8 +201,7 @@ func (h *privateWorkbookHandler) RemoveWorkbook(c *gin.Context) {
 		}
 
 		if err := h.studentUsecaseWorkbook.RemoveWorkbook(ctx, organizationID, operatorID, domain.WorkbookID(workbookID), version); err != nil {
-			logger.WithError(err).Errorf("failed to RemoveWorkbook. err: %v", err)
-			return err
+			return liberrors.Errorf("h.studentUsecaseWorkbook.RemoveWorkbook. err: %w", err)
 		}
 
 		c.Status(http.StatusOK)
@@ -224,6 +222,6 @@ func (h *privateWorkbookHandler) errorHandle(c *gin.Context, err error) bool {
 		c.JSON(http.StatusNotFound, gin.H{"message": "Workbook not found"})
 		return true
 	}
-	logger.Errorf("workbookHandler err: %+v", err)
+	logger.WithError(err).Errorf("workbookHandler err: %+v", err)
 	return false
 }

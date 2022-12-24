@@ -44,33 +44,33 @@ func (e *englishSentenceProblemEntity) TableName() string {
 func (e *englishSentenceProblemEntity) toProblem(ctx context.Context, synthesizerClient appS.SynthesizerClient) (service.EnglishSentenceProblem, error) {
 	model, err := userD.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("userD.NewModel. err: %w", err)
 	}
 
 	properties := make(map[string]interface{})
 	problemModel, err := appD.NewProblemModel(model, e.Number, domain.EnglishSentenceProblemType, properties)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(" appD.NewProblemModel. err: %w", err)
 	}
 
 	problem, err := appS.NewProblem(synthesizerClient, problemModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appS.NewProblem. err: %w", err)
 	}
 
 	lang2, err := appD.NewLang2(e.Lang2)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 	}
 
 	englishSentenceProblemModel, err := domain.NewEnglishSentenceProblemModel(problemModel, appD.AudioID(e.AudioID), "", e.Text, lang2, e.Translated, e.Note)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewEnglishSentenceProblemModel. err: %w", err)
 	}
 
 	englishSentenceProblem, err := service.NewEnglishSentenceProblem(englishSentenceProblemModel, problem)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("service.NewEnglishSentenceProblem. err: %w", err)
 	}
 
 	logger := log.FromContext(ctx)
@@ -111,7 +111,7 @@ func makeTatoebaNote(param appS.ProblemAddParameter) (string, error) {
 
 		noteBytes, err := json.Marshal(noteMap)
 		if err != nil {
-			return "", err
+			return "", liberrors.Errorf("json.Marshal. err: %w", err)
 		}
 
 		return string(noteBytes), nil
@@ -169,7 +169,7 @@ func toEnglishSentenceProblemAddParameter(param appS.ProblemAddParameter) (*engl
 
 	note, err := makeTatoebaNote(param)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("makeTatoebaNote. err: %w", err)
 	}
 	// audioID, err := strconv.Atoi(param.GetProperties()["audioId"])
 	// if err != nil {
@@ -191,7 +191,12 @@ func toEnglishSentenceProblemAddParameter(param appS.ProblemAddParameter) (*engl
 		Translated: param.GetProperties()[service.EnglishSentenceProblemAddPropertyTranslated],
 		Note:       note,
 	}
-	return m, libD.Validator.Struct(m)
+
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy uint, param appS.ProblemUpdateParameter) (*englishSentenceProblemEntity, error) {
@@ -223,7 +228,11 @@ func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy u
 		m.Translated = translated
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type englishSentenceProblemRepository struct {
@@ -366,7 +375,7 @@ func (r *englishSentenceProblemRepository) FindProblemsByCustomCondition(ctx con
 
 	problem, err := problemEntity.toProblem(ctx, r.synthesizerClient)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("problemEntity.toProblem. err: %w", err)
 	}
 
 	return []appD.ProblemModel{problem}, nil
@@ -377,7 +386,7 @@ func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Con
 	for i, e := range problemEntities {
 		p, err := e.toProblem(ctx, r.synthesizerClient)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("e.toProblem. err: %w", err)
 		}
 		problems[i] = p
 	}
@@ -386,7 +395,12 @@ func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Con
 		return nil, errors.New("overflow")
 	}
 
-	return appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return foundProblems, nil
 }
 
 func (r *englishSentenceProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter1) (appS.Problem, error) {

@@ -64,8 +64,6 @@ const readHeaderTimeout = time.Duration(30) * time.Second
 
 const jobIntervalSec = 300
 
-// type newIteratorFunc func(ctx context.Context, workbookID appD.WorkbookID, problemType string, reader io.Reader) (appS.ProblemAddParameterIterator, error)
-
 func getValue(values ...string) string {
 	for _, v := range values {
 		if len(v) != 0 {
@@ -118,21 +116,21 @@ func main() {
 	newIterator := func(ctx context.Context, workbookID appD.WorkbookID, problemType appD.ProblemTypeName, reader io.Reader) (appS.ProblemAddParameterIterator, error) {
 		processor, ok := problemImportProcessor[problemType]
 		if ok {
-			return processor.CreateCSVReader(ctx, workbookID, reader)
+			return processor.CreateCSVReader(ctx, workbookID, reader) // nolint:wrapcheck
 		}
 		return nil, liberrors.Errorf("processor not found. problemType: %s", problemType)
 	}
 
 	jobRff := func(ctx context.Context, db *gorm.DB) (jobS.RepositoryFactory, error) {
-		return jobG.NewRepositoryFactory(ctx, db)
+		return jobG.NewRepositoryFactory(ctx, db) // nolint:wrapcheck
 	}
 
 	userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
-		return userG.NewRepositoryFactory(ctx, db)
+		return userG.NewRepositoryFactory(ctx, db) // nolint:wrapcheck
 	}
 
 	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
-		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemRepositories)
+		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemRepositories) // nolint:wrapcheck
 	}
 
 	jobTransaction, authTransaction, appTransaction, err := initTransaction(db, jobRff, userRff, rff)
@@ -183,12 +181,12 @@ func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff use
 
 	authTransaction, err := authG.NewTransaction(db, userRff)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	appTransaction, err := appG.NewTransaction(db, rff)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
 	}
 	return jobTransaction, authTransaction, appTransaction, nil
 }
@@ -202,20 +200,20 @@ func run(ctx context.Context, cfg *config.Config, transaction service.Transactio
 	}
 
 	eg.Go(func() error {
-		return appServer(ctx, cfg, pf, authTransaction, jobTransaction, appTransaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc)
+		return appServer(ctx, cfg, pf, authTransaction, jobTransaction, appTransaction, synthesizerClient, translatorClient, tatoebaClient, newIteratorFunc) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return jobServer(ctx, cfg, jobTransaction, appTransaction)
+		return jobServer(ctx, cfg, jobTransaction, appTransaction) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
+		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return libG.SignalWatchProcess(ctx)
+		return libG.SignalWatchProcess(ctx) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		<-ctx.Done()
-		return ctx.Err()
+		return ctx.Err() // nolint:wrapcheck
 	})
 
 	if err := eg.Wait(); err != nil {
@@ -232,11 +230,11 @@ type studyStatUpdater struct {
 
 func (o *studyStatUpdater) Update(ctx context.Context, studyNotification service.StudyEvent) error {
 	logrus.Warn("-===========Update========")
-	return o.appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+	return o.appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error { // nolint:wrapcheck
 		studyRepo := rf.NewStudyStatRepository(ctx)
 		today := timeutil.Today()
 		if err := studyRepo.AggregateResults(ctx, o.systemOwnerModel, today, studyNotification.GetAppUserID()); err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		return nil
 	})
@@ -247,24 +245,24 @@ func getSystemOwnerModel(ctx context.Context, appTransaction appS.Transaction, o
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		appUserRepo := userRf.NewAppUserRepository(ctx)
 
 		tmpSystemOwnerModel, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, systemAdmin, orgName)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		systemOwnerModel = tmpSystemOwnerModel
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 	return systemOwnerModel, nil
 }
@@ -285,14 +283,14 @@ func appServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory
 	googleAuthClient := authG.NewGoogleAuthClient(cfg.Auth.GoogleClientID, cfg.Auth.GoogleClientSecret, cfg.Auth.GoogleCallbackURL, time.Duration(cfg.Auth.APITimeoutSec)*time.Second)
 
 	registerAppUserCallback := func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error {
-		return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error { // nolint:wrapcheck
 			return callback(ctx, cfg.App.TestUserEmail, pf, rf, organizationName, appUser)
 		})
 	}
 
-	systemOwnerModel, err := getSystemOwnerModel(ctx, appTransaction, "cocotola")
+	systemOwnerModel, err := getSystemOwnerModel(ctx, appTransaction, appS.OrganizationName)
 	if err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 	problemMonitor := service.NewProblemMonitor()
 	studyMonitor := service.NewStudyMonitor()
@@ -301,7 +299,7 @@ func appServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory
 		appTransaction:   appTransaction,
 	}
 	if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 
 	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback)
@@ -364,22 +362,22 @@ func appServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory
 		defer shutdownCancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
 			logrus.Infof("Server forced to shutdown. err: %v", err)
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		return nil
 	case err := <-errCh:
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 }
 
 func jobServer(ctx context.Context, cfg *config.Config, jobTransaction jobS.Transaction, appTransaction appS.Transaction) error {
 	jobService, err := jobS.NewJobService(ctx, jobTransaction)
 	if err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 	router, err := controller.NewJobRouter(appTransaction, jobService, cfg.Debug)
 	if err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 
 	httpServer := http.Server{
@@ -406,7 +404,7 @@ func jobServer(ctx context.Context, cfg *config.Config, jobTransaction jobS.Tran
 		defer shutdownCancel()
 		if err := httpServer.Shutdown(shutdownCtx); err != nil {
 			logrus.Infof("Server forced to shutdown. err: %v", err)
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		return nil
 	case err := <-errCh:
@@ -444,14 +442,14 @@ func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCom
 
 	englishWordProblemRepositoryFunc := func(ctx context.Context, db *gorm.DB) (appS.ProblemRepository, error) {
 		// fmt.Println("-------Word")
-		return pluginEnglishGateway.NewEnglishWordProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishWordProblemType)
+		return pluginEnglishGateway.NewEnglishWordProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishWordProblemType) // nolint:wrapcheck
 	}
 	englishPhraseProblemRepositoryFunc := func(ctx context.Context, db *gorm.DB) (appS.ProblemRepository, error) {
-		return pluginEnglishGateway.NewEnglishPhraseProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishPhraseProblemType)
+		return pluginEnglishGateway.NewEnglishPhraseProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishPhraseProblemType) // nolint:wrapcheck
 	}
 	englishSentenceProblemRepositoryFunc := func(ctx context.Context, db *gorm.DB) (appS.ProblemRepository, error) {
 		// fmt.Println("-------Sentence")
-		return pluginEnglishGateway.NewEnglishSentenceProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishSentenceProblemType)
+		return pluginEnglishGateway.NewEnglishSentenceProblemRepository(db, synthesizerClient, pluginEnglishDomain.EnglishSentenceProblemType) // nolint:wrapcheck
 	}
 
 	pf := appS.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
@@ -467,12 +465,12 @@ func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCom
 func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider, error) {
 	cfg, err := config.LoadConfig(env)
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	// init log
 	if err := libconfig.InitLog(env, cfg.Log); err != nil {
-		return nil, nil, nil, nil, err
+		return nil, nil, nil, nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	// init tracer
@@ -503,15 +501,15 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 	if err := db.Transaction(func(tx *gorm.DB) error {
 		userRf, err := userG.NewRepositoryFactory(ctx, db)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
-		organization, err := systemAdmin.FindOrganizationByName(ctx, "cocotola")
+		organization, err := systemAdmin.FindOrganizationByName(ctx, appS.OrganizationName)
 		if err != nil {
 			if !errors.Is(err, userS.ErrOrganizationNotFound) {
 				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
@@ -522,7 +520,7 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
 			}
 
-			organizationAddParameter, err := userS.NewOrganizationAddParameter("cocotola", firstOwnerAddParam)
+			organizationAddParameter, err := userS.NewOrganizationAddParameter(appS.OrganizationName, firstOwnerAddParam)
 			if err != nil {
 				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
 			}
@@ -538,7 +536,7 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 		logger.Infof("organization: %d", organization.GetID())
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 	return nil
 }
@@ -565,7 +563,7 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
@@ -573,7 +571,7 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
 		}
 
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, "cocotola")
+		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
 		if err != nil {
 			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
 		}
@@ -600,7 +598,7 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 		}
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 
 	appS.SetSystemStudentID(propertiesSystemStudentID)
@@ -614,7 +612,7 @@ func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
@@ -645,7 +643,7 @@ func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
 
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 
 	appS.SetSystemSpaceID(propertiesSystemSpaceID)
@@ -658,7 +656,7 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 
 		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
@@ -689,7 +687,7 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 		tatoebaWorkbook, err := systemStudent.FindWorkbookFromSystemSpace(ctx, appS.TatoebaWorkbookName)
 		if err != nil {
 			if !errors.Is(err, appS.ErrWorkbookNotFound) {
-				return err
+				return liberrors.Errorf(". err: %w", err)
 			}
 
 			paramToAddWorkbook, err := appS.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, appS.TatoebaWorkbookName, appD.Lang2JA, "", map[string]string{})
@@ -709,7 +707,7 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 
 		return nil
 	}); err != nil {
-		return err
+		return liberrors.Errorf(". err: %w", err)
 	}
 
 	appS.SetTatoebaWorkbookID(propertiesTatoebaWorkbookID)

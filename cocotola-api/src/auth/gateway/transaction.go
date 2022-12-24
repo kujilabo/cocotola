@@ -22,7 +22,7 @@ func NewTransaction(db *gorm.DB, userRff userG.RepositoryFactoryFunc) (service.T
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(userRf userS.RepositoryFactory) error) error {
-	return t.db.Transaction(func(tx *gorm.DB) error {
+	return t.db.Transaction(func(tx *gorm.DB) error { // nolint:wrapcheck
 		userRf, err := t.userRff(ctx, tx)
 		if err != nil {
 			return err

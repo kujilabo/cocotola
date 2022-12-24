@@ -34,13 +34,13 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, j
 	problemTypeRepo := newProblemTypeRepository(db)
 	problemTypes, err := problemTypeRepo.FindAllProblemTypes(ctx)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("problemTypeRepo.FindAllProblemTypes. err: %w", err)
 	}
 
 	studyTypeRepo := newStudyTypeRepository(db)
 	studyTypes, err := studyTypeRepo.FindAllStudyTypes(ctx)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("studyTypeRepo.FindAllStudyTypes. err: %w", err)
 	}
 
 	return &repositoryFactory{
@@ -98,11 +98,11 @@ func (f *repositoryFactory) NewStudyStatRepository(ctx context.Context) service.
 }
 
 func (f *repositoryFactory) NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error) {
-	return jobG.NewRepositoryFactory(ctx, f.db)
+	return jobG.NewRepositoryFactory(ctx, f.db) //nolint:wrapcheck
 }
 
 func (f *repositoryFactory) NewUserRepositoryFactory(ctx context.Context) (userS.RepositoryFactory, error) {
-	return userG.NewRepositoryFactory(ctx, f.db)
+	return userG.NewRepositoryFactory(ctx, f.db) //nolint:wrapcheck
 }
 
 type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)
@@ -120,10 +120,10 @@ func NewTransaction(db *gorm.DB, rff RepositoryFactoryFunc) (service.Transaction
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
-	return t.db.Transaction(func(tx *gorm.DB) error {
+	return t.db.Transaction(func(tx *gorm.DB) error { // nolint:wrapcheck
 		rf, err := t.rff(ctx, tx)
 		if err != nil {
-			return err
+			return liberrors.Errorf(". err: %w", err)
 		}
 		return fn(rf)
 	})

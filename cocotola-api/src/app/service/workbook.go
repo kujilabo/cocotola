@@ -54,7 +54,7 @@ func NewWorkbook(ctx context.Context, rf RepositoryFactory, pf ProcessorFactory,
 
 	problemRepo, err := rf.NewProblemRepository(ctx, workbookModel.GetProblemType())
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	m := &workbook{
@@ -65,7 +65,11 @@ func NewWorkbook(ctx context.Context, rf RepositoryFactory, pf ProcessorFactory,
 		problemRepo:   problemRepo,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *workbook) GetWorkbookModel() domain.WorkbookModel {
@@ -73,27 +77,53 @@ func (m *workbook) GetWorkbookModel() domain.WorkbookModel {
 }
 
 func (m *workbook) FindProblems(ctx context.Context, operator domain.StudentModel, param ProblemSearchCondition) (ProblemSearchResult, error) {
-	return m.problemRepo.FindProblems(ctx, operator, param)
+	problems, err := m.problemRepo.FindProblems(ctx, operator, param)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return problems, nil
 }
 
 func (m *workbook) FindAllProblems(ctx context.Context, operator domain.StudentModel) (ProblemSearchResult, error) {
-	return m.problemRepo.FindAllProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	problems, err := m.problemRepo.FindAllProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return problems, nil
 }
 
 func (m *workbook) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param ProblemIDsCondition) (ProblemSearchResult, error) {
-	return m.problemRepo.FindProblemsByProblemIDs(ctx, operator, param)
+	problems, err := m.problemRepo.FindProblemsByProblemIDs(ctx, operator, param)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return problems, nil
 }
 
 func (m *workbook) FindProblemIDs(ctx context.Context, operator domain.StudentModel) ([]domain.ProblemID, error) {
-	return m.problemRepo.FindProblemIDs(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	ids, err := m.problemRepo.FindProblemIDs(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return ids, nil
 }
 
 func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentModel, problemID domain.ProblemID) (Problem, error) {
 	id, err := NewProblemSelectParameter1(m.GetWorkbookModel().GetWorkbookID(), problemID)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
-	return m.problemRepo.FindProblemByID(ctx, operator, id)
+
+	problem, err := m.problemRepo.FindProblemByID(ctx, operator, id)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return problem, nil
 }
 
 func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
@@ -109,8 +139,11 @@ func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel,
 		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
-	logger.Infof("processor.AddProblem")
-	return processor.AddProblem(ctx, m.rf, operator, m.GetWorkbookModel(), param)
+	added, updated, removed, err := processor.AddProblem(ctx, m.rf, operator, m.GetWorkbookModel(), param)
+	if err != nil {
+		return nil, nil, nil, liberrors.Errorf("c.userClient.DictionaryLookup. err: %w", err)
+	}
+	return added, updated, removed, nil
 }
 
 func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
@@ -126,7 +159,12 @@ func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentMod
 		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
-	return processor.UpdateProblem(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
+	added, updated, removed, err := processor.UpdateProblem(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
+	if err != nil {
+		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return added, updated, removed, nil
 }
 
 func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
@@ -142,7 +180,11 @@ func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.St
 		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
-	return processor.UpdateProblemProperty(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
+	added, updated, removed, err := processor.UpdateProblemProperty(ctx, m.rf, operator, m.GetWorkbookModel(), id, param)
+	if err != nil {
+		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
+	}
+	return added, updated, removed, nil
 }
 
 func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
@@ -158,7 +200,12 @@ func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentMod
 		return nil, nil, nil, liberrors.Errorf("processor not found. problemType: %s, err: %w", m.GetWorkbookModel().GetProblemType(), err)
 	}
 
-	return processor.RemoveProblem(ctx, m.rf, operator, id)
+	added, updated, removed, err := processor.RemoveProblem(ctx, m.rf, operator, id)
+	if err != nil {
+		return nil, nil, nil, liberrors.Errorf("processor.RemoveProblem. err: %w", err)
+	}
+
+	return added, updated, removed, nil
 }
 
 func (m *workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter WorkbookUpdateParameter) error {
@@ -166,7 +213,11 @@ func (m *workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentMo
 		return ErrWorkbookPermissionDenied
 	}
 
-	return m.workbookRepo.UpdateWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version, parameter)
+	if err := m.workbookRepo.UpdateWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version, parameter); err != nil {
+		return liberrors.Errorf("m.workbookRepo.UpdateWorkbook. err: %w", err)
+	}
+
+	return nil
 }
 
 func (m *workbook) RemoveWorkbook(ctx context.Context, operator domain.StudentModel, version int) error {
@@ -174,9 +225,18 @@ func (m *workbook) RemoveWorkbook(ctx context.Context, operator domain.StudentMo
 		return ErrWorkbookPermissionDenied
 	}
 
-	return m.workbookRepo.RemoveWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version)
+	if err := m.workbookRepo.RemoveWorkbook(ctx, operator, m.GetWorkbookModel().GetWorkbookID(), version); err != nil {
+		return liberrors.Errorf("m.workbookRepo.RemoveWorkbook. err: %w", err)
+	}
+
+	return nil
 }
 
 func (m *workbook) CountProblems(ctx context.Context, operator domain.StudentModel) (int, error) {
-	return m.problemRepo.CountProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	num, err := m.problemRepo.CountProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
+	if err != nil {
+		return 0, liberrors.Errorf("m.problemRepo.CountProblems. err: %w", err)
+	}
+
+	return num, nil
 }

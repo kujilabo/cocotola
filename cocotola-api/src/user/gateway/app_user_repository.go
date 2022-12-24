@@ -90,27 +90,27 @@ func (e *appUserEntity) toSystemOwner(ctx context.Context, rf service.Repository
 
 	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewModel. err: %w", err)
 	}
 
 	appUserModel, err := domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, []string{"SystemOwner"}, map[string]string{})
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewAppUserModel. err: %w", err)
 	}
 
 	ownerModel, err := domain.NewOwnerModel(appUserModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewOwnerModel. err: %w", err)
 	}
 
 	systemOwnerModel, err := domain.NewSystemOwnerModel(ownerModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewSystemOwnerModel. err: %w", err)
 	}
 
 	systemOwner, err := service.NewSystemOwner(ctx, rf, systemOwnerModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("service.NewSystemOwner. err: %w", err)
 	}
 
 	return systemOwner, nil
@@ -119,20 +119,25 @@ func (e *appUserEntity) toSystemOwner(ctx context.Context, rf service.Repository
 func (e *appUserEntity) toAppUserModel(roles []string, properties map[string]string) (domain.AppUserModel, error) {
 	model, err := e.toModel()
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("e.toModel. err: %w", err)
 	}
-	return domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, roles, properties)
+	appUserModel, err := domain.NewAppUserModel(model, domain.OrganizationID(e.OrganizationID), e.LoginID, e.Username, roles, properties)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return appUserModel, nil
 }
 
 func (e *appUserEntity) toAppUser(ctx context.Context, rf service.RepositoryFactory, roles []string, properties map[string]string) (service.AppUser, error) {
 	appUserModel, err := e.toAppUserModel(roles, properties)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("e.toAppUserModel. err: %w", err)
 	}
 
 	appUser, err := service.NewAppUser(ctx, rf, appUserModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("service.NewAppUser. err: %w", err)
 	}
 
 	return appUser, nil
@@ -141,12 +146,12 @@ func (e *appUserEntity) toAppUser(ctx context.Context, rf service.RepositoryFact
 func (e *appUserEntity) toOwner(rf service.RepositoryFactory, roles []string, properties map[string]string) (service.Owner, error) {
 	appUserModel, err := e.toAppUserModel(roles, properties)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("e.toAppUserModel. err: %w", err)
 	}
 
 	ownerModel, err := domain.NewOwnerModel(appUserModel)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewOwnerModel. err: %w", err)
 	}
 
 	return service.NewOwner(rf, ownerModel), nil
@@ -273,7 +278,7 @@ func (r *appUserRepository) FindOwnerByLoginID(ctx context.Context, operator dom
 
 func (r *appUserRepository) addAppUser(ctx context.Context, appUserEntity *appUserEntity) (domain.AppUserID, error) {
 	if result := r.db.Create(appUserEntity); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, service.ErrAppUserAlreadyExists)
+		return 0, liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrAppUserAlreadyExists))
 	}
 	return domain.AppUserID(appUserEntity.ID), nil
 }
@@ -287,7 +292,7 @@ func (r *appUserRepository) AddAppUser(ctx context.Context, operator domain.Owne
 	if ok {
 		hashed, err := passwordhelper.HashPassword(password)
 		if err != nil {
-			return 0, err
+			return 0, liberrors.Errorf("passwordhelper.HashPassword. err: %w", err)
 		}
 
 		hashedPassword = hashed
@@ -332,7 +337,7 @@ func (r *appUserRepository) AddFirstOwner(ctx context.Context, operator domain.S
 
 	hashedPassword, err := passwordhelper.HashPassword(param.GetPassword())
 	if err != nil {
-		return 0, err
+		return 0, liberrors.Errorf("passwordhelper.HashPassword. err: %w", err)
 	}
 
 	appUserEntity := appUserEntity{

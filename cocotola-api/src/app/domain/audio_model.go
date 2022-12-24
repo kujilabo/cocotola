@@ -1,7 +1,10 @@
 //go:generate mockery --output mock --name AudioModel
 package domain
 
-import libD "github.com/kujilabo/cocotola/lib/domain"
+import (
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
+)
 
 type AudioID uint
 
@@ -27,7 +30,11 @@ func NewAudioModel(id uint, lang2 Lang2, text, content string) (AudioModel, erro
 		Content: content,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *audioModel) GetID() uint {

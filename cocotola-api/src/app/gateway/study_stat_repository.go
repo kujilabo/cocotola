@@ -10,6 +10,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type studyStatEntity struct {
@@ -45,7 +46,7 @@ func (r *studyStatRepository) AggregateResults(ctx context.Context, operator use
 
 	results, err := studyRecordRepo.CountAnsweredProblems(ctx, operator, userID, targetDate)
 	if err != nil {
-		return err
+		return liberrors.Errorf("studyRecordRepo.CountAnsweredProblems. err: %w", err)
 	}
 
 	for _, result := range results.Results {

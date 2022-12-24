@@ -1,3 +1,5 @@
+//go:build m
+
 package gateway_test
 
 import (
@@ -36,7 +38,7 @@ type testService struct {
 	rf         service.RepositoryFactory
 }
 
-func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
+func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testService)) {
 	logrus.SetLevel(logrus.WarnLevel)
 	// englishWord := testNewProblemType(t, englishWordID, englishWordName)
 	// memorization := testNewStudyType(t, memorizationID, memorizationName)
@@ -61,26 +63,27 @@ func testDB(t *testing.T, fn func(ctx context.Context, ts testService)) {
 
 	ctx := context.Background()
 	for driverName, db := range testlibG.ListDB() {
-		logrus.Debugf("%s\n", driverName)
-		sqlDB, err := db.DB()
-		require.NoError(t, err)
-		defer sqlDB.Close()
+		driverName := driverName
+		db := db
+		t.Run(driverName, func(t *testing.T) {
+			t.Parallel()
+			logrus.Debugf("%s\n", driverName)
+			sqlDB, err := db.DB()
+			require.NoError(t, err)
+			defer sqlDB.Close()
 
-		rbacRepo := userG.NewRBACRepository(ctx, db)
-		err = rbacRepo.Init()
-		require.NoError(t, err)
+			problemRepository := new(service_mock.ProblemRepository)
+			problemRepositories := map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error){
+				englishWordName: func(context.Context, *gorm.DB) (service.ProblemRepository, error) {
+					return problemRepository, nil
+				},
+			}
+			rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemRepositories)
+			require.NoError(t, err)
+			testService := testService{driverName: driverName, db: db, pf: pf, rf: rf}
 
-		problemRepository := new(service_mock.ProblemRepository)
-		problemRepositories := map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error){
-			englishWordName: func(context.Context, *gorm.DB) (service.ProblemRepository, error) {
-				return problemRepository, nil
-			},
-		}
-		rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemRepositories)
-		require.NoError(t, err)
-		testService := testService{driverName: driverName, db: db, pf: pf, rf: rf}
-
-		fn(ctx, testService)
+			fn(t, ctx, testService)
+		})
 	}
 }
 

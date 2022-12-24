@@ -250,7 +250,7 @@ func (r *recordbookRepository) CountMasteredProblems(ctx context.Context, operat
 		for _, result := range results {
 			studyType2, err := r.studyTypes.ToStudyType(uint(result.StudyTypeID))
 			if err != nil {
-				return nil, err
+				return nil, liberrors.Errorf("r.studyTypes.ToStudyType. err: %w", err)
 			}
 			if studyType1.GetName() == studyType2 {
 				resultMap[studyType2] = result.Count

@@ -8,6 +8,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -50,7 +51,7 @@ func (r *userSpaceRepository) Add(ctx context.Context, operator domain.AppUserMo
 		AppUserID:      operator.GetID(),
 		SpaceID:        uint(spaceID),
 	}); result.Error != nil {
-		return libG.ConvertDuplicatedError(result.Error, service.ErrAppUserAlreadyExists)
+		return liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrAppUserAlreadyExists))
 	}
 
 	return nil

@@ -1,7 +1,10 @@
 //go:generate mockery --output mock --name StudyType
 package domain
 
-import libD "github.com/kujilabo/cocotola/lib/domain"
+import (
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
+)
 
 type StudyTypeName string
 
@@ -21,7 +24,11 @@ func NewStudyType(id uint, name string) (StudyType, error) {
 		Name: name,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *studyType) GetID() uint {

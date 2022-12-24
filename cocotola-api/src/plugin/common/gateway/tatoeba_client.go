@@ -17,6 +17,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var timeoutImportMin = 30
@@ -39,10 +40,15 @@ type tatoebaSentenceResponse struct {
 func (s *tatoebaSentenceResponse) toModel() (service.TatoebaSentence, error) {
 	lang2, err := domain.NewLang2(s.Lang2)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewLang2. err: %w", err)
 	}
 
-	return service.NewTatoebaSentence(s.SentenceNumber, lang2, s.Text, s.Author, s.UpdatedAt)
+	sentence, err := service.NewTatoebaSentence(s.SentenceNumber, lang2, s.Text, s.Author, s.UpdatedAt)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return sentence, nil
 }
 
 type tatoebaSentencePair struct {
@@ -53,15 +59,20 @@ type tatoebaSentencePair struct {
 func (p *tatoebaSentencePair) toModel() (service.TatoebaSentencePair, error) {
 	src, err := p.Src.toModel()
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("p.Src.toModel. err: %w", err)
 	}
 
 	dst, err := p.Dst.toModel()
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("p.Dst.toModel. err: %w", err)
 	}
 
-	return service.NewTatoebaSentencePair(src, dst)
+	sentencePair, err := service.NewTatoebaSentencePair(src, dst)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return sentencePair, nil
 }
 
 type tatoebaSentenceFindResponse struct {
@@ -74,7 +85,7 @@ func (r *tatoebaSentenceFindResponse) toModel() (*service.TatoebaSentencePairSea
 	for i, r := range r.Results {
 		pair, err := r.toModel()
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("r.toModel. err: %w", err)
 		}
 		sentences[i] = pair
 	}
@@ -114,7 +125,7 @@ func (c *tatoebaClient) FindSentencePairs(ctx context.Context, param service.Tat
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "sentence_pair", "find")
@@ -128,28 +139,28 @@ func (c *tatoebaClient) FindSentencePairs(ctx context.Context, param service.Tat
 
 	paramBytes, err := json.Marshal(params)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(paramBytes))
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContextl. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := tatoebaSentenceFindResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -161,30 +172,30 @@ func (c *tatoebaClient) FindSentenceBySentenceNumber(ctx context.Context, senten
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "sentence", strconv.Itoa(sentenceNumber))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), http.NoBody)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := tatoebaSentenceResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return response.toModel()
@@ -197,7 +208,7 @@ func (c *tatoebaClient) ImportSentences(ctx context.Context, reader io.Reader) e
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return err
+		return liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "admin", "sentence", "import")
@@ -206,32 +217,32 @@ func (c *tatoebaClient) ImportSentences(ctx context.Context, reader io.Reader) e
 
 	fw, err := mw.CreateFormFile("file", "filename")
 	if err != nil {
-		return err
+		return liberrors.Errorf("mw.CreateFormFile. err: %w", err)
 	}
 
 	if _, err := io.Copy(fw, reader); err != nil {
-		return err
+		return liberrors.Errorf("io.Copy. err: %w", err)
 	}
 
 	if err := mw.Close(); err != nil {
-		return err
+		return liberrors.Errorf("mw.Close(). err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), &body)
 	if err != nil {
-		return err
+		return liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	req.Header.Set("Content-Type", mw.FormDataContentType())
 	resp, err := c.importClient.Do(req)
 	if err != nil {
-		return err
+		return liberrors.Errorf("c.importClient.Do(. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return err
+		return liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	return nil
@@ -243,7 +254,7 @@ func (c *tatoebaClient) ImportLinks(ctx context.Context, reader io.Reader) error
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return err
+		return liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "admin", "sentence", "import")
@@ -252,32 +263,32 @@ func (c *tatoebaClient) ImportLinks(ctx context.Context, reader io.Reader) error
 
 	fw, err := mw.CreateFormFile("file", "filename")
 	if err != nil {
-		return err
+		return liberrors.Errorf("mw.CreateFormFile. err: %w", err)
 	}
 
 	if _, err := io.Copy(fw, reader); err != nil {
-		return err
+		return liberrors.Errorf("io.Copy. err: %w", err)
 	}
 
 	if err := mw.Close(); err != nil {
-		return err
+		return liberrors.Errorf("mw.Close. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), &body)
 	if err != nil {
-		return err
+		return liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.SetBasicAuth(c.username, c.password)
 	req.Header.Set("Content-Type", mw.FormDataContentType())
 	resp, err := c.importClient.Do(req)
 	if err != nil {
-		return err
+		return liberrors.Errorf("c.importClient.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return err
+		return liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	return nil

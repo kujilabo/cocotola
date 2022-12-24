@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type studyTypeEntity struct {
@@ -19,7 +20,12 @@ func (e *studyTypeEntity) TableName() string {
 }
 
 func (e *studyTypeEntity) toModel() (domain.StudyType, error) {
-	return domain.NewStudyType(e.ID, e.Name)
+	studyType, err := domain.NewStudyType(e.ID, e.Name)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return studyType, nil
 }
 
 type studyTypeRepository struct {

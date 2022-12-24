@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
 	"gorm.io/gorm"
+
+	"github.com/kujilabo/cocotola/cocotola-api/src/job/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type repositoryFactory struct {
@@ -45,10 +47,10 @@ func NewTransaction(db *gorm.DB, rff RepositoryFactoryFunc) service.Transaction 
 }
 
 func (t *transaction) Do(ctx context.Context, fn func(rf service.RepositoryFactory) error) error {
-	return t.db.Transaction(func(tx *gorm.DB) error {
+	return t.db.Transaction(func(tx *gorm.DB) error { // nolint:wrapcheck
 		rf, err := t.rff(ctx, tx)
 		if err != nil {
-			return err
+			return liberrors.Errorf("rff. err: %w", err)
 		}
 		return fn(rf)
 	})

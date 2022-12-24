@@ -8,6 +8,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -27,15 +28,20 @@ func (e *organizationEntity) TableName() string {
 func (e *organizationEntity) toModel() (service.Organization, error) {
 	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewModel. err: %w", err)
 	}
 
 	organizationModel, err := domain.NewOrganizationModel(model, e.Name)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewOrganizationModel. err: %w", err)
 	}
 
-	return service.NewOrganization(organizationModel)
+	org, err := service.NewOrganization(organizationModel)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return org, nil
 }
 
 func NewOrganizationRepository(ctx context.Context, db *gorm.DB) service.OrganizationRepository {
@@ -120,7 +126,7 @@ func (r *organizationRepository) AddOrganization(ctx context.Context, operator d
 	}
 
 	if result := r.db.Create(&organization); result.Error != nil {
-		return 0, libG.ConvertDuplicatedError(result.Error, service.ErrOrganizationAlreadyExists)
+		return 0, liberrors.Errorf("libD.Validator.Struct. err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrOrganizationAlreadyExists))
 	}
 
 	return domain.OrganizationID(organization.ID), nil

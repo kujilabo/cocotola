@@ -138,6 +138,84 @@ jobs:
           tool_name: goimports
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
+
+      - name: bodyclose
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E bodyclose --timeout=10m"
+          tool_name: bodyclose
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: exhaustive
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E exhaustive --timeout=10m"
+          tool_name: exhaustive
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: forbidigo
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E forbidigo --timeout=10m"
+          tool_name: forbidigo
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: forcetypeassert
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E forcetypeassert --timeout=10m"
+          tool_name: forcetypeassert
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: ifshort
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E ifshort --timeout=10m"
+          tool_name: ifshort
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: noctx
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E noctx --timeout=10m"
+          tool_name: noctx
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
+      - name: whitespace
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
+          reporter: github-pr-review
+          golangci_lint_flags: "--disable-all -E whitespace --timeout=10m"
+          tool_name: whitespace
+          fail_on_error: true
+          workdir: ${{ matrix.workdir }}
+
   typescript:
     strategy:
       matrix:

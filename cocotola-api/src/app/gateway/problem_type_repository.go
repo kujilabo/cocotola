@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type problemTypeEntity struct {
@@ -19,7 +20,12 @@ func (e *problemTypeEntity) TableName() string {
 }
 
 func (e *problemTypeEntity) toModel() (domain.ProblemType, error) {
-	return domain.NewProblemType(e.ID, e.Name)
+	problemType, err := domain.NewProblemType(e.ID, e.Name)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return problemType, nil
 }
 
 type problemTypeRepository struct {

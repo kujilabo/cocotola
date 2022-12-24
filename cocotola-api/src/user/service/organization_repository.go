@@ -7,6 +7,7 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrOrganizationNotFound = errors.New("organization not found")
@@ -30,7 +31,12 @@ func NewFirstOwnerAddParameter(loginID, username, password string) (FirstOwnerAd
 		Username: username,
 		Password: password,
 	}
-	return m, libD.Validator.Struct(m)
+
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *firstOwnerAddParameter) GetLoginID() string {
@@ -58,7 +64,11 @@ func NewOrganizationAddParameter(name string, firstOwner FirstOwnerAddParameter)
 		Name:       name,
 		FirstOwner: firstOwner,
 	}
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *organizationAddParameter) GetName() string {

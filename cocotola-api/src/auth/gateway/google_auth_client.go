@@ -54,12 +54,12 @@ func (c *googleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 
 	paramBytes, err := json.Marshal(paramMap)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "POST", "https://accounts.google.com/o/oauth2/token", bytes.NewBuffer(paramBytes))
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -73,7 +73,7 @@ func (c *googleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 	if resp.StatusCode != http.StatusOK {
 		respBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("io.ReadAll. err: %w", err)
 		}
 		logger.Debugf("status:%d", resp.StatusCode)
 		logger.Debugf("Resp:%s", string(respBytes))
@@ -82,7 +82,7 @@ func (c *googleAuthClient) RetrieveAccessToken(ctx context.Context, code string)
 
 	googleAuthResponse := service.GoogleAuthResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&googleAuthResponse); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 	logger.Infof("RetrieveAccessToken:%s", googleAuthResponse.AccessToken)
 
@@ -97,7 +97,7 @@ func (c *googleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.googleapis.com/oauth2/v1/userinfo", http.NoBody)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("http.NewRequestWithContext. err: %w", err)
 	}
 
 	q := req.URL.Query()
@@ -107,7 +107,7 @@ func (c *googleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -116,7 +116,7 @@ func (c *googleAuthClient) RetrieveUserInfo(ctx context.Context, googleAuthRespo
 
 	googleUserInfo := service.GoogleUserInfo{}
 	if err := json.NewDecoder(resp.Body).Decode(&googleUserInfo); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
 	}
 
 	return &googleUserInfo, nil

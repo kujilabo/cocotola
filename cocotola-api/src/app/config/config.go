@@ -10,6 +10,7 @@ import (
 
 	libconfig "github.com/kujilabo/cocotola/lib/config"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type AppConfig struct {
@@ -83,19 +84,20 @@ type Config struct {
 var config embed.FS
 
 func LoadConfig(env string) (*Config, error) {
-	confContent, err := config.ReadFile(env + ".yml")
+	filename := env + ".yml"
+	confContent, err := config.ReadFile(filename)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("config.ReadFile. filename: %s, err: %w", filename, err)
 	}
 
 	confContent = []byte(os.ExpandEnv(string(confContent)))
 	conf := &Config{}
 	if err := yaml.Unmarshal(confContent, conf); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("yaml.Unmarshal. filename: %s, err: %w", filename, err)
 	}
 
 	if err := libD.Validator.Struct(conf); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("Validator.Structl. filename: %s, err: %w", filename, err)
 	}
 
 	return conf, nil

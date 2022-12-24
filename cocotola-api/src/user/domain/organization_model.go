@@ -1,6 +1,9 @@
 package domain
 
-import libD "github.com/kujilabo/cocotola/lib/domain"
+import (
+	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
+)
 
 type OrganizationID uint
 
@@ -19,7 +22,11 @@ func NewOrganizationModel(model Model, name string) (OrganizationModel, error) {
 		Model: model,
 		Name:  name,
 	}
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *organizationModel) GetName() string {

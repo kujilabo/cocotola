@@ -80,7 +80,7 @@ func NewEnglishWordProblemAddParemeter(param appS.ProblemAddParameter) (*English
 
 	number, err := param.GetIntProperty("number")
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	m := &EnglishWordProblemAddParemeter{
@@ -90,7 +90,11 @@ func NewEnglishWordProblemAddParemeter(param appS.ProblemAddParameter) (*English
 		Pos:        plugin.WordPos(pos),
 		Translated: translated,
 	}
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type EnglishWordProblemUpdateParemeter struct {
@@ -148,7 +152,7 @@ func NewEnglishWordProblemUpdateParemeter(param appS.ProblemUpdateParameter) (*E
 
 	number, err := param.GetIntProperty("number")
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	m := &EnglishWordProblemUpdateParemeter{
@@ -160,7 +164,11 @@ func NewEnglishWordProblemUpdateParemeter(param appS.ProblemUpdateParameter) (*E
 		TatoebaSentenceNumberFrom: tatoebaSentenceNumberFrom,
 		TatoebaSentenceNumberTo:   tatoebaSentenceNumberTo,
 	}
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 type EnglishWordProblemProcessor interface {
@@ -203,7 +211,7 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 	if workbook.GetProperties()["audioEnabled"] == "true" {
 		audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 		if err != nil {
-			return nil, nil, nil, err
+			return nil, nil, nil, liberrors.Errorf("p.synthesizerClient.Synthesize. param: %+v, err: %w", param, err)
 		}
 
 		audioID = appD.AudioID(audio.GetAudioModel().GetID())
@@ -224,7 +232,7 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 			message := "Translation not found"
 			return nil, nil, nil, appD.NewPluginError("client", message, []string{message}, err)
 		}
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf("Run. param: %+v, err: %w", param, err)
 	}
 
 	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
@@ -260,7 +268,7 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 		if workbook.GetProperties()["audioEnabled"] == "true" {
 			audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
 			if err != nil {
-				return err
+				return liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
 			}
 
 			audioID = appD.AudioID(audio.GetAudioModel().GetID())
@@ -278,7 +286,7 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 		converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, extractedParam.Number, extractedParam, audioID, sentenceID)
 		toUpdateParams, err := converter.Run(ctx)
 		if err != nil {
-			return err
+			return liberrors.Errorf("Run. err: %w", err)
 		}
 
 		problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
@@ -316,7 +324,7 @@ func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS
 	}
 
 	if err := problemRepo.RemoveProblem(ctx, operator, id); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, liberrors.Errorf("problemRepo.RemoveProblem. err: %w", err)
 	}
 
 	return nil, nil, nil, nil
@@ -400,5 +408,5 @@ func (p *englishWordProblemProcessor) findOrAddSentenceFromTatoeba(ctx context.C
 		return 0, liberrors.Errorf("failed to AddProblem. err: %w", err)
 	}
 
-	return id, err
+	return id, liberrors.Errorf(". err: %w", err)
 }

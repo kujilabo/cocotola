@@ -8,6 +8,7 @@ import (
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrTranslationNotFound = errors.New("translation not found")
@@ -46,7 +47,11 @@ func NewTransalationAddParameter(text string, pos domain.WordPos, lang2 appD.Lan
 		Translated: translated,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *translationAddParameter) GetText() string {
@@ -78,7 +83,11 @@ func NewTransaltionUpdateParameter(translated string) (TranslationUpdateParamete
 		Translated: translated,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *translationUpdateParameter) GetTranslated() string {

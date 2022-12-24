@@ -126,7 +126,7 @@ func (s *studentUsecaseWorkbook) studentHandle(ctx context.Context, organization
 		}
 		return fn(student)
 	}); err != nil {
-		return err
+		return liberrors.Errorf("studentHandle. err: %w", err)
 	}
 	return nil
 }

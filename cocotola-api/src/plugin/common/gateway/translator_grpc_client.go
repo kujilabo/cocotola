@@ -12,6 +12,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
 	pb "github.com/kujilabo/cocotola/cocotola-api/src/proto"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type translatorGRPCClient struct {
@@ -47,24 +48,24 @@ func (c *translatorGRPCClient) DictionaryLookup(ctx context.Context, fromLang, t
 
 	resp, err := c.userClient.DictionaryLookup(ctx, &param)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.userClient.DictionaryLookup. err: %w", err)
 	}
 
 	translationList := make([]domain.Translation, len(resp.Results))
 	for i, r := range resp.Results {
 		pos, err := domain.NewWordPos(int(r.Pos))
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("domain.NewWordPos. err: %w", err)
 		}
 
 		lang2, err := appD.NewLang2(r.Lang2)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 		}
 
 		m, err := domain.NewTranslation(r.Text, pos, lang2, r.Translated, r.Provider)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("domain.NewTranslation. err: %w", err)
 		}
 
 		translationList[i] = m
@@ -88,24 +89,24 @@ func (c *translatorGRPCClient) DictionaryLookupWithPos(ctx context.Context, from
 
 	resp, err := c.userClient.DictionaryLookupWithPos(ctx, &param)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.userClient.DictionaryLookupWithPo. err: %w", err)
 	}
 
 	result := resp.Result
 	{
 		pos, err := domain.NewWordPos(int(result.Pos))
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("domain.NewWordPos. err: %w", err)
 		}
 
 		lang2, err := appD.NewLang2(result.Lang2)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 		}
 
 		m, err := domain.NewTranslation(result.Text, pos, lang2, result.Translated, result.Provider)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("domain.NewTranslation. err: %w", err)
 		}
 
 		return m, nil

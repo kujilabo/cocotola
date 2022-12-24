@@ -5,6 +5,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 func ToWorkbookSearchResponse(result service.WorkbookSearchResult) (*entity.WorkbookSearchResponse, error) {
@@ -12,7 +13,7 @@ func ToWorkbookSearchResponse(result service.WorkbookSearchResult) (*entity.Work
 	for i, w := range result.GetResults() {
 		model, err := entity.NewModel(w)
 		if err != nil {
-			return nil, err
+			return nil, liberrors.Errorf("entity.NewModel. err: %w", err)
 		}
 
 		workbooks[i] = &entity.WorkbookResponseHTTPEntity{
@@ -28,7 +29,12 @@ func ToWorkbookSearchResponse(result service.WorkbookSearchResult) (*entity.Work
 		TotalCount: result.GetTotalCount(),
 		Results:    workbooks,
 	}
-	return e, libD.Validator.Struct(e)
+
+	if err := libD.Validator.Struct(e); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToWorkbookHTTPEntity(workbook domain.WorkbookModel) (entity.WorkbookResponseHTTPEntity, error) {
@@ -45,15 +51,30 @@ func ToWorkbookHTTPEntity(workbook domain.WorkbookModel) (entity.WorkbookRespons
 		QuestionText: workbook.GetQuestionText(),
 	}
 
-	return e, libD.Validator.Struct(e)
+	if err := libD.Validator.Struct(e); err != nil {
+		return entity.WorkbookResponseHTTPEntity{}, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return e, nil
 }
 
 func ToWorkbookAddParameter(param *entity.WorkbookAddParameter) (service.WorkbookAddParameter, error) {
-	return service.NewWorkbookAddParameter(domain.ProblemTypeName(param.ProblemType), param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
+	domainParam, err := service.NewWorkbookAddParameter(domain.ProblemTypeName(param.ProblemType), param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
 		"audioEnabled": "false",
 	})
+
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return domainParam, nil
 }
 
 func ToWorkbookUpdateParameter(param *entity.WorkbookUpdateParameter) (service.WorkbookUpdateParameter, error) {
-	return service.NewWorkbookUpdateParameter(param.Name, param.QuestionText)
+	domainParam, err := service.NewWorkbookUpdateParameter(param.Name, param.QuestionText)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return domainParam, nil
 }

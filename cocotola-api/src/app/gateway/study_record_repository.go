@@ -11,6 +11,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type studyRecordEntity struct {
@@ -53,11 +54,11 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator domain.S
 
 	problemTypeID, err := r.problemTypes.ToProblemTypeID(problemType)
 	if err != nil {
-		return err
+		return liberrors.Errorf("r.problemTypes.ToProblemTypeID. err: %w", err)
 	}
 	studyTypeID, err := r.studyTypes.ToStudyTypeID(studyType)
 	if err != nil {
-		return err
+		return liberrors.Errorf("r.studyTypes.ToStudyTypeID. err: %w", err)
 	}
 
 	now := time.Now()

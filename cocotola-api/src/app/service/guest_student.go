@@ -8,6 +8,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	userS "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type GuestStudent interface {
@@ -28,7 +29,7 @@ type guestStudent struct {
 func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFactory, studentModel domain.StudentModel) (GuestStudent, error) {
 	userRf, err := rf.NewUserRepositoryFactory(ctx)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	spaceRepo := userRf.NewSpaceRepository(ctx)
@@ -40,11 +41,20 @@ func NewGuestStudent(ctx context.Context, pf ProcessorFactory, rf RepositoryFact
 		spaceRepo:    spaceRepo,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (s *guestStudent) GetDefaultSpace(ctx context.Context) (userS.Space, error) {
-	return s.spaceRepo.FindDefaultSpace(ctx, s)
+	space, err := s.spaceRepo.FindDefaultSpace(ctx, s)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return space, nil
 }
 
 func (s *guestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {

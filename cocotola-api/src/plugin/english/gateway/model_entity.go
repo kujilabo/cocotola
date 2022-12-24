@@ -19,7 +19,7 @@ type SinmpleModelEntity struct {
 func (e *SinmpleModelEntity) toModel() (domain.Model, error) {
 	model, err := domain.NewModel(e.ID, e.Version, e.CreatedAt, e.UpdatedAt, e.CreatedBy, e.UpdatedBy)
 	if err != nil {
-		return nil, liberrors.Errorf("domain.NewModel. err: %w", err)
+		return nil, liberrors.Errorf(". err: %w", err)
 	}
 
 	return model, nil

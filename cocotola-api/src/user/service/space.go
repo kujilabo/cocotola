@@ -4,6 +4,7 @@ package service
 import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type Space interface {
@@ -19,5 +20,9 @@ func NewSpace(spaceModel domain.SpaceModel) (Space, error) {
 		spaceModel,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }

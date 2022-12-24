@@ -35,21 +35,26 @@ type audioResponse struct {
 func (r *audioResponse) toModel() (service.Audio, error) {
 	lang2, err := domain.NewLang2(r.Lang2)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewLang2. err: %w", err)
 	}
 
 	audioModel, err := domain.NewAudioModel(uint(r.ID), lang2, r.Text, r.Content)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("domain.NewAudioModel. err: %w", err)
 	}
 
-	return service.NewAudio(audioModel)
+	audio, err := service.NewAudio(audioModel)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return audio, nil
 }
 
 func NewSynthesizerClient(endpoint, username, password string, timeout time.Duration) (service.SynthesizerClient, error) {
 
 	if _, err := url.Parse(endpoint); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	return &synthesizerClient{
@@ -69,7 +74,7 @@ func (c *synthesizerClient) Synthesize(ctx context.Context, lang2 domain.Lang2, 
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "synthesize")
@@ -80,7 +85,7 @@ func (c *synthesizerClient) Synthesize(ctx context.Context, lang2 domain.Lang2, 
 
 	paramBytes, err := json.Marshal(paramMap)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("json.Marshal. err: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(paramBytes))
@@ -97,15 +102,20 @@ func (c *synthesizerClient) Synthesize(ctx context.Context, lang2 domain.Lang2, 
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := audioResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
+	}
+
+	audio, err := response.toModel()
+	if err != nil {
 		return nil, err
 	}
 
-	return response.toModel()
+	return audio, nil
 }
 
 func (c *synthesizerClient) FindAudioByAudioID(ctx context.Context, audioID domain.AudioID) (service.Audio, error) {
@@ -114,7 +124,7 @@ func (c *synthesizerClient) FindAudioByAudioID(ctx context.Context, audioID doma
 
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("url.Parse. err: %w", err)
 	}
 
 	u.Path = path.Join(u.Path, "v1", "user", "audio", strconv.Itoa(int(audioID)))
@@ -128,20 +138,25 @@ func (c *synthesizerClient) FindAudioByAudioID(ctx context.Context, audioID doma
 	req.SetBasicAuth(c.username, c.password)
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.client.Do. err: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if err := c.errorHandle(resp.StatusCode); err != nil {
-		return nil, err
+		return nil, liberrors.Errorf("c.errorHandle. err: %w", err)
 	}
 
 	response := audioResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, liberrors.Errorf("json.NewDecoder. err: %w", err)
+	}
+
+	audio, err := response.toModel()
+	if err != nil {
 		return nil, err
 	}
 
-	return response.toModel()
+	return audio, nil
 }
 
 func (c *synthesizerClient) errorHandle(statusCode int) error {

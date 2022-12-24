@@ -2,6 +2,7 @@ package domain
 
 import (
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 const SystemOwnerID = 2
@@ -20,7 +21,11 @@ func NewSystemOwnerModel(appUser OwnerModel) (SystemOwnerModel, error) {
 		OwnerModel: appUser,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *systemOwnerModel) IsSystemOwnerModel() bool {

@@ -6,6 +6,7 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 const EnglishPhraseProblemType = appD.ProblemTypeName("english_phrase")
@@ -35,7 +36,11 @@ func NewEnglishPhraseProblemModel(problemModel appD.ProblemModel, audioID appD.A
 		Translated:   translated,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (m *englishPhraseProblemModel) GetAudioID() appD.AudioID {

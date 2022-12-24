@@ -4,6 +4,7 @@ package service
 import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type Audio interface {
@@ -19,7 +20,11 @@ func NewAudio(audioModel domain.AudioModel) (Audio, error) {
 		AudioModel: audioModel,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (s *audio) GetAudioModel() domain.AudioModel {

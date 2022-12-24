@@ -40,15 +40,30 @@ func NewSystemAdmin(ctx context.Context, rf RepositoryFactory) (SystemAdmin, err
 }
 
 func (m *systemAdmin) FindSystemOwnerByOrganizationID(ctx context.Context, organizationID domain.OrganizationID) (SystemOwner, error) {
-	return m.appUserRepo.FindSystemOwnerByOrganizationID(ctx, m, organizationID)
+	sysOwner, err := m.appUserRepo.FindSystemOwnerByOrganizationID(ctx, m, organizationID)
+	if err != nil {
+		return nil, liberrors.Errorf("m.appUserRepo.FindSystemOwnerByOrganizationID. error: %w", err)
+	}
+
+	return sysOwner, nil
 }
 
 func (m *systemAdmin) FindSystemOwnerByOrganizationName(ctx context.Context, organizationName string) (SystemOwner, error) {
-	return m.appUserRepo.FindSystemOwnerByOrganizationName(ctx, m, organizationName)
+	sysOwner, err := m.appUserRepo.FindSystemOwnerByOrganizationName(ctx, m, organizationName)
+	if err != nil {
+		return nil, liberrors.Errorf("m.appUserRepo.FindSystemOwnerByOrganizationName. error: %w", err)
+	}
+
+	return sysOwner, nil
 }
 
 func (m *systemAdmin) FindOrganizationByName(ctx context.Context, name string) (Organization, error) {
-	return m.orgRepo.FindOrganizationByName(ctx, m, name)
+	org, err := m.orgRepo.FindOrganizationByName(ctx, m, name)
+	if err != nil {
+		return nil, liberrors.Errorf("m.orgRepo.FindOrganizationByName. error: %w", err)
+	}
+
+	return org, nil
 }
 
 func (m *systemAdmin) AddOrganization(ctx context.Context, param OrganizationAddParameter) (domain.OrganizationID, error) {
