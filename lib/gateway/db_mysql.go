@@ -17,16 +17,17 @@ import (
 
 func OpenMySQL(username, password, host string, port int, database string) (*gorm.DB, error) {
 	c := mysql.Config{
-		DBName:          database,
-		User:            username,
-		Passwd:          password,
-		Addr:            fmt.Sprintf("%s:%d", host, port),
-		Net:             "tcp",
-		ParseTime:       true,
-		MultiStatements: true,
-		Params:          map[string]string{"charset": "utf8"},
-		Collation:       "utf8mb4_unicode_ci",
-		Loc:             jst,
+		DBName:               database,
+		User:                 username,
+		Passwd:               password,
+		Addr:                 fmt.Sprintf("%s:%d", host, port),
+		Net:                  "tcp",
+		ParseTime:            true,
+		MultiStatements:      true,
+		Params:               map[string]string{"charset": "utf8"},
+		Collation:            "utf8mb4_unicode_ci",
+		Loc:                  jst,
+		AllowNativePasswords: true,
 	}
 	dsn := c.FormatDSN()
 	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&multiStatements=true", username, password, host, port, database)
