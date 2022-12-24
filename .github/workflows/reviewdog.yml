@@ -2,7 +2,7 @@
 on: [pull_request]
 name: Reviewdog
 jobs:
-  golang:
+  golang_1:
     strategy:
       matrix:
         workdir:
@@ -17,12 +17,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Get changed files
         id: changed-files-specific
         uses: tj-actions/changed-files@v35
         with:
           files: |
             ${{ matrix.workdir }}/**
+
       - name: staticcheck
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
@@ -79,6 +81,29 @@ jobs:
           filter_mode: nofilter
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
+
+  golang_2:
+    strategy:
+      matrix:
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
+    name: golang
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
 
       - name: unconvert
         if: steps.changed-files-specific.outputs.any_changed == 'true'
@@ -139,6 +164,29 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
+  golang_3:
+    strategy:
+      matrix:
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
+    name: golang
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
+
       - name: bodyclose
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: reviewdog/action-golangci-lint@v2
@@ -193,6 +241,29 @@ jobs:
           tool_name: ifshort
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
+
+  golang_4:
+    strategy:
+      matrix:
+        workdir:
+          - lib
+          - cocotola-api
+          - cocotola-synthesizer-api
+          - cocotola-translator-api
+          - cocotola-tatoeba-api
+    name: golang
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v35
+        with:
+          files: |
+            ${{ matrix.workdir }}/**
 
       - name: noctx
         if: steps.changed-files-specific.outputs.any_changed == 'true'
