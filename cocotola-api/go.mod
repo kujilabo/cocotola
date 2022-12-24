@@ -10,7 +10,7 @@ require (
 	github.com/go-co-op/gocron v1.18.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/go-cmp v0.5.9
-	github.com/kujilabo/cocotola/lib v0.0.0-20221224153134-619046321fe3
+	github.com/kujilabo/cocotola/lib v0.0.0-20221224170227-eae90a0c5859
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221103022908-251fac8c039e
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.10.0
