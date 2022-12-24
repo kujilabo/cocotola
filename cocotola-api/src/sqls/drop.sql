@@ -1,5 +1,6 @@
 
 drop table casbin_rule              ;
+drop table user_quota               ;
 drop table tatoeba_link             ;
 drop table tatoeba_sentence         ;
 drop table template_problem         ;
@@ -23,3 +24,4 @@ drop table space                    ;
 drop table user_role                ;
 drop table app_user                 ;
 drop table organization             ;
+drop table schema_migrations        ;

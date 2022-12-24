@@ -650,36 +650,44 @@ func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
 
 	return nil
 }
+func findSystemStudent(ctx context.Context, rf appS.RepositoryFactory) (appS.SystemStudent, error) {
+	userRf, err := rf.NewUserRepositoryFactory(ctx)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
 
+	systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+	if err != nil {
+		return nil, liberrors.Errorf("NewSystemAdmin. err: %w", err)
+	}
+
+	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
+	if err != nil {
+		return nil, liberrors.Errorf("FindSystemOwnerByOrganizationName. err: %w", err)
+	}
+
+	systemStudentAppUser, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
+	if err != nil {
+		return nil, liberrors.Errorf("FindAppUserByLoginID. err: %w", err)
+	}
+
+	systemStudentModel, err := appD.NewSystemStudentModel(systemStudentAppUser)
+	if err != nil {
+		return nil, liberrors.Errorf("NewSystemStudentModel. err: %w", err)
+	}
+
+	systemStudent, err := appS.NewSystemStudent(rf, systemStudentModel)
+	if err != nil {
+		return nil, liberrors.Errorf("NewSystemStudent. err: %w", err)
+	}
+
+	return systemStudent, nil
+
+}
 func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 	var propertiesTatoebaWorkbookID appD.WorkbookID
 	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
-		userRf, err := rf.NewUserRepositoryFactory(ctx)
-		if err != nil {
-			return liberrors.Errorf(". err: %w", err)
-		}
-
-		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
-		if err != nil {
-			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
-		}
-
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
-		if err != nil {
-			return liberrors.Errorf("FindSystemOwnerByOrganizationName. err: %w", err)
-		}
-
-		systemStudentAppUser, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
-		if err != nil {
-			return liberrors.Errorf("FindAppUserByLoginID. err: %w", err)
-		}
-
-		systemStudentModel, err := appD.NewSystemStudentModel(systemStudentAppUser)
-		if err != nil {
-			return liberrors.Errorf("NewSystemStudentModel. err: %w", err)
-		}
-
-		systemStudent, err := appS.NewSystemStudent(rf, systemStudentModel)
+		systemStudent, err := findSystemStudent(ctx, rf)
 		if err != nil {
 			return liberrors.Errorf("NewSystemStudent. err: %w", err)
 		}
