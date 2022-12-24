@@ -64,6 +64,8 @@ const readHeaderTimeout = time.Duration(30) * time.Second
 
 const jobIntervalSec = 300
 
+type mainObject struct{}
+
 func getValue(values ...string) string {
 	for _, v := range values {
 		if len(v) != 0 {
@@ -88,10 +90,6 @@ func main() {
 	}
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
-
-	if err := initApp1(ctx, db, cfg.App.OwnerPassword); err != nil {
-		panic(err)
-	}
 
 	synthesizer, err := appG.NewSynthesizerClient(cfg.Synthesizer.Endpoint, cfg.Synthesizer.Username, cfg.Synthesizer.Password, time.Duration(cfg.Synthesizer.TimeoutSec)*time.Second)
 	if err != nil {
@@ -135,6 +133,10 @@ func main() {
 
 	jobTransaction, authTransaction, appTransaction, err := initTransaction(db, jobRff, userRff, rff)
 	if err != nil {
+		panic(err)
+	}
+
+	if err := initApp1(ctx, appTransaction, cfg.App.OwnerPassword); err != nil {
 		panic(err)
 	}
 
@@ -255,7 +257,11 @@ func getSystemOwnerModel(ctx context.Context, appTransaction appS.Transaction, o
 
 		appUserRepo := userRf.NewAppUserRepository(ctx)
 
-		tmpSystemOwnerModel, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, systemAdmin, orgName)
+		tmpSystemOwner, err := appUserRepo.FindSystemOwnerByOrganizationName(ctx, systemAdmin, orgName)
+		if err != nil {
+			return liberrors.Errorf(". err: %w", err)
+		}
+		tmpSystemOwnerModel, err := userD.NewSystemOwnerModel(tmpSystemOwner)
 		if err != nil {
 			return liberrors.Errorf(". err: %w", err)
 		}
@@ -495,11 +501,9 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	return cfg, db, sqlDB, tp, nil
 }
 
-func initApp1(ctx context.Context, db *gorm.DB, password string) error {
-	logger := log.FromContext(ctx)
-
-	if err := db.Transaction(func(tx *gorm.DB) error {
-		userRf, err := userG.NewRepositoryFactory(ctx, db)
+func systemAdminAction(ctx context.Context, appTransaction appS.Transaction, fn func(context.Context, userS.SystemAdmin) error) error {
+	return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
 			return liberrors.Errorf(". err: %w", err)
 		}
@@ -509,35 +513,100 @@ func initApp1(ctx context.Context, db *gorm.DB, password string) error {
 			return liberrors.Errorf(". err: %w", err)
 		}
 
-		organization, err := systemAdmin.FindOrganizationByName(ctx, appS.OrganizationName)
+		return fn(ctx, systemAdmin)
+	})
+}
+
+func systemOwnerAction(ctx context.Context, appTransaction appS.Transaction, fn func(context.Context, userS.SystemOwner) error) error {
+	return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		userRf, err := rf.NewUserRepositoryFactory(ctx)
 		if err != nil {
-			if !errors.Is(err, userS.ErrOrganizationNotFound) {
-				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
-			}
-
-			firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("cocotola-owner", "Owner(cocotola)", password)
-			if err != nil {
-				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
-			}
-
-			organizationAddParameter, err := userS.NewOrganizationAddParameter(appS.OrganizationName, firstOwnerAddParam)
-			if err != nil {
-				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
-			}
-
-			organizationID, err := systemAdmin.AddOrganization(ctx, organizationAddParameter)
-			if err != nil {
-				return liberrors.Errorf("failed to AddOrganization. err: %w", err)
-			}
-
-			logger.Infof("organizationID: %d", organizationID)
-			return nil
+			return liberrors.Errorf(". err: %w", err)
 		}
-		logger.Infof("organization: %d", organization.GetID())
+
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return liberrors.Errorf(". err: %w", err)
+		}
+
+		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
+		if err != nil {
+			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
+		}
+
+		return fn(ctx, systemOwner)
+	})
+}
+func systemStudentAction(ctx context.Context, appTransaction appS.Transaction, fn func(context.Context, appS.SystemStudent) error) error {
+	return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
+		userRf, err := rf.NewUserRepositoryFactory(ctx)
+		if err != nil {
+			return liberrors.Errorf(". err: %w", err)
+		}
+
+		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
+		if err != nil {
+			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
+		}
+
+		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
+		if err != nil {
+			return liberrors.Errorf("FindSystemOwnerByOrganizationName. err: %w", err)
+		}
+
+		systemStudentAppUser, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
+		if err != nil {
+			return liberrors.Errorf("FindAppUserByLoginID. err: %w", err)
+		}
+
+		systemStudentModel, err := appD.NewSystemStudentModel(systemStudentAppUser)
+		if err != nil {
+			return liberrors.Errorf("NewSystemStudentModel. err: %w", err)
+		}
+
+		systemStudent, err := appS.NewSystemStudent(rf, systemStudentModel)
+		if err != nil {
+			return liberrors.Errorf("NewSystemStudent. err: %w", err)
+		}
+
+		return fn(ctx, systemStudent)
+	})
+}
+
+func initApp1(ctx context.Context, appTransaction appS.Transaction, password string) error {
+	logger := log.FromContext(ctx)
+	addOrganizationFunc := func(ctx context.Context, systemAdmin userS.SystemAdmin) error {
+		organization, err := systemAdmin.FindOrganizationByName(ctx, appS.OrganizationName)
+		if err == nil {
+			logger.Infof("organization: %d", organization.GetID())
+			return nil
+		} else if !errors.Is(err, userS.ErrOrganizationNotFound) {
+			return liberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		firstOwnerAddParam, err := userS.NewFirstOwnerAddParameter("cocotola-owner", "Owner(cocotola)", password)
+		if err != nil {
+			return liberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		organizationAddParameter, err := userS.NewOrganizationAddParameter(appS.OrganizationName, firstOwnerAddParam)
+		if err != nil {
+			return liberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		organizationID, err := systemAdmin.AddOrganization(ctx, organizationAddParameter)
+		if err != nil {
+			return liberrors.Errorf("failed to AddOrganization. err: %w", err)
+		}
+
+		logger.Infof("organizationID: %d", organizationID)
 		return nil
-	}); err != nil {
+	}
+
+	if err := systemAdminAction(ctx, appTransaction, addOrganizationFunc); err != nil {
 		return liberrors.Errorf(". err: %w", err)
 	}
+
 	return nil
 }
 
@@ -558,24 +627,9 @@ func initApp2(ctx context.Context, appTransaction service.Transaction) error {
 }
 
 func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
-	var propertiesSystemStudentID userD.AppUserID
+	var systemStudentID userD.AppUserID
 
-	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
-		userRf, err := rf.NewUserRepositoryFactory(ctx)
-		if err != nil {
-			return liberrors.Errorf(". err: %w", err)
-		}
-
-		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
-		if err != nil {
-			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
-		}
-
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
-		if err != nil {
-			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
-		}
-
+	addSystemStudentFunc := func(ctx context.Context, systemOwner userS.SystemOwner) error {
 		systemStudent, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
 		if err != nil {
 			if !errors.Is(err, userS.ErrAppUserNotFound) {
@@ -587,111 +641,61 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 				return liberrors.Errorf("failed to NewAppUserAddParameter. err: %w", err)
 			}
 
-			systemStudentID, err := systemOwner.AddAppUser(ctx, param)
+			tmpSystemStudentID, err := systemOwner.AddAppUser(ctx, param)
 			if err != nil {
 				return liberrors.Errorf("failed to AddAppUser. err: %w", err)
 			}
 
-			propertiesSystemStudentID = systemStudentID
+			systemStudentID = tmpSystemStudentID
 		} else {
-			propertiesSystemStudentID = userD.AppUserID(systemStudent.GetID())
+			systemStudentID = userD.AppUserID(systemStudent.GetID())
 		}
 		return nil
-	}); err != nil {
-		return liberrors.Errorf(". err: %w", err)
 	}
 
-	appS.SetSystemStudentID(propertiesSystemStudentID)
+	if err := systemOwnerAction(ctx, appTransaction, addSystemStudentFunc); err != nil {
+		return err
+	}
 
+	appS.SetSystemStudentID(systemStudentID)
 	return nil
 }
 
 func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
-	var propertiesSystemSpaceID userD.SpaceID
+	var systemSpaceID userD.SpaceID
 
-	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
-		userRf, err := rf.NewUserRepositoryFactory(ctx)
-		if err != nil {
-			return liberrors.Errorf(". err: %w", err)
-		}
-
-		systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
-		if err != nil {
-			return liberrors.Errorf("NewSystemAdmin. err: %w", err)
-		}
-
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
-		if err != nil {
-			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
-		}
-
+	addSystemSpaceFunc := func(ctx context.Context, systemOwner userS.SystemOwner) error {
 		systemSpace, err := systemOwner.FindSystemSpace(ctx)
 		if err != nil {
 			if !errors.Is(err, userS.ErrSpaceNotFound) {
 				return liberrors.Errorf("failed to FindSystemSpace. err: %w", err)
 			}
 
-			spaceID, err := systemOwner.AddSystemSpace(ctx)
+			tmpSystemSpaceID, err := systemOwner.AddSystemSpace(ctx)
 			if err != nil {
 				return liberrors.Errorf("failed to AddSystemSpace. err: %w", err)
 			}
 
-			propertiesSystemSpaceID = spaceID
+			systemSpaceID = tmpSystemSpaceID
 		} else {
-			propertiesSystemSpaceID = userD.SpaceID(systemSpace.GetID())
+			systemSpaceID = userD.SpaceID(systemSpace.GetID())
 		}
 
 		return nil
-	}); err != nil {
-		return liberrors.Errorf(". err: %w", err)
 	}
 
-	appS.SetSystemSpaceID(propertiesSystemSpaceID)
+	if err := systemOwnerAction(ctx, appTransaction, addSystemSpaceFunc); err != nil {
+		return err
+	}
 
+	appS.SetSystemSpaceID(systemSpaceID)
 	return nil
 }
-func findSystemStudent(ctx context.Context, rf appS.RepositoryFactory) (appS.SystemStudent, error) {
-	userRf, err := rf.NewUserRepositoryFactory(ctx)
-	if err != nil {
-		return nil, liberrors.Errorf(". err: %w", err)
-	}
 
-	systemAdmin, err := userS.NewSystemAdmin(ctx, userRf)
-	if err != nil {
-		return nil, liberrors.Errorf("NewSystemAdmin. err: %w", err)
-	}
-
-	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
-	if err != nil {
-		return nil, liberrors.Errorf("FindSystemOwnerByOrganizationName. err: %w", err)
-	}
-
-	systemStudentAppUser, err := systemOwner.FindAppUserByLoginID(ctx, appS.SystemStudentLoginID)
-	if err != nil {
-		return nil, liberrors.Errorf("FindAppUserByLoginID. err: %w", err)
-	}
-
-	systemStudentModel, err := appD.NewSystemStudentModel(systemStudentAppUser)
-	if err != nil {
-		return nil, liberrors.Errorf("NewSystemStudentModel. err: %w", err)
-	}
-
-	systemStudent, err := appS.NewSystemStudent(rf, systemStudentModel)
-	if err != nil {
-		return nil, liberrors.Errorf("NewSystemStudent. err: %w", err)
-	}
-
-	return systemStudent, nil
-
-}
 func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 	var propertiesTatoebaWorkbookID appD.WorkbookID
-	if err := appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
-		systemStudent, err := findSystemStudent(ctx, rf)
-		if err != nil {
-			return liberrors.Errorf("NewSystemStudent. err: %w", err)
-		}
 
+	addWorkbookToSystemSpaceFunc := func(ctx context.Context, systemStudent appS.SystemStudent) error {
 		tatoebaWorkbook, err := systemStudent.FindWorkbookFromSystemSpace(ctx, appS.TatoebaWorkbookName)
 		if err != nil {
 			if !errors.Is(err, appS.ErrWorkbookNotFound) {
@@ -714,8 +718,10 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 		}
 
 		return nil
-	}); err != nil {
-		return liberrors.Errorf(". err: %w", err)
+	}
+
+	if err := systemStudentAction(ctx, appTransaction, addWorkbookToSystemSpaceFunc); err != nil {
+		return err
 	}
 
 	appS.SetTatoebaWorkbookID(propertiesTatoebaWorkbookID)

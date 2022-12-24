@@ -43,7 +43,6 @@ func migrateDB(db *gorm.DB, driverName string, sourceDriver source.Driver, getDa
 	if err != nil {
 		return liberrors.Errorf("db.DB in gateway.migrateDB. err: %w", err)
 	}
-	defer sqlDB.Close()
 
 	databaseDriver, err := getDatabaseDriver(sqlDB)
 	if err != nil {
