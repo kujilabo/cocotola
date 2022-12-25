@@ -12,6 +12,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 )
 
@@ -29,7 +30,7 @@ func (e *azureTranslationDBEntity) TableName() string {
 	return "azure_translation"
 }
 
-func NewAzureTranslationRepository(db *gorm.DB) service.AzureTranslationRepository {
+func newAzureTranslationRepository(db *gorm.DB) service.AzureTranslationRepository {
 	return &azureTranslationRepository{
 		db: db,
 	}
@@ -48,7 +49,7 @@ func (r *azureTranslationRepository) Add(ctx context.Context, lang2 domain.Lang2
 	}
 
 	if result := r.db.Create(&entity); result.Error != nil {
-		return libG.ConvertDuplicatedError(result.Error, service.ErrAzureTranslationAlreadyExists)
+		return liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrAzureTranslationAlreadyExists))
 	}
 
 	return nil

@@ -351,8 +351,8 @@ go_repository(
     name = "com_github_azure_azure_sdk_for_go",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/Azure/azure-sdk-for-go",
-    sum = "h1:oziYcaopbnIKfM69DL05wXdypiqfrUKdxUKrKpynJTw=",
-    version = "v67.1.0+incompatible",
+    sum = "h1:Uu/Ww6ernvPTrpq31kITVTIm/I5jlJ1wjtEH/bmSB2k=",
+    version = "v67.2.0+incompatible",
 )
 
 go_repository(
@@ -1311,8 +1311,8 @@ go_repository(
     name = "com_github_gin_gonic_gin",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/gin-gonic/gin",
-    sum = "h1:4+fr/el88TOO3ewCmQr8cx/CtZ/umlIRIs5M4NTNjf8=",
-    version = "v1.8.1",
+    sum = "h1:UzKToD9/PoFj/V4rvlKqTRKnQYyz8Sc1MJlv4JHPtvY=",
+    version = "v1.8.2",
 )
 
 go_repository(
@@ -1815,8 +1815,8 @@ go_repository(
     name = "com_github_google_pprof",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/google/pprof",
-    sum = "h1:fR20TYVVwhK4O7r7y+McjRYyaTH6/vjwJOajE+XhlzM=",
-    version = "v0.0.0-20221203041831-ce31453925ec",
+    sum = "h1:wORs2YN3R3ona/CXYuTvLM31QlgoNKHvlCNuArCDDCU=",
+    version = "v0.0.0-20221219190121-3cb0bae90811",
 )
 
 go_repository(
@@ -3111,16 +3111,16 @@ go_repository(
     name = "com_github_prometheus_common",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/prometheus/common",
-    sum = "h1:VTQitp6mXTdUoCmDMugDVOJ1opi6ADftKfp/yeqTR/E=",
-    version = "v0.38.0",
+    sum = "h1:oOyhkDq05hPZKItWVBkJ6g6AtGxi+fy7F4JvUV8uhsI=",
+    version = "v0.39.0",
 )
 
 go_repository(
     name = "com_github_prometheus_procfs",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/prometheus/procfs",
-    sum = "h1:ODq8ZFEaYeCaZOJlZZdJA2AbQR98dSHSM1KW/You5mo=",
-    version = "v0.8.0",
+    sum = "h1:wzCHvIvM5SxWqYvwgVL7yJY8Lz3PKn49KQtpgMYJfhI=",
+    version = "v0.9.0",
 )
 
 go_repository(
@@ -3679,8 +3679,8 @@ go_repository(
     name = "com_google_cloud_go_storage",
     build_file_proto_mode = "disable_global",
     importpath = "cloud.google.com/go/storage",
-    sum = "h1:STgFzyU5/8miMl0//zKh2aQeTyeaUH3WN9bSUiJ09bA=",
-    version = "v1.10.0",
+    sum = "h1:YOO045NZI9RKfCj1c5A/ZtuuENUc8OAW+gHdGnDgyMQ=",
+    version = "v1.27.0",
 )
 
 go_repository(
@@ -4215,8 +4215,8 @@ go_repository(
     name = "org_golang_google_api",
     build_file_proto_mode = "disable_global",
     importpath = "google.golang.org/api",
-    sum = "h1:KBfmLRqdZEbwQleFlSLnzpQJwhjpmNOk4cKQIBDZ9mg=",
-    version = "v0.104.0",
+    sum = "h1:t6P9Jj+6XTn4U9I2wycQai6Q/Kz7iOT+QzjJ3G2V4x8=",
+    version = "v0.105.0",
 )
 
 go_repository(
@@ -4367,8 +4367,8 @@ go_repository(
     name = "org_golang_x_time",
     build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/time",
-    sum = "h1:M73Iuj3xbbb9Uk1DYhzydthsj6oOd6l9bpuFcNoUvTs=",
-    version = "v0.0.0-20220224211638-0e9765cccd65",
+    sum = "h1:xYY+Bajn2a7VBmTM5GikTmnK8ZuX8YgnQCqZpbBNtmA=",
+    version = "v0.1.0",
 )
 
 go_repository(
@@ -4487,8 +4487,8 @@ go_repository(
     name = "org_modernc_libc",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/libc",
-    sum = "h1:xBkU9fnHV+hvZuPSRszN0AXDG4M7nwPLwTWwkYcvLCI=",
-    version = "v1.21.5",
+    sum = "h1:4U7v51GyhlWqQmwCHj28Rdq2Yzwk55ovjFrdPjs8Hb0=",
+    version = "v1.22.2",
 )
 
 go_repository(
@@ -4623,8 +4623,8 @@ go_repository(
     name = "org_uber_go_multierr",
     build_file_proto_mode = "disable_global",
     importpath = "go.uber.org/multierr",
-    sum = "h1:dg6GjLku4EH+249NNmoIciG9N/jURbDG+pFlTkhzIC8=",
-    version = "v1.8.0",
+    sum = "h1:7fIwc/ZtS0q++VgcfqFDxSBZVv/Xo49/SYnDFupUwlI=",
+    version = "v1.9.0",
 )
 
 go_repository(
@@ -4843,8 +4843,8 @@ go_repository(
 go_repository(
     name = "com_github_microsoft_go_mssqldb",
     importpath = "github.com/microsoft/go-mssqldb",
-    sum = "h1:6Pf95ZIt8mjg3Bm374SlH7RFiez1nGy4xKKOiCw/zFE=",
-    version = "v0.18.0",
+    sum = "h1:LMRSgLcNMF8paPX14xlyQBmBH+jnFylPsYpVZf86eHM=",
+    version = "v0.19.0",
 )
 
 go_repository(
@@ -5039,8 +5039,8 @@ go_repository(
 go_repository(
     name = "com_google_cloud_go_compute_metadata",
     importpath = "cloud.google.com/go/compute/metadata",
-    sum = "h1:aWKAjYaBaOSrpKl57+jnS/3fJRQnxL7TvR/u1VVbt6k=",
-    version = "v0.2.2",
+    sum = "h1:mg4jlk7mCAj6xXp9UJ4fjI9VUI5rubuGBW5aJ7UnBMY=",
+    version = "v0.2.3",
 )
 
 go_repository(

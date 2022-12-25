@@ -7,6 +7,7 @@ go_library(
         "AzureTranslationRepository.go",
         "CustomTranslationRepository.go",
         "RepositoryFactory.go",
+        "Transaction.go",
         "TranslationUpdateParameter.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/service/mock",

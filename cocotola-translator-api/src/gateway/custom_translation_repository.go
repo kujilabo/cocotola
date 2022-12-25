@@ -47,10 +47,10 @@ func (e *customTranslationDBEntity) toModel() (domain.Translation, error) {
 	return t, nil
 }
 
-func NewCustomTranslationRepository(db *gorm.DB) (service.CustomTranslationRepository, error) {
+func newCustomTranslationRepository(db *gorm.DB) service.CustomTranslationRepository {
 	return &customTranslationRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *customTranslationRepository) Add(ctx context.Context, param service.TranslationAddParameter) error {
@@ -84,7 +84,7 @@ func (r *customTranslationRepository) Update(ctx context.Context, lang2 domain.L
 			"translated": param.GetTranslated(),
 		})
 	if result.Error != nil {
-		return libG.ConvertDuplicatedError(result.Error, service.ErrTranslationAlreadyExists)
+		return liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrTranslationAlreadyExists))
 	}
 
 	if result.RowsAffected != 1 {

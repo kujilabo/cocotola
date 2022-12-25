@@ -20,8 +20,7 @@ type UserUsecase interface {
 }
 
 type userUsecase struct {
-	rf                     service.RepositoryFactory
-	customRepo             service.CustomTranslationRepository
+	transaction            service.Transaction
 	azureTranslationClient service.AzureTranslationClient
 }
 
@@ -30,19 +29,14 @@ type UserPresenter interface {
 	WriteTranslation(ctx context.Context, translation domain.Translation) error
 }
 
-func NewUserUsecase(ctx context.Context, rf service.RepositoryFactory, azureTranslationClient service.AzureTranslationClient) (UserUsecase, error) {
-	customRepo, err := rf.NewCustomTranslationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+func NewUserUsecase(ctx context.Context, transaction service.Transaction, azureTranslationClient service.AzureTranslationClient) UserUsecase {
 	return &userUsecase{
-		rf:                     rf,
-		customRepo:             customRepo,
+		transaction:            transaction,
 		azureTranslationClient: azureTranslationClient,
-	}, nil
+	}
 }
 
-func (u *userUsecase) selectMaxConfidenceTranslations(ctx context.Context, in []service.AzureTranslation) (map[domain.WordPos]service.AzureTranslation, error) {
+func (u *userUsecase) selectMaxConfidenceTranslations(ctx context.Context, in []service.AzureTranslation) map[domain.WordPos]service.AzureTranslation {
 	results := make(map[domain.WordPos]service.AzureTranslation)
 	for _, i := range in {
 		if _, ok := results[i.Pos]; !ok {
@@ -51,15 +45,11 @@ func (u *userUsecase) selectMaxConfidenceTranslations(ctx context.Context, in []
 			results[i.Pos] = i
 		}
 	}
-	return results, nil
+	return results
 }
 
-func (u *userUsecase) customDictionaryLookup(ctx context.Context, text string, fromLang, toLang domain.Lang2) ([]domain.Translation, error) {
-	// repo, err := u.rf.NewAzureTranslationRepository()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	customContained, err := u.customRepo.Contain(ctx, toLang, text)
+func (u *userUsecase) customDictionaryLookup(ctx context.Context, customRepo service.CustomTranslationRepository, text string, fromLang, toLang domain.Lang2) ([]domain.Translation, error) {
+	customContained, err := customRepo.Contain(ctx, toLang, text)
 	if err != nil {
 		return nil, err
 	}
@@ -67,20 +57,14 @@ func (u *userUsecase) customDictionaryLookup(ctx context.Context, text string, f
 		return nil, service.ErrTranslationNotFound
 	}
 
-	customResults, err := u.customRepo.FindByText(ctx, toLang, text)
+	customResults, err := customRepo.FindByText(ctx, toLang, text)
 	if err != nil {
 		return nil, err
 	}
 	return customResults, nil
 }
 
-func (u *userUsecase) azureDictionaryLookup(ctx context.Context, fromLang, toLang domain.Lang2, text string) ([]service.AzureTranslation, error) {
-	// repo, err := t.repo(t.db)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	azureRepo := u.rf.NewAzureTranslationRepository(ctx)
+func (u *userUsecase) azureDictionaryLookup(ctx context.Context, azureRepo service.AzureTranslationRepository, fromLang, toLang domain.Lang2, text string) ([]service.AzureTranslation, error) {
 	azureContained, err := azureRepo.Contain(ctx, toLang, text)
 	if err != nil {
 		return nil, err
@@ -110,54 +94,65 @@ func (u *userUsecase) azureDictionaryLookup(ctx context.Context, fromLang, toLan
 }
 
 func (u *userUsecase) DictionaryLookup(ctx context.Context, fromLang, toLang domain.Lang2, text string) ([]domain.Translation, error) {
-	// find translations from custom reopository
-	customResults, err := u.customDictionaryLookup(ctx, text, fromLang, toLang)
-	if err != nil && !errors.Is(err, service.ErrTranslationNotFound) {
-		return nil, err
-	}
-	// if !errors.Is(err, service.ErrTranslationNotFound) {
-	// 	return customResults, err
-	// }
+	results := make([]domain.Translation, 0)
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
 
-	// find translations from azure
-	azureResults, err := u.azureDictionaryLookup(ctx, fromLang, toLang, text)
-	if err != nil {
-		return nil, err
-	}
-	azureResultMap, err := u.selectMaxConfidenceTranslations(ctx, azureResults)
-	if err != nil {
-		return nil, err
-	}
-	makeKey := func(text string, pos domain.WordPos) string {
-		return text + "_" + strconv.Itoa(int(pos))
-	}
-	resultMap := make(map[string]domain.Translation)
+		// find translations from custom reopository
+		customResults, err := u.customDictionaryLookup(ctx, customRepo, text, fromLang, toLang)
+		if err != nil && !errors.Is(err, service.ErrTranslationNotFound) {
+			return err
+		}
+		// if !errors.Is(err, service.ErrTranslationNotFound) {
+		// 	return customResults, err
+		// }
 
-	// insert customResults into resultMap
-	for _, c := range customResults {
-		key := makeKey(c.GetText(), c.GetPos())
-		resultMap[key] = c
-	}
+		azureRepo := rf.NewAzureTranslationRepository(ctx)
 
-	// insert azureResultMap into resultMap
-	for _, a := range azureResultMap {
-		key := makeKey(text, a.Pos)
-		if _, ok := resultMap[key]; !ok {
+		// find translations from azure
+		azureResults, err := u.azureDictionaryLookup(ctx, azureRepo, fromLang, toLang, text)
+		if err != nil {
+			return err
+		}
+		azureResultMap := u.selectMaxConfidenceTranslations(ctx, azureResults)
+		makeKey := func(text string, pos domain.WordPos) string {
+			return text + "_" + strconv.Itoa(int(pos))
+		}
+		resultMap := make(map[string]domain.Translation)
+
+		// insert customResults into resultMap
+		for _, c := range customResults {
+			key := makeKey(c.GetText(), c.GetPos())
+			resultMap[key] = c
+		}
+
+		// insert azureResultMap into resultMap
+		for _, a := range azureResultMap {
+			key := makeKey(text, a.Pos)
+			if _, ok := resultMap[key]; ok {
+				continue
+			}
+
 			result, err := domain.NewTranslation(1, time.Now(), time.Now(), text, a.Pos, fromLang, a.Target, "azure")
 			if err != nil {
-				return nil, err
+				return err
 			}
 			resultMap[key] = result
 		}
-	}
 
-	// convert map to list
-	results := make([]domain.Translation, 0)
-	for _, v := range resultMap {
-		results = append(results, v)
-	}
+		// convert map to list
+		tmpResults := make([]domain.Translation, 0)
+		for _, v := range resultMap {
+			tmpResults = append(tmpResults, v)
+		}
 
-	sort.Slice(results, func(i, j int) bool { return results[i].GetPos() < results[j].GetPos() })
+		sort.Slice(tmpResults, func(i, j int) bool { return tmpResults[i].GetPos() < tmpResults[j].GetPos() })
+
+		results = tmpResults
+		return nil
+	}); err != nil {
+		return nil, err
+	}
 
 	return results, nil
 }

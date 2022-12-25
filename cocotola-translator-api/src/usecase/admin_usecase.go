@@ -33,150 +33,192 @@ type AdminPresenter interface {
 }
 
 type adminUsecase struct {
-	rf         service.RepositoryFactory
-	customRepo service.CustomTranslationRepository
+	transaction service.Transaction
 }
 
-func NewAdminUsecase(ctx context.Context, rf service.RepositoryFactory) (AdminUsecase, error) {
-	customRepo, err := rf.NewCustomTranslationRepository(ctx)
-	if err != nil {
-		return nil, err
-	}
+func NewAdminUsecase(ctx context.Context, transaction service.Transaction) AdminUsecase {
 	return &adminUsecase{
-		rf:         rf,
-		customRepo: customRepo,
-	}, nil
+		transaction: transaction,
+	}
 }
 
 func (u *adminUsecase) FindTranslationsByFirstLetter(ctx context.Context, lang2 domain.Lang2, firstLetter string) ([]domain.Translation, error) {
-	customResults, err := u.customRepo.FindByFirstLetter(ctx, lang2, firstLetter)
-	if err != nil {
-		return nil, err
-	}
-	azureRepo := u.rf.NewAzureTranslationRepository(ctx)
-	azureResults, err := azureRepo.FindByFirstLetter(ctx, lang2, firstLetter)
-	if err != nil {
-		return nil, err
-	}
-
-	makeKey := func(text string, pos domain.WordPos) string {
-		return text + "_" + strconv.Itoa(int(pos))
-	}
-	resultMap := make(map[string]domain.Translation)
-	for _, c := range customResults {
-		key := makeKey(c.GetText(), c.GetPos())
-		resultMap[key] = c
-	}
-	for _, a := range azureResults {
-		key := makeKey(a.GetText(), a.GetPos())
-		if _, ok := resultMap[key]; !ok {
-			resultMap[key] = a
-		}
-	}
-
 	results := make([]domain.Translation, 0)
-	for _, v := range resultMap {
-		results = append(results, v)
-	}
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		customResults, err := customRepo.FindByFirstLetter(ctx, lang2, firstLetter)
+		if err != nil {
+			return err
+		}
 
-	sort.Slice(results, func(i, j int) bool { return results[i].GetText() < results[j].GetText() })
+		azureRepo := rf.NewAzureTranslationRepository(ctx)
+		azureResults, err := azureRepo.FindByFirstLetter(ctx, lang2, firstLetter)
+		if err != nil {
+			return err
+		}
+
+		makeKey := func(text string, pos domain.WordPos) string {
+			return text + "_" + strconv.Itoa(int(pos))
+		}
+		resultMap := make(map[string]domain.Translation)
+		for _, c := range customResults {
+			key := makeKey(c.GetText(), c.GetPos())
+			resultMap[key] = c
+		}
+		for _, a := range azureResults {
+			key := makeKey(a.GetText(), a.GetPos())
+			if _, ok := resultMap[key]; !ok {
+				resultMap[key] = a
+			}
+		}
+
+		tmpResults := make([]domain.Translation, 0)
+		for _, v := range resultMap {
+			tmpResults = append(tmpResults, v)
+		}
+
+		sort.Slice(tmpResults, func(i, j int) bool { return tmpResults[i].GetText() < tmpResults[j].GetText() })
+
+		results = tmpResults
+		return nil
+	}); err != nil {
+		return nil, err
+	}
 
 	return results, nil
 }
 
 func (u *adminUsecase) FindTranslationByTextAndPos(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos) (domain.Translation, error) {
-	customResult, err := u.customRepo.FindByTextAndPos(ctx, lang2, text, pos)
-	if err == nil {
-		return customResult, nil
-	}
-	if !errors.Is(err, service.ErrTranslationNotFound) {
-		return nil, err
-	}
+	var result domain.Translation
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		customResult, err := customRepo.FindByTextAndPos(ctx, lang2, text, pos)
+		if err == nil {
+			result = customResult
+			return nil
+		} else if !errors.Is(err, service.ErrTranslationNotFound) {
+			return err
+		}
 
-	azureRepo := u.rf.NewAzureTranslationRepository(ctx)
-	azureResult, err := azureRepo.FindByTextAndPos(ctx, lang2, text, pos)
-	if err != nil {
+		azureRepo := rf.NewAzureTranslationRepository(ctx)
+		azureResult, err := azureRepo.FindByTextAndPos(ctx, lang2, text, pos)
+		if err != nil {
+			return err
+		}
+
+		result = azureResult
+		return nil
+	}); err != nil {
 		return nil, err
 	}
-	return azureResult, nil
+	return result, nil
 }
 
 func (u *adminUsecase) FindTranslationByText(ctx context.Context, lang2 domain.Lang2, text string) ([]domain.Translation, error) {
 	logger := log.FromContext(ctx)
-	customResults, err := u.customRepo.FindByText(ctx, lang2, text)
-	if err != nil {
-		return nil, err
-	}
-	azureRepo := u.rf.NewAzureTranslationRepository(ctx)
-	azureResults, err := azureRepo.FindByText(ctx, lang2, text)
-	if err != nil {
-		return nil, err
-	}
-
-	makeKey := func(text string, pos domain.WordPos) string {
-		return text + "_" + strconv.Itoa(int(pos))
-	}
-	resultMap := make(map[string]domain.Translation)
-	for _, c := range customResults {
-		key := makeKey(c.GetText(), c.GetPos())
-		resultMap[key] = c
-	}
-	for _, a := range azureResults {
-		key := makeKey(a.GetText(), a.GetPos())
-		if _, ok := resultMap[key]; !ok {
-			resultMap[key] = a
-			logger.Infof("translation: %v", a)
+	var results []domain.Translation
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		customResults, err := customRepo.FindByText(ctx, lang2, text)
+		if err != nil {
+			return err
 		}
-	}
 
-	// convert map to list
-	results := make([]domain.Translation, 0)
-	for _, v := range resultMap {
-		results = append(results, v)
-	}
+		azureRepo := rf.NewAzureTranslationRepository(ctx)
+		azureResults, err := azureRepo.FindByText(ctx, lang2, text)
+		if err != nil {
+			return err
+		}
 
-	sort.Slice(results, func(i, j int) bool { return results[i].GetPos() < results[j].GetPos() })
+		makeKey := func(text string, pos domain.WordPos) string {
+			return text + "_" + strconv.Itoa(int(pos))
+		}
+		resultMap := make(map[string]domain.Translation)
+		for _, c := range customResults {
+			key := makeKey(c.GetText(), c.GetPos())
+			resultMap[key] = c
+		}
+		for _, a := range azureResults {
+			key := makeKey(a.GetText(), a.GetPos())
+			if _, ok := resultMap[key]; !ok {
+				resultMap[key] = a
+				logger.Infof("translation: %v", a)
+			}
+		}
+
+		// convert map to list
+		tmpResults := make([]domain.Translation, 0)
+		for _, v := range resultMap {
+			tmpResults = append(tmpResults, v)
+		}
+
+		sort.Slice(tmpResults, func(i, j int) bool { return tmpResults[i].GetPos() < tmpResults[j].GetPos() })
+
+		results = tmpResults
+		return nil
+	}); err != nil {
+		return nil, err
+	}
 
 	return results, nil
 }
 
 func (u *adminUsecase) AddTranslation(ctx context.Context, param service.TranslationAddParameter) error {
-	if err := u.customRepo.Add(ctx, param); err != nil {
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		if err := customRepo.Add(ctx, param); err != nil {
+			return err
+		}
+		return nil
+	}); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (u *adminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param service.TranslationUpdateParameter) error {
-	translationFound := true
-	if _, err := u.customRepo.FindByTextAndPos(ctx, lang2, text, pos); err != nil {
-		if errors.Is(err, service.ErrTranslationNotFound) {
-			translationFound = false
-		} else {
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		translationFound := true
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		if _, err := customRepo.FindByTextAndPos(ctx, lang2, text, pos); err != nil {
+			if errors.Is(err, service.ErrTranslationNotFound) {
+				translationFound = false
+			} else {
+				return err
+			}
+		}
+
+		if translationFound {
+			if err := customRepo.Update(ctx, lang2, text, pos, param); err != nil {
+				return err
+			}
+			return nil
+		}
+
+		paramToAdd, err := service.NewTransalationAddParameter(text, pos, lang2, param.GetTranslated())
+		if err != nil {
 			return err
 		}
-	}
 
-	if translationFound {
-		if err := u.customRepo.Update(ctx, lang2, text, pos, param); err != nil {
+		if err := customRepo.Add(ctx, paramToAdd); err != nil {
 			return err
 		}
 		return nil
-	}
-
-	paramToAdd, err := service.NewTransalationAddParameter(text, pos, lang2, param.GetTranslated())
-	if err != nil {
-		return err
-	}
-	if err := u.customRepo.Add(ctx, paramToAdd); err != nil {
+	}); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (u *adminUsecase) RemoveTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos) error {
-	if err := u.customRepo.Remove(ctx, lang2, text, pos); err != nil {
-		return liberrors.Errorf("failed to customRepo.Remove in adminUsecase.RemoveTranslation. err: %w", err)
+	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+		customRepo := rf.NewCustomTranslationRepository(ctx)
+		if err := customRepo.Remove(ctx, lang2, text, pos); err != nil {
+			return liberrors.Errorf("failed to customRepo.Remove in adminUsecase.RemoveTranslation. err: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return err
 	}
 	return nil
 }

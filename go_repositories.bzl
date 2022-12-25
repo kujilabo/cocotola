@@ -106,8 +106,8 @@ def go_repositories():
         name = "com_github_swaggo_swag",
         build_file_proto_mode = "disable_global",
         importpath = "github.com/swaggo/swag",
-        sum = "h1:/GgJmrJ8/c0z4R4hoEPZ5UeEhVGdvsII4JbVDLbR7Xc=",
-        version = "v1.8.8",
+        sum = "h1:kHtaBe/Ob9AZzAANfcn5c6RyCke9gG9QpH0jky0I/sA=",
+        version = "v1.8.9",
     )
     go_repository(
         name = "com_github_urfave_cli_v2",

@@ -10,7 +10,6 @@ import (
 )
 
 func ToTranslationFindResposne(ctx context.Context, translations []domain.Translation) (*entity.TranslationFindResponseHTTPEntity, error) {
-
 	results := make([]entity.TranslationHTTPEntity, len(translations))
 	for i, t := range translations {
 		results[i] = entity.TranslationHTTPEntity{

@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
@@ -36,6 +37,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/config"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/gateway"
+	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/sqls"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
 	libconfig "github.com/kujilabo/cocotola/lib/config"
@@ -46,23 +48,22 @@ import (
 
 const readHeaderTimeout = time.Duration(30) * time.Second
 
+func getValue(values ...string) string {
+	for _, v := range values {
+		if len(v) != 0 {
+			return v
+		}
+	}
+	return ""
+}
+
 // @securityDefinitions.basic BasicAuth
 func main() {
-	logrus.Infof("Starting cocotola-translator-api")
-
 	ctx := context.Background()
 	env := flag.String("env", "", "environment")
 	flag.Parse()
-	if len(*env) == 0 {
-		appEnv := os.Getenv("APP_ENV")
-		if len(appEnv) == 0 {
-			*env = "local"
-		} else {
-			*env = appEnv
-		}
-	}
-
-	logrus.Infof("env: %s", *env)
+	appEnv := getValue(*env, os.Getenv("APP_ENV"), "local")
+	logrus.Infof("env: %s", appEnv)
 
 	liberrors.UseXerrorsErrorf()
 
@@ -74,20 +75,18 @@ func main() {
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
 	azureTranslationClient := gateway.NewAzureTranslationClient(cfg.Azure.SubscriptionKey)
-	rf, err := gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName)
+
+	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+		return gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName) // nolint:wrapcheck
+	}
+
+	appTransaction, err := initTransaction(db, rff)
 	if err != nil {
 		panic(err)
 	}
 
-	adminUsecase, err := usecase.NewAdminUsecase(ctx, rf)
-	if err != nil {
-		panic(err)
-	}
-
-	userUsecase, err := usecase.NewUserUsecase(ctx, rf, azureTranslationClient)
-	if err != nil {
-		panic(err)
-	}
+	adminUsecase := usecase.NewAdminUsecase(ctx, appTransaction)
+	userUsecase := usecase.NewUserUsecase(ctx, appTransaction, azureTranslationClient)
 
 	result := run(context.Background(), cfg, db, adminUsecase, userUsecase)
 
@@ -97,25 +96,38 @@ func main() {
 	os.Exit(result)
 }
 
+func initTransaction(db *gorm.DB, rff gateway.RepositoryFactoryFunc) (service.Transaction, error) {
+	appTransaction, err := gateway.NewTransaction(db, rff)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return appTransaction, nil
+}
+
 func run(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
+	if !cfg.Debug.GinMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	eg.Go(func() error {
-		return httpServer(ctx, cfg, db, adminUsecase, userUsecase)
+		return appServer(ctx, cfg, adminUsecase, userUsecase) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return grpcServer(ctx, cfg, db, adminUsecase, userUsecase)
+		return grpcServer(ctx, cfg, db, adminUsecase, userUsecase) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
+		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return libG.SignalWatchProcess(ctx)
+		return libG.SignalWatchProcess(ctx) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		<-ctx.Done()
-		return ctx.Err()
+		return ctx.Err() // nolint:wrapcheck
 	})
 
 	if err := eg.Wait(); err != nil {
@@ -125,16 +137,25 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usec
 	return 0
 }
 
-func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) error {
+func appServer(ctx context.Context, cfg *config.Config, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
 
 	if err := corsConfig.Validate(); err != nil {
-		return err
+		return liberrors.Errorf("corsConfig.Validate. err: %w", err)
 	}
 
-	router := controller.NewRouter(adminUsecase, userUsecase, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	publicRouterGroupFunc := []controller.InitRouterGroupFunc{}
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitAdminRouterFunc(adminUsecase),
+		controller.NewInitUserRouterFunc(userUsecase),
+	}
+
+	router, err := controller.NewAppRouter(publicRouterGroupFunc, privateRouterGroupFunc, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	if err != nil {
+		panic(err)
+	}
 
 	if cfg.Swagger.Enabled {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
