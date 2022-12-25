@@ -84,10 +84,7 @@ func main() {
 
 	liberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp, err := initialize(ctx, appEnv)
-	if err != nil {
-		panic(err)
-	}
+	cfg, db, sqlDB, tp := initialize(ctx, appEnv)
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
@@ -131,18 +128,12 @@ func main() {
 		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, time.Local, jobRff, userRff, pf, problemRepositories) // nolint:wrapcheck
 	}
 
-	jobTransaction, authTransaction, appTransaction, err := initTransaction(db, jobRff, userRff, rff)
-	if err != nil {
-		panic(err)
-	}
+	jobTransaction, authTransaction, appTransaction := initTransaction(db, jobRff, userRff, rff)
 
-	if err := initApp1(ctx, appTransaction, cfg.App.OwnerPassword); err != nil {
-		panic(err)
-	}
-
-	if err := initApp2(ctx, appTransaction); err != nil {
-		panic(err)
-	}
+	initApp1(ctx, appTransaction, cfg.App.OwnerPassword)
+	initApp2_1(ctx, appTransaction)
+	initApp2_2(ctx, appTransaction)
+	initApp2_3(ctx, appTransaction)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
@@ -178,20 +169,20 @@ func initLocalEnv(ctx context.Context, jobTransaction jobS.Transaction, appTrans
 	s.StartAsync()
 }
 
-func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, rff appG.RepositoryFactoryFunc) (jobS.Transaction, authS.Transaction, appS.Transaction, error) {
+func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, rff appG.RepositoryFactoryFunc) (jobS.Transaction, authS.Transaction, appS.Transaction) {
 	jobTransaction := jobG.NewTransaction(db, jobRff)
 
 	authTransaction, err := authG.NewTransaction(db, userRff)
 	if err != nil {
-		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
+		panic(err)
 	}
 
 	appTransaction, err := appG.NewTransaction(db, rff)
 	if err != nil {
-		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
+		panic(err)
 	}
 
-	return jobTransaction, authTransaction, appTransaction, nil
+	return jobTransaction, authTransaction, appTransaction
 }
 
 func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, pf appS.ProcessorFactory, authTransaction authS.Transaction, jobTransaction jobS.Transaction, appTransaction appS.Transaction, synthesizerClient appS.SynthesizerClient, translatorClient pluginCommonS.TranslatorClient, tatoebaClient pluginCommonS.TatoebaClient, newIteratorFunc controller.NewIteratorFunc) int {
@@ -469,21 +460,21 @@ func initPf(synthesizerClient appS.SynthesizerClient, translatorClient pluginCom
 	return pf, problemRepositories, problemImportProcessor
 }
 
-func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider, error) {
+func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql.DB, *sdktrace.TracerProvider) {
 	cfg, err := config.LoadConfig(env)
 	if err != nil {
-		return nil, nil, nil, nil, liberrors.Errorf(". err: %w", err)
+		panic(err)
 	}
 
 	// init log
 	if err := libconfig.InitLog(env, cfg.Log); err != nil {
-		return nil, nil, nil, nil, liberrors.Errorf(". err: %w", err)
+		panic(err)
 	}
 
 	// init tracer
 	tp, err := libconfig.InitTracerProvider(cfg.App.Name, cfg.Trace)
 	if err != nil {
-		return nil, nil, nil, nil, liberrors.Errorf("failed to InitTracerProvider. err: %w", err)
+		panic(err)
 	}
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
@@ -491,10 +482,10 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 	// init db
 	db, sqlDB, err := libconfig.InitDB(cfg.DB, sqls.SQL)
 	if err != nil {
-		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
+		panic(err)
 	}
 
-	return cfg, db, sqlDB, tp, nil
+	return cfg, db, sqlDB, tp
 }
 
 func systemAdminAction(ctx context.Context, appTransaction appS.Transaction, fn func(context.Context, userS.SystemAdmin) error) error {
@@ -570,7 +561,7 @@ func systemStudentAction(ctx context.Context, appTransaction appS.Transaction, f
 	})
 }
 
-func initApp1(ctx context.Context, appTransaction appS.Transaction, password string) error {
+func initApp1(ctx context.Context, appTransaction appS.Transaction, password string) {
 	logger := log.FromContext(ctx)
 	addOrganizationFunc := func(ctx context.Context, systemAdmin userS.SystemAdmin) error {
 		organization, err := systemAdmin.FindOrganizationByName(ctx, appS.OrganizationName)
@@ -601,29 +592,11 @@ func initApp1(ctx context.Context, appTransaction appS.Transaction, password str
 	}
 
 	if err := systemAdminAction(ctx, appTransaction, addOrganizationFunc); err != nil {
-		return liberrors.Errorf(". err: %w", err)
+		panic(err)
 	}
-
-	return nil
 }
 
-func initApp2(ctx context.Context, appTransaction service.Transaction) error {
-	if err := initApp2_1(ctx, appTransaction); err != nil {
-		return liberrors.Errorf("failed to initApp2_1. err: %w", err)
-	}
-
-	if err := initApp2_2(ctx, appTransaction); err != nil {
-		return liberrors.Errorf("failed to initApp2_2. err: %w", err)
-	}
-
-	if err := initApp2_3(ctx, appTransaction); err != nil {
-		return liberrors.Errorf("failed to initApp2_3. err: %w", err)
-	}
-
-	return nil
-}
-
-func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
+func initApp2_1(ctx context.Context, appTransaction service.Transaction) {
 	var systemStudentID userD.AppUserID
 
 	addSystemStudentFunc := func(ctx context.Context, systemOwner userS.SystemOwner) error {
@@ -651,14 +624,13 @@ func initApp2_1(ctx context.Context, appTransaction service.Transaction) error {
 	}
 
 	if err := systemOwnerAction(ctx, appTransaction, addSystemStudentFunc); err != nil {
-		return err
+		panic(err)
 	}
 
 	appS.SetSystemStudentID(systemStudentID)
-	return nil
 }
 
-func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
+func initApp2_2(ctx context.Context, appTransaction service.Transaction) {
 	var systemSpaceID userD.SpaceID
 
 	addSystemSpaceFunc := func(ctx context.Context, systemOwner userS.SystemOwner) error {
@@ -682,14 +654,13 @@ func initApp2_2(ctx context.Context, appTransaction service.Transaction) error {
 	}
 
 	if err := systemOwnerAction(ctx, appTransaction, addSystemSpaceFunc); err != nil {
-		return err
+		panic(err)
 	}
 
 	appS.SetSystemSpaceID(systemSpaceID)
-	return nil
 }
 
-func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
+func initApp2_3(ctx context.Context, appTransaction service.Transaction) {
 	var propertiesTatoebaWorkbookID appD.WorkbookID
 
 	addWorkbookToSystemSpaceFunc := func(ctx context.Context, systemStudent appS.SystemStudent) error {
@@ -718,12 +689,10 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) error {
 	}
 
 	if err := systemStudentAction(ctx, appTransaction, addWorkbookToSystemSpaceFunc); err != nil {
-		return err
+		panic(err)
 	}
 
 	appS.SetTatoebaWorkbookID(propertiesTatoebaWorkbookID)
-
-	return nil
 }
 
 func callback(ctx context.Context, testUserEmail string, pf appS.ProcessorFactory, rf appS.RepositoryFactory, organizationName string, appUser userD.AppUserModel) error {
