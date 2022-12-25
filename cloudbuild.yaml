@@ -80,11 +80,17 @@ steps:
   # cocotola
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
       - -c
       - |
         diff_cocotola=$(cat /workspace/diff_cocotola.txt)
-        if [ $diff_cocotola == '0' ]; then docker pull     gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0; fi
         if [ $diff_cocotola == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-api-builder:latest --target builder ./cocotola-api; fi
         if [ $diff_cocotola == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-api-builder:latest; fi
 
@@ -94,7 +100,6 @@ steps:
       - -c
       - |
         diff_cocotola=$(cat /workspace/diff_cocotola.txt)
-        if [ $diff_cocotola == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0; fi
         if [ $diff_cocotola == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-api:latest ./cocotola-api; fi
         if [ $diff_cocotola == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-api:latest; fi
         if [ $diff_cocotola == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-api:$SHORT_SHA; fi
