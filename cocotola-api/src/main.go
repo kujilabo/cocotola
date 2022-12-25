@@ -190,6 +190,7 @@ func initTransaction(db *gorm.DB, jobRff jobG.RepositoryFactoryFunc, userRff use
 	if err != nil {
 		return nil, nil, nil, liberrors.Errorf(". err: %w", err)
 	}
+
 	return jobTransaction, authTransaction, appTransaction, nil
 }
 
@@ -493,11 +494,6 @@ func initialize(ctx context.Context, env string) (*config.Config, *gorm.DB, *sql
 		return nil, nil, nil, nil, liberrors.Errorf("failed to InitDB. err: %w", err)
 	}
 
-	// userRff := func(ctx context.Context, db *gorm.DB) (userS.RepositoryFactory, error) {
-	// 	return userG.NewRepositoryFactory(db)
-	// }
-	// userS.InitSystemAdmin(userRff)
-
 	return cfg, db, sqlDB, tp, nil
 }
 
@@ -537,6 +533,7 @@ func systemOwnerAction(ctx context.Context, appTransaction appS.Transaction, fn 
 		return fn(ctx, systemOwner)
 	})
 }
+
 func systemStudentAction(ctx context.Context, appTransaction appS.Transaction, fn func(context.Context, appS.SystemStudent) error) error {
 	return appTransaction.Do(ctx, func(rf appS.RepositoryFactory) error {
 		userRf, err := rf.NewUserRepositoryFactory(ctx)

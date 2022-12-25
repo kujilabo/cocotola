@@ -14,6 +14,7 @@ go_library(
         "//cocotola-api/src/job/service",
         "//cocotola-api/src/user/domain",
         "//cocotola-api/src/user/service",
+        "//lib/errors",
         "//lib/log",
         "@io_opentelemetry_go_otel//:otel",
     ],

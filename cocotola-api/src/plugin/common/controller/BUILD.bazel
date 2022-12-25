@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "controller",
@@ -20,22 +20,5 @@ go_library(
         "//lib/errors",
         "//lib/log",
         "@com_github_gin_gonic_gin//:gin",
-    ],
-)
-
-go_test(
-    name = "controller_test",
-    srcs = ["tatoeba_handler_test.go"],
-    deps = [
-        "//cocotola-api/src/app/controller",
-        "//cocotola-api/src/app/domain",
-        "//cocotola-api/src/plugin/common/service",
-        "//cocotola-api/src/plugin/common/service/mock",
-        "@com_github_gin_gonic_gin//:gin",
-        "@com_github_ohler55_ojg//jp",
-        "@com_github_ohler55_ojg//oj",
-        "@com_github_stretchr_testify//assert",
-        "@com_github_stretchr_testify//mock",
-        "@com_github_stretchr_testify//require",
     ],
 )

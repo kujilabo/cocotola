@@ -1,4 +1,3 @@
-//go:build s
 package domain
 
 import (

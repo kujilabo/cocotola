@@ -9,6 +9,7 @@ go_library(
         "english_word_problem_reader.go",
         "english_word_problem_repository.go",
         "init.go",
+        "model_entity.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/gateway",
     visibility = ["//visibility:public"],

@@ -1,5 +1,3 @@
-//go:build s
-
 package converter
 
 import (

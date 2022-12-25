@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//cocotola-api/src/app/config",
         "//cocotola-api/src/plugin/common/gateway",
+        "//lib/errors",
         "@io_opentelemetry_go_otel//:otel",
         "@io_opentelemetry_go_otel//attribute",
         "@io_opentelemetry_go_otel//semconv/v1.4.0:v1_4_0",

@@ -28,34 +28,34 @@ type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...
 
 func NewInitAuthRouterFunc(googleUserUsecase authU.GoogleUserUsecase, guestUserUsecase authU.GuestUserUsecase, authTokenManager service.AuthTokenManager) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		v1auth := parentRouterGroup.Group("auth")
+		auth := parentRouterGroup.Group("auth")
 		for _, m := range middleware {
-			v1auth.Use(m)
+			auth.Use(m)
 		}
 		// googleUserUsecase := authU.NewGoogleUserUsecase(db, googleAuthClient, authTokenManager, registerAppUserCallback)
 		// guestUserUsecase := authU.NewGuestUserUsecase(authTokenManager)
 		authHandler := authH.NewAuthHandler(authTokenManager)
 		googleAuthHandler := authH.NewGoogleAuthHandler(googleUserUsecase)
 		guestAuthHandler := authH.NewGuestAuthHandler(guestUserUsecase)
-		v1auth.POST("google/authorize", googleAuthHandler.Authorize)
-		v1auth.POST("guest/authorize", guestAuthHandler.Authorize)
-		v1auth.POST("refresh_token", authHandler.RefreshToken)
+		auth.POST("google/authorize", googleAuthHandler.Authorize)
+		auth.POST("guest/authorize", guestAuthHandler.Authorize)
+		auth.POST("refresh_token", authHandler.RefreshToken)
 		return nil
 	}
 }
 
 func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentU.StudentUsecaseWorkbook) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		v1Workbook := parentRouterGroup.Group("private/workbook")
+		workbook := parentRouterGroup.Group("private/workbook")
 		privateWorkbookHandler := NewPrivateWorkbookHandler(studentUsecaseWorkbook)
 		for _, m := range middleware {
-			v1Workbook.Use(m)
+			workbook.Use(m)
 		}
-		v1Workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
-		v1Workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
-		v1Workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
-		v1Workbook.DELETE(":workbookID", privateWorkbookHandler.RemoveWorkbook)
-		v1Workbook.POST("", privateWorkbookHandler.AddWorkbook)
+		workbook.POST(":workbookID", privateWorkbookHandler.FindWorkbooks)
+		workbook.GET(":workbookID", privateWorkbookHandler.FindWorkbookByID)
+		workbook.PUT(":workbookID", privateWorkbookHandler.UpdateWorkbook)
+		workbook.DELETE(":workbookID", privateWorkbookHandler.RemoveWorkbook)
+		workbook.POST("", privateWorkbookHandler.AddWorkbook)
 		return nil
 	}
 }
@@ -63,68 +63,70 @@ func NewInitWorkbookRouterFunc(studentUsecaseWorkbook studentU.StudentUsecaseWor
 func NewInitProblemRouterFunc(studentUsecaseProblem studentU.StudentUsecaseProblem, newIteratorFunc NewIteratorFunc) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 
-		v1Problem := parentRouterGroup.Group("workbook/:workbookID/problem")
+		problem := parentRouterGroup.Group("workbook/:workbookID/problem")
 		problemHandler, err := NewProblemHandler(studentUsecaseProblem, newIteratorFunc)
 		if err != nil {
 			return err
 		}
 		for _, m := range middleware {
-			v1Problem.Use(m)
+			problem.Use(m)
 		}
-		v1Problem.POST("", problemHandler.AddProblem)
-		v1Problem.GET(":problemID", problemHandler.FindProblemByID)
-		v1Problem.DELETE(":problemID", problemHandler.RemoveProblem)
-		v1Problem.PUT(":problemID", problemHandler.UpdateProblem)
-		v1Problem.PUT(":problemID/property", problemHandler.UpdateProblemProperty)
+		problem.POST("", problemHandler.AddProblem)
+		problem.GET(":problemID", problemHandler.FindProblemByID)
+		problem.DELETE(":problemID", problemHandler.RemoveProblem)
+		problem.PUT(":problemID", problemHandler.UpdateProblem)
+		problem.PUT(":problemID/property", problemHandler.UpdateProblemProperty)
 		// v1Problem.GET("problem_ids", problemHandler.FindProblemIDs)
-		v1Problem.POST("find", problemHandler.FindProblems)
-		v1Problem.POST("find_all", problemHandler.FindAllProblems)
-		v1Problem.POST("find_by_ids", problemHandler.FindProblemsByProblemIDs)
-		v1Problem.POST("import", problemHandler.ImportProblems)
+		problem.POST("find", problemHandler.FindProblems)
+		problem.POST("find_all", problemHandler.FindAllProblems)
+		problem.POST("find_by_ids", problemHandler.FindProblemsByProblemIDs)
+		problem.POST("import", problemHandler.ImportProblems)
 
 		return nil
 	}
 }
 func NewInitStudyRouterFunc(studentUsecaseStudy studentU.StudentUsecaseStudy) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		v1Study := parentRouterGroup.Group("study/workbook/:workbookID")
+		study := parentRouterGroup.Group("study/workbook/:workbookID")
 		recordbookHandler, err := NewRecordbookHandler(studentUsecaseStudy)
 		if err != nil {
 			return err
 		}
 		for _, m := range middleware {
-			v1Study.Use(m)
+			study.Use(m)
 		}
-		v1Study.GET("study_type/:studyType", recordbookHandler.FindRecordbook)
-		v1Study.POST("study_type/:studyType/problem/:problemID/record", recordbookHandler.SetStudyResult)
-		v1Study.GET("completion_rate", recordbookHandler.GetCompletionRate)
+		study.GET("study_type/:studyType", recordbookHandler.FindRecordbook)
+		study.POST("study_type/:studyType/problem/:problemID/record", recordbookHandler.SetStudyResult)
+		study.GET("completion_rate", recordbookHandler.GetCompletionRate)
 
 		return nil
 	}
 }
+
 func NewInitAudioRouterFunc(studentUsecaseAudio studentU.StudentUsecaseAudio) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		v1Audio := parentRouterGroup.Group("workbook/:workbookID/problem/:problemID/audio")
+		audio := parentRouterGroup.Group("workbook/:workbookID/problem/:problemID/audio")
 		audioHandler := NewAudioHandler(studentUsecaseAudio)
 		for _, m := range middleware {
-			v1Audio.Use(m)
+			audio.Use(m)
 		}
-		v1Audio.GET(":audioID", audioHandler.FindAudioByID)
+		audio.GET(":audioID", audioHandler.FindAudioByID)
 		return nil
 	}
 }
 
 func NewInitStatRouterFunc(studenUsecaseStat studentU.StudentUsecaseStat) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
-		v1Stat := parentRouterGroup.Group("stat")
+		stat := parentRouterGroup.Group("stat")
 		for _, m := range middleware {
-			v1Stat.Use(m)
+			stat.Use(m)
 		}
 		statHandler := NewStatHandler(studenUsecaseStat)
-		v1Stat.GET("", statHandler.GetStat)
+		stat.GET("", statHandler.GetStat)
 		return nil
 	}
 }
+
 func NewInitTranslationRouterFunc(translatorClient pluginCommonService.TranslatorClient) InitRouterGroupFunc {
 	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
 		pluginTranslation := parentRouterGroup.Group("translation")

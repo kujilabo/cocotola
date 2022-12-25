@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "domain",
@@ -14,15 +14,12 @@ go_library(
         "space_model.go",
         "system_admin_model.go",
         "system_owner_model.go",
+        "user_preference.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/user/domain",
     visibility = ["//visibility:public"],
-    deps = ["//lib/domain"],
-)
-
-go_test(
-    name = "domain_test",
-    srcs = ["system_owner_model_test.go"],
-    embed = [":domain"],
-    deps = ["@com_github_stretchr_testify//assert"],
+    deps = [
+        "//lib/domain",
+        "//lib/errors",
+    ],
 )

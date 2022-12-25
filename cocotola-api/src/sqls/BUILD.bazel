@@ -52,6 +52,7 @@ go_library(
         "mysql/2022010102_create_english_phrase_problem.up.sql",
         "mysql/2022010103_create_english_word_problem.up.sql",
         "mysql/2022010104_create_template_problem.up.sql",
+        "mysql/2020010109_create_user_preference.up.sql",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/sqls",
     visibility = ["//visibility:public"],

@@ -59,6 +59,29 @@ func (_m *Student) CheckQuota(ctx context.Context, problemType domain.ProblemTyp
 	return r0
 }
 
+// FindPreferences provides a mock function with given fields: ctx
+func (_m *Student) FindPreferences(ctx context.Context) (userservice.UserPreferences, error) {
+	ret := _m.Called(ctx)
+
+	var r0 userservice.UserPreferences
+	if rf, ok := ret.Get(0).(func(context.Context) userservice.UserPreferences); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(userservice.UserPreferences)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindRecordbook provides a mock function with given fields: ctx, workbookID, studyType
 func (_m *Student) FindRecordbook(ctx context.Context, workbookID domain.WorkbookID, studyType domain.StudyTypeName) (service.Recordbook, error) {
 	ret := _m.Called(ctx, workbookID, studyType)
