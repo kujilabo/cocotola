@@ -231,17 +231,6 @@ jobs:
           fail_on_error: true
           workdir: ${{ matrix.workdir }}
 
-      - name: ifshort
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
-        uses: reviewdog/action-golangci-lint@v2
-        with:
-          github_token: ${{ secrets.REVIEWDOG_TOKEN }}
-          reporter: github-pr-review
-          golangci_lint_flags: "--disable-all -E ifshort --timeout=10m"
-          tool_name: ifshort
-          fail_on_error: true
-          workdir: ${{ matrix.workdir }}
-
   golang_4:
     strategy:
       matrix:

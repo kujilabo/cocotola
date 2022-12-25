@@ -18,7 +18,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kujilabo/cocotola/cocotola-translator-api/src/config"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/usecase"
@@ -33,10 +32,13 @@ func initCrosConfig() cors.Config {
 	return corsConfig
 }
 
-func initAdminRouter(adminUsecase usecase.AdminUsecase, corsConfig cors.Config) *gin.Engine {
-	userUsecase := new(usecase_mock.UserUsecase)
-
-	return controller.NewRouter(adminUsecase, userUsecase, corsConfig, &config.AppConfig{Name: "app"}, &config.AuthConfig{Username: "user", Password: "pass"}, &config.DebugConfig{GinMode: false})
+func initAdminRouter(t *testing.T, adminUsecase usecase.AdminUsecase) *gin.Engine {
+	router := gin.New()
+	g := router.Group("v1")
+	fn := controller.NewInitAdminRouterFunc(adminUsecase)
+	err := fn(g)
+	require.NoError(t, err)
+	return router
 }
 
 func parseJSON(t *testing.T, b *bytes.Buffer) interface{} {
@@ -63,7 +65,8 @@ func Test_adminHandler_FindTranslationsByFirstLetter_OK(t *testing.T) {
 		apple,
 	}, nil)
 
-	r := initAdminRouter(adminUsecase, initCrosConfig())
+	r := initAdminRouter(t, adminUsecase)
+	w := httptest.NewRecorder()
 
 	// when
 	// - letter is 'a'
@@ -73,7 +76,6 @@ func Test_adminHandler_FindTranslationsByFirstLetter_OK(t *testing.T) {
 	req, err := http.NewRequest(http.MethodPost, "/v1/admin/find", bytes.NewBuffer(body))
 	req.SetBasicAuth("user", "pass")
 	require.NoError(t, err)
-	w := httptest.NewRecorder()
 	r.ServeHTTP(w, req)
 
 	// then
@@ -101,7 +103,7 @@ func Test_adminHandler_FindTranslationsByFirstLetter_LetterIsNothing(t *testing.
 		apple,
 	}, nil)
 
-	r := initAdminRouter(adminUsecase, initCrosConfig())
+	r := initAdminRouter(t, adminUsecase)
 
 	// when
 	// - letter is nothing

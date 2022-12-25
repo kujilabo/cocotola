@@ -21,6 +21,7 @@ go_test(
     srcs = [
         "admin_usecase_test.go",
         "init_test.go",
+        "usecase_test.go",
         "user_usecase_test.go",
     ],
     deps = [
@@ -30,6 +31,5 @@ go_test(
         "//cocotola-translator-api/src/service/mock",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//mock",
-        "@com_github_stretchr_testify//require",
     ],
 )

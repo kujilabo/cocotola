@@ -28,7 +28,6 @@ func NewAzureTranslationClient(subscriptionKey string) service.AzureTranslationC
 	return &azureTranslationClient{
 		client: client,
 	}
-
 }
 
 func (c *azureTranslationClient) DictionaryLookup(ctx context.Context, text string, fromLang, toLang domain.Lang2) ([]service.AzureTranslation, error) {

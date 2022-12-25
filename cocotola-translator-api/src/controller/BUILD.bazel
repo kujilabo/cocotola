@@ -37,7 +37,6 @@ go_test(
     srcs = ["admin_handler_test.go"],
     deps = [
         ":controller",
-        "//cocotola-translator-api/src/config",
         "//cocotola-translator-api/src/domain",
         "//cocotola-translator-api/src/usecase",
         "//cocotola-translator-api/src/usecase/mock",

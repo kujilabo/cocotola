@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
@@ -34,8 +33,8 @@ func Test_adminUsecase_RemoveTranslation(t *testing.T) {
 	customRepo.On("Remove", anythingOfContext, domain.Lang2JA, "orange", domain.PosNoun).Return(service.ErrTranslationNotFound)
 	rf := new(service_mock.RepositoryFactory)
 	rf.On("NewCustomTranslationRepository", anythingOfContext).Return(customRepo, nil)
-	adminUsecase, err := usecase.NewAdminUsecase(ctx, rf)
-	require.NoError(t, err)
+	transaction := newTransaction(rf)
+	adminUsecase := usecase.NewAdminUsecase(ctx, transaction)
 	type args struct {
 		lang2 domain.Lang2
 		text  string

@@ -30,17 +30,11 @@ go_test(
     name = "gateway_test",
     srcs = [
         "azure_translator_test.go",
-        "custom_translation_repository_test.go",
         "gateway_test.go",
     ],
     deps = [
-        ":gateway",
-        "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/service",
         "//cocotola-translator-api/src/sqls",
         "//test-lib/gateway",
-        "@com_github_sirupsen_logrus//:logrus",
-        "@com_github_stretchr_testify//assert",
-        "@com_github_stretchr_testify//require",
-        "@io_gorm_gorm//:gorm",
     ],
 )

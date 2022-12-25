@@ -23,7 +23,6 @@ func NewTranslatorUserServer(userUsecase usecase.UserUsecase) pb.TranslatorUserS
 }
 
 func (s *userServer) DictionaryLookup(ctx context.Context, in *pb.DictionaryLookupParameter) (*pb.DictionaryLookupResponses, error) {
-
 	fromLang, err := domain.NewLang2(in.FromLang2)
 	if err != nil {
 		return nil, status.New(codes.InvalidArgument, "bad request").Err()
@@ -55,7 +54,6 @@ func (s *userServer) DictionaryLookup(ctx context.Context, in *pb.DictionaryLook
 }
 
 func (s *userServer) DictionaryLookupWithPos(ctx context.Context, in *pb.DictionaryLookupWithPosParameter) (*pb.DictionaryLookupResponse, error) {
-
 	fromLang, err := domain.NewLang2(in.FromLang2)
 	if err != nil {
 		return nil, status.New(codes.InvalidArgument, "bad request").Err()
