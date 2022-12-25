@@ -78,7 +78,7 @@ steps:
         if [ $diff_tatoeba == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
 
   # cocotola
-  - name: "gcr.io/cloud-builders/docker - builder - pull & build & push"
+  - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args:
       - -c
@@ -88,7 +88,7 @@ steps:
         if [ $diff_cocotola == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-api-builder:latest --target builder ./cocotola-api; fi
         if [ $diff_cocotola == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-api-builder:latest; fi
 
-  - name: "gcr.io/cloud-builders/docker - runner - pull & build & push"
+  - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args:
       - -c
