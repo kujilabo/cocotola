@@ -580,7 +580,7 @@ func initApp1(ctx context.Context, appTransaction appS.Transaction, password str
 
 		organizationAddParameter, err := userS.NewOrganizationAddParameter(appS.OrganizationName, firstOwnerAddParam)
 		if err != nil {
-			return liberrors.Errorf("failed to AddOrganization. err: %w", err)
+			return liberrors.Errorf("NewOrganizationAddParameter. err: %w", err)
 		}
 
 		organizationID, err := systemAdmin.AddOrganization(ctx, organizationAddParameter)
