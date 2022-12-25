@@ -3,6 +3,7 @@ package gateway_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -60,6 +61,7 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 	pf := service.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
 	ctx := context.Background()
+	location := time.Local
 	for driverName, db := range testlibG.ListDB() {
 		driverName := driverName
 		db := db
@@ -76,7 +78,7 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 					return problemRepository, nil
 				},
 			}
-			rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, jobRff, userRff, pf, problemRepositories)
+			rf, err := gateway.NewRepositoryFactory(ctx, db, driverName, location, jobRff, userRff, pf, problemRepositories)
 			require.NoError(t, err)
 			testService := testService{driverName: driverName, db: db, pf: pf, rf: rf}
 

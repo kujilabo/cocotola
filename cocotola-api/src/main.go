@@ -128,7 +128,7 @@ func main() {
 	}
 
 	rff := func(ctx context.Context, db *gorm.DB) (appS.RepositoryFactory, error) {
-		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, jobRff, userRff, pf, problemRepositories) // nolint:wrapcheck
+		return appG.NewRepositoryFactory(ctx, db, cfg.DB.DriverName, time.Local, jobRff, userRff, pf, problemRepositories) // nolint:wrapcheck
 	}
 
 	jobTransaction, authTransaction, appTransaction, err := initTransaction(db, jobRff, userRff, rff)
