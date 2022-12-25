@@ -101,6 +101,7 @@ func main() {
 		panic(err)
 	}
 	defer connTranslator.Close()
+
 	// translatorClient := pluginCommonGateway.NewTranslatorHTTPClient(cfg.Translator.Endpoint, cfg.Translator.Username, cfg.Translator.Password, time.Duration(cfg.Translator.TimeoutSec)*time.Second)
 	translatorClient := pluginCommonGateway.NewTranslatorGRPCClient(connTranslator, cfg.Translator.Username, cfg.Translator.Password, time.Duration(cfg.Translator.TimeoutSec)*time.Second)
 
