@@ -10,7 +10,7 @@ import (
 )
 
 func Test_tatoebaSentenceRepository_FindTatoebaSentences(t *testing.T) {
-	logrus.SetLevel(logrus.DebugLevel)
+	// logrus.SetLevel(logrus.DebugLevel)
 
 	for driverName, db := range testlibG.ListDB() {
 		logrus.Println(driverName)

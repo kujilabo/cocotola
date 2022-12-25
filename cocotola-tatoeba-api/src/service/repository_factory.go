@@ -5,7 +5,7 @@ import (
 )
 
 type RepositoryFactory interface {
-	NewTatoebaLinkRepository(ctx context.Context) (TatoebaLinkRepository, error)
+	NewTatoebaLinkRepository(ctx context.Context) TatoebaLinkRepository
 
-	NewTatoebaSentenceRepository(ctx context.Context) (TatoebaSentenceRepository, error)
+	NewTatoebaSentenceRepository(ctx context.Context) TatoebaSentenceRepository
 }
