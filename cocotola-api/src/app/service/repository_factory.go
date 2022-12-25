@@ -33,7 +33,3 @@ type RepositoryFactory interface {
 
 	NewJobRepositoryFactory(ctx context.Context) (jobS.RepositoryFactory, error)
 }
-
-type Transaction interface {
-	Do(ctx context.Context, fn func(rf RepositoryFactory) error) error
-}
