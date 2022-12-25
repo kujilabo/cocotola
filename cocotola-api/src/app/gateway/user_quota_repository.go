@@ -27,12 +27,14 @@ func (e *userQuotaEntity) TableName() string {
 }
 
 type userQuotaRepository struct {
-	db *gorm.DB
+	db       *gorm.DB
+	location *time.Location
 }
 
-func newUserQuotaRepository(db *gorm.DB) service.UserQuotaRepository {
+func newUserQuotaRepository(db *gorm.DB, location *time.Location) service.UserQuotaRepository {
 	return &userQuotaRepository{
-		db: db,
+		db:       db,
+		location: location,
 	}
 }
 
@@ -40,11 +42,11 @@ func (r *userQuotaRepository) IsExceeded(ctx context.Context, organizationID use
 	now := time.Now()
 	var date time.Time
 	if unit == "month" {
-		date = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, jst)
+		date = time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, r.location)
 	} else if unit == "day" {
-		date = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, jst)
+		date = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, r.location)
 	} else {
-		date = time.Date(1900, 1, 1, 0, 0, 0, 0, jst)
+		date = time.Date(1900, 1, 1, 0, 0, 0, 0, r.location)
 	}
 	entity := userQuotaEntity{}
 	if result := r.db.Where(&userQuotaEntity{

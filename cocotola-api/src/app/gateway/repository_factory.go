@@ -3,6 +3,7 @@ package gateway
 import (
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -19,6 +20,7 @@ import (
 type repositoryFactory struct {
 	db                  *gorm.DB
 	driverName          string
+	location            *time.Location
 	userRff             userG.RepositoryFactoryFunc
 	pf                  service.ProcessorFactory
 	problemRepositories map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error)
@@ -26,7 +28,7 @@ type repositoryFactory struct {
 	studyTypes          StudyTypes
 }
 
-func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemRepositories map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
+func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, location *time.Location, jobRff jobG.RepositoryFactoryFunc, userRff userG.RepositoryFactoryFunc, pf service.ProcessorFactory, problemRepositories map[domain.ProblemTypeName]func(context.Context, *gorm.DB) (service.ProblemRepository, error)) (service.RepositoryFactory, error) {
 	if db == nil {
 		panic(errors.New("db is nil"))
 	}
@@ -46,6 +48,7 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string, j
 	return &repositoryFactory{
 		db:                  db,
 		driverName:          driverName,
+		location:            location,
 		userRff:             userRff,
 		pf:                  pf,
 		problemRepositories: problemRepositories,
@@ -86,7 +89,7 @@ func (f *repositoryFactory) NewRecordbookRepository(ctx context.Context) service
 }
 
 func (f *repositoryFactory) NewUserQuotaRepository(ctx context.Context) service.UserQuotaRepository {
-	return newUserQuotaRepository(f.db)
+	return newUserQuotaRepository(f.db, f.location)
 }
 
 func (f *repositoryFactory) NewStatRepository(ctx context.Context) service.StatRepository {
