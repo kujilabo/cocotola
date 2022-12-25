@@ -45,20 +45,10 @@ go_library(
 
 go_test(
     name = "service_test",
-    srcs = [
-        "problem_repository_test.go",
-        "service_test.go",
-        "student_test.go",
-    ],
+    srcs = ["problem_repository_test.go"],
     embed = [":service"],
     deps = [
         "//cocotola-api/src/app/domain",
-        "//cocotola-api/src/app/service/mock",
-        "//cocotola-api/src/user/domain",
-        "//cocotola-api/src/user/domain/mock",
-        "//cocotola-api/src/user/service/mock",
         "@com_github_stretchr_testify//assert",
-        "@com_github_stretchr_testify//mock",
-        "@com_github_stretchr_testify//require",
     ],
 )

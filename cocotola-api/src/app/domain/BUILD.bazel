@@ -29,10 +29,7 @@ go_library(
 
 go_test(
     name = "domain_test",
-    srcs = [
-        "audio_model_test.go",
-        "lang_test.go",
-    ],
+    srcs = ["lang_test.go"],
     embed = [":domain"],
     deps = [
         "//lib/domain",

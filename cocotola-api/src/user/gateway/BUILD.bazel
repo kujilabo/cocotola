@@ -12,6 +12,7 @@ go_library(
         "rbac_repository.go",
         "repository_factory.go",
         "space_repository.go",
+        "user_preferences_repository.go",
         "user_space_repository.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/user/gateway",
@@ -34,11 +35,8 @@ go_library(
 go_test(
     name = "gateway_test",
     srcs = [
-        "app_user_repository_test.go",
         "db_test.go",
         "gateway_test.go",
-        "organization_repository_test.go",
-        "space_repository_test.go",
     ],
     deps = [
         ":gateway",

@@ -1,0 +1,8 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "helper",
+    srcs = ["helper.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/service/helper",
+    visibility = ["//visibility:public"],
+)

@@ -13,5 +13,6 @@ go_library(
         "//cocotola-api/src/plugin/common/controller/entity",
         "//cocotola-api/src/plugin/common/domain",
         "//cocotola-api/src/plugin/common/service",
+        "//lib/errors",
     ],
 )

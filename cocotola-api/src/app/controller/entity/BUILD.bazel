@@ -14,5 +14,6 @@ go_library(
     deps = [
         "//cocotola-api/src/user/domain",
         "//lib/domain",
+        "//lib/errors",
     ],
 )
