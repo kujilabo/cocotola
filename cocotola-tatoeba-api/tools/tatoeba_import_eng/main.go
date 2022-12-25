@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -15,6 +16,7 @@ import (
 var timeoutImportMin = 30
 
 func main() {
+	ctx := context.Background()
 	cfg, err := config.LoadConfig("local")
 	if err != nil {
 		panic(err)
@@ -46,7 +48,7 @@ func main() {
 		panic(err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, url, &body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, &body)
 	if err != nil {
 		panic(err)
 	}

@@ -60,11 +60,15 @@ func main() {
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
-	rfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName)
+	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+		return gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName) // nolint:wrapcheck
 	}
 
-	result := run(context.Background(), cfg, db, rfFunc)
+	appTransaction, err := initTransaction(db, rff)
+	if err != nil {
+		panic(err)
+	}
+	result := run(context.Background(), cfg, appTransaction)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 	time.Sleep(gracefulShutdownTime2)
@@ -72,12 +76,21 @@ func main() {
 	os.Exit(result)
 }
 
-func run(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.RepositoryFactoryFunc) int {
+func initTransaction(db *gorm.DB, rff gateway.RepositoryFactoryFunc) (service.Transaction, error) {
+	appTransaction, err := gateway.NewTransaction(db, rff)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return appTransaction, nil
+}
+
+func run(ctx context.Context, cfg *config.Config, transaction service.Transaction) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
 	eg.Go(func() error {
-		return httpServer(ctx, cfg, db, rfFunc)
+		return appServer(ctx, cfg, transaction)
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
@@ -97,7 +110,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.Re
 	return 0
 }
 
-func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.RepositoryFactoryFunc) error {
+func appServer(ctx context.Context, cfg *config.Config, transaction service.Transaction) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
@@ -110,10 +123,19 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc ser
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	adminUsecase := usecase.NewAdminUsecase(db, rfFunc)
-	userUsecase := usecase.NewUserUsecase(db, rfFunc)
+	adminUsecase := usecase.NewAdminUsecase(transaction)
+	userUsecase := usecase.NewUserUsecase(transaction)
 
-	router := controller.NewRouter(adminUsecase, userUsecase, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	publicRouterGroupFunc := []controller.InitRouterGroupFunc{}
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitAdminRouterFunc(adminUsecase),
+		controller.NewInitUserRouterFunc(userUsecase),
+	}
+
+	router, err := controller.NewAppRouter(publicRouterGroupFunc, privateRouterGroupFunc, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	if err != nil {
+		return err
+	}
 
 	if cfg.Swagger.Enabled {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

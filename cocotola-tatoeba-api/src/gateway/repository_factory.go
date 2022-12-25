@@ -20,10 +20,12 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string) (
 	}, nil
 }
 
-func (f *repositoryFactory) NewTatoebaSentenceRepository(ctx context.Context) (service.TatoebaSentenceRepository, error) {
-	return NewTatoebaSentenceRepository(f.db)
+func (f *repositoryFactory) NewTatoebaSentenceRepository(ctx context.Context) service.TatoebaSentenceRepository {
+	return newTatoebaSentenceRepository(f.db)
 }
 
-func (f *repositoryFactory) NewTatoebaLinkRepository(ctx context.Context) (service.TatoebaLinkRepository, error) {
-	return NewTatoebaLinkRepository(f.db)
+func (f *repositoryFactory) NewTatoebaLinkRepository(ctx context.Context) service.TatoebaLinkRepository {
+	return newTatoebaLinkRepository(f.db, f)
 }
+
+type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

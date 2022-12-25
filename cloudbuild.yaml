@@ -34,6 +34,9 @@ steps:
   # synthesizer
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
 
   - name: "gcr.io/cloud-builders/docker"
@@ -42,11 +45,23 @@ steps:
       - -c
       - |
         diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
-        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api; fi
-        if [ $diff_synthesizer == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest; fi
-        if [ $diff_synthesizer == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
+        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest --target builder ./cocotola-synthesizer-api; fi
+        if [ $diff_synthesizer == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest; fi
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
+        if [ $diff_synthesizer == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest ./cocotola-synthesizer-api; fi
+        if [ $diff_synthesizer == '0' ]; then docker tag      gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest; fi
+        if [ $diff_synthesizer == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
 
   # translator
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest || exit 0"]
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
@@ -57,11 +72,24 @@ steps:
       - -c
       - |
         diff_translator=$(cat /workspace/diff_translator.txt)
-        if [ $diff_translator == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-translator-api:latest ./cocotola-translator-api; fi
-        if [ $diff_translator == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-translator-api:latest; fi
-        if [ $diff_translator == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA; fi
+        if [ $diff_translator == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest --target builder ./cocotola-translator-api; fi
+        if [ $diff_translator == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest; fi
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_translator=$(cat /workspace/diff_translator.txt)
+        if [ $diff_translator == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-translator-api:latest  ./cocotola-translator-api; fi
+        if [ $diff_translator == '0' ]; then docker tag      gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-translator-api:latest; fi
+        if [ $diff_translator == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-translator-api:$SHORT_SHA; fi
+        if [ $diff_translator == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-translator-api:latest; fi
 
   # tatoeba
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest || exit 0"]
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
@@ -72,10 +100,19 @@ steps:
       - -c
       - |
         diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
-        if [ $diff_tatoeba == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest ./cocotola-tatoeba-api; fi
-        if [ $diff_tatoeba == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
-        if [ $diff_tatoeba == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA; fi
-        if [ $diff_tatoeba == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
+        if [ $diff_tatoeba == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest --target builder ./cocotola-tatoeba-api; fi
+        if [ $diff_tatoeba == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest; fi
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
+        if [ $diff_tatoeba == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest ./cocotola-tatoeba-api; fi
+        if [ $diff_tatoeba == '0' ]; then docker tag      gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
+        if [ $diff_tatoeba == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-tatoeba-api:$SHORT_SHA; fi
+        if [ $diff_tatoeba == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest; fi
 
   # cocotola
   - name: "gcr.io/cloud-builders/docker"
@@ -108,6 +145,9 @@ steps:
   # web
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-web-builder:latest || exit 0"]
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0"]
 
   - name: "gcr.io/cloud-builders/docker"
@@ -116,7 +156,16 @@ steps:
       - -c
       - |
         diff_web=$(cat /workspace/diff_web.txt)
-        if [ $diff_web == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-web:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-web:latest ./cocotola-web; fi
+        if [ $diff_web == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-web-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-web-builder:latest --target builder ./cocotola-web; fi
+        if [ $diff_web == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-web-builder:latest; fi
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      - -c
+      - |
+        diff_web=$(cat /workspace/diff_web.txt)
+        if [ $diff_web == '0' ]; then docker build -t gcr.io/$PROJECT_ID/cocotola-web:$SHORT_SHA --cache-from gcr.io/$PROJECT_ID/cocotola-web-builder:latest --cache-from gcr.io/$PROJECT_ID/cocotola-web:latest ./cocotola-web; fi
         if [ $diff_web == '0' ]; then docker tag gcr.io/$PROJECT_ID/cocotola-web:$SHORT_SHA gcr.io/$PROJECT_ID/cocotola-web:latest; fi
         if [ $diff_web == '0' ]; then docker push gcr.io/$PROJECT_ID/cocotola-web:$SHORT_SHA; fi
 

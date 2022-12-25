@@ -11,7 +11,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service"
-	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	libG "github.com/kujilabo/cocotola/lib/gateway"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -90,13 +89,14 @@ type tatoebaSentenceRepository struct {
 	db *gorm.DB
 }
 
-func NewTatoebaSentenceRepository(db *gorm.DB) (service.TatoebaSentenceRepository, error) {
+func newTatoebaSentenceRepository(db *gorm.DB) service.TatoebaSentenceRepository {
 	if db == nil {
-		return nil, libD.ErrInvalidArgument
+		panic(errors.New(""))
 	}
+
 	return &tatoebaSentenceRepository{
 		db: db,
-	}, nil
+	}
 }
 
 // func (r *tatoebaSentenceRepository) FindTatoebaSentences(ctx context.Context, param domain.TatoebaSentenceSearchCondition) (*domain.TatoebaSentenceSearchResult, error) {

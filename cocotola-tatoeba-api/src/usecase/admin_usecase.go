@@ -5,8 +5,6 @@ import (
 	"errors"
 	"io"
 
-	"gorm.io/gorm"
-
 	"github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -24,14 +22,12 @@ type AdminUsecase interface {
 }
 
 type adminUsecase struct {
-	db     *gorm.DB
-	rfFunc service.RepositoryFactoryFunc
+	transaction service.Transaction
 }
 
-func NewAdminUsecase(db *gorm.DB, rfFunc service.RepositoryFactoryFunc) AdminUsecase {
+func NewAdminUsecase(transaction service.Transaction) AdminUsecase {
 	return &adminUsecase{
-		db:     db,
-		rfFunc: rfFunc,
+		transaction: transaction,
 	}
 }
 
@@ -43,16 +39,8 @@ func (u *adminUsecase) ImportSentences(ctx context.Context, iterator service.Tat
 	var skipCount = 0
 	var loop = true
 	for loop {
-		if err := u.db.Transaction(func(tx *gorm.DB) error {
-			rf, err := u.rfFunc(ctx, tx)
-			if err != nil {
-				return liberrors.Errorf("create RepositoryFactory. err: %w", err)
-			}
-
-			repo, err := rf.NewTatoebaSentenceRepository(ctx)
-			if err != nil {
-				return liberrors.Errorf("new TatoebaSentenceRepository. err: %w", err)
-			}
+		if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+			repo := rf.NewTatoebaSentenceRepository(ctx)
 
 			i := 0
 			for {
@@ -108,16 +96,8 @@ func (u *adminUsecase) ImportLinks(ctx context.Context, iterator service.Tatoeba
 	var skipCount = 0
 	var loop = true
 	for loop {
-		if err := u.db.Transaction(func(tx *gorm.DB) error {
-			rf, err := u.rfFunc(ctx, tx)
-			if err != nil {
-				return liberrors.Errorf("create RepositoryFactory. err: %w", err)
-			}
-
-			repo, err := rf.NewTatoebaLinkRepository(ctx)
-			if err != nil {
-				return liberrors.Errorf("new TatoebaLinkRepository. err: %w", err)
-			}
+		if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
+			repo := rf.NewTatoebaLinkRepository(ctx)
 
 			i := 0
 			for {

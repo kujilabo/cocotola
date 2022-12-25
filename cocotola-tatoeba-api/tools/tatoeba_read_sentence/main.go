@@ -93,7 +93,6 @@ func run(fileName string) (map[int]bool, error) {
 // }
 
 func writeLinks(eng map[int]bool, jpn map[int]bool, fileName1, fileName2 string) error {
-
 	filePath := "../cocotola-data/datasource/tatoeba/" + fileName1
 
 	file1, err := os.Open(filePath)
@@ -175,5 +174,4 @@ func main() {
 	if err := writeLinks(eng, jpn, "links.csv", "links2.csv"); err != nil {
 		panic(err)
 	}
-
 }
