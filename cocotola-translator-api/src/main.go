@@ -88,7 +88,7 @@ func main() {
 	adminUsecase := usecase.NewAdminUsecase(ctx, appTransaction)
 	userUsecase := usecase.NewUserUsecase(ctx, appTransaction, azureTranslationClient)
 
-	result := run(context.Background(), cfg, db, adminUsecase, userUsecase)
+	result := run(context.Background(), cfg, adminUsecase, userUsecase)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 	time.Sleep(gracefulShutdownTime2)
@@ -105,7 +105,7 @@ func initTransaction(db *gorm.DB, rff gateway.RepositoryFactoryFunc) (service.Tr
 	return appTransaction, nil
 }
 
-func run(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) int {
+func run(ctx context.Context, cfg *config.Config, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
@@ -117,7 +117,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usec
 		return appServer(ctx, cfg, adminUsecase, userUsecase) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
-		return grpcServer(ctx, cfg, db, adminUsecase, userUsecase) // nolint:wrapcheck
+		return grpcServer(ctx, cfg, adminUsecase, userUsecase) // nolint:wrapcheck
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1) // nolint:wrapcheck
@@ -154,7 +154,7 @@ func appServer(ctx context.Context, cfg *config.Config, adminUsecase usecase.Adm
 
 	router, err := controller.NewAppRouter(publicRouterGroupFunc, privateRouterGroupFunc, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	if cfg.Swagger.Enabled {
@@ -197,7 +197,7 @@ func appServer(ctx context.Context, cfg *config.Config, adminUsecase usecase.Adm
 	}
 }
 
-func grpcServer(ctx context.Context, cfg *config.Config, db *gorm.DB, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) error {
+func grpcServer(ctx context.Context, cfg *config.Config, adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase) error {
 	lis, err := net.Listen("tcp", ":"+strconv.Itoa(cfg.App.GRPCPort))
 	if err != nil {
 		logrus.Fatalf("failed to Listen: %v", err)

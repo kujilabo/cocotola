@@ -11,7 +11,3 @@ type RepositoryFactory interface {
 
 	NewCustomTranslationRepository(ctx context.Context) CustomTranslationRepository
 }
-
-type Transaction interface {
-	Do(ctx context.Context, fn func(rf RepositoryFactory) error) error
-}
