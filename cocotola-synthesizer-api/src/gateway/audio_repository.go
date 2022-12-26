@@ -35,7 +35,7 @@ type audioRepository struct {
 	db *gorm.DB
 }
 
-func NewAudioRepository(db *gorm.DB) service.AudioRepository {
+func newAudioRepository(db *gorm.DB) service.AudioRepository {
 	return &audioRepository{
 		db: db,
 	}

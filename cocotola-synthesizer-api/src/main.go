@@ -35,21 +35,22 @@ import (
 
 const readHeaderTimeout = time.Duration(30) * time.Second
 
+func getValue(values ...string) string {
+	for _, v := range values {
+		if len(v) != 0 {
+			return v
+		}
+	}
+	return ""
+}
+
 // @securityDefinitions.basic BasicAuth
 func main() {
 	ctx := context.Background()
 	env := flag.String("env", "", "environment")
 	flag.Parse()
-	if len(*env) == 0 {
-		appEnv := os.Getenv("APP_ENV")
-		if len(appEnv) == 0 {
-			*env = "local"
-		} else {
-			*env = appEnv
-		}
-	}
-
-	logrus.Infof("env: %s", *env)
+	appEnv := getValue(*env, os.Getenv("APP_ENV"), "local")
+	logrus.Infof("env: %s", appEnv)
 
 	liberrors.UseXerrorsErrorf()
 
@@ -60,13 +61,18 @@ func main() {
 	defer sqlDB.Close()
 	defer tp.ForceFlush(ctx) // flushes any pending spans
 
-	rfFunc := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
-		return gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName)
+	rff := func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error) {
+		return gateway.NewRepositoryFactory(ctx, db, cfg.DB.DriverName) // nolint:wrapcheck
+	}
+
+	appTransaction, err := initTransaction(db, rff)
+	if err != nil {
+		panic(err)
 	}
 
 	synthesizerClient := gateway.NewSynthesizerClient(cfg.Synthesizer.Key, time.Duration(cfg.Synthesizer.TimeoutSec)*time.Second)
 
-	result := run(context.Background(), cfg, db, rfFunc, synthesizerClient)
+	result := run(context.Background(), cfg, appTransaction, synthesizerClient)
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 	time.Sleep(gracefulShutdownTime2)
@@ -74,12 +80,25 @@ func main() {
 	os.Exit(result)
 }
 
-func run(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.RepositoryFactoryFunc, synthesizerClient service.SynthesizerClient) int {
+func initTransaction(db *gorm.DB, rff gateway.RepositoryFactoryFunc) (service.Transaction, error) {
+	appTransaction, err := gateway.NewTransaction(db, rff)
+	if err != nil {
+		return nil, liberrors.Errorf(". err: %w", err)
+	}
+
+	return appTransaction, nil
+}
+
+func run(ctx context.Context, cfg *config.Config, transaction service.Transaction, synthesizerClient service.SynthesizerClient) int {
 	var eg *errgroup.Group
 	eg, ctx = errgroup.WithContext(ctx)
 
+	if !cfg.Debug.GinMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	eg.Go(func() error {
-		return httpServer(ctx, cfg, db, rfFunc, synthesizerClient)
+		return appServer(ctx, cfg, transaction, synthesizerClient)
 	})
 	eg.Go(func() error {
 		return libG.MetricsServerProcess(ctx, cfg.App.MetricsPort, cfg.Shutdown.TimeSec1)
@@ -99,7 +118,7 @@ func run(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.Re
 	return 0
 }
 
-func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc service.RepositoryFactoryFunc, synthesizerClient service.SynthesizerClient) error {
+func appServer(ctx context.Context, cfg *config.Config, transaction service.Transaction, synthesizerClient service.SynthesizerClient) error {
 	// cors
 	corsConfig := libconfig.InitCORS(cfg.CORS)
 	logrus.Infof("cors: %+v", corsConfig)
@@ -112,10 +131,19 @@ func httpServer(ctx context.Context, cfg *config.Config, db *gorm.DB, rfFunc ser
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	adminUsecase := usecase.NewAdminUsecase(rfFunc)
-	userUsecase := usecase.NewUserUsecase(db, rfFunc, synthesizerClient)
+	adminUsecase := usecase.NewAdminUsecase(transaction)
+	userUsecase := usecase.NewUserUsecase(transaction, synthesizerClient)
 
-	router := controller.NewRouter(adminUsecase, userUsecase, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	publicRouterGroupFunc := []controller.InitRouterGroupFunc{}
+	privateRouterGroupFunc := []controller.InitRouterGroupFunc{
+		controller.NewInitAdminRouterFunc(adminUsecase),
+		controller.NewInitUserRouterFunc(userUsecase),
+	}
+
+	router, err := controller.NewAppRouter(publicRouterGroupFunc, privateRouterGroupFunc, corsConfig, cfg.App, cfg.Auth, cfg.Debug)
+	if err != nil {
+		return err
+	}
 
 	if cfg.Swagger.Enabled {
 		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

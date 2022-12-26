@@ -21,5 +21,7 @@ func NewRepositoryFactory(ctx context.Context, db *gorm.DB, driverName string) (
 }
 
 func (f *repositoryFactory) NewAudioRepository(ctx context.Context) service.AudioRepository {
-	return NewAudioRepository(f.db)
+	return newAudioRepository(f.db)
 }
+
+type RepositoryFactoryFunc func(ctx context.Context, db *gorm.DB) (service.RepositoryFactory, error)

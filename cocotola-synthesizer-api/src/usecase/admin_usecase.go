@@ -9,9 +9,11 @@ type AdminUsecase interface {
 }
 
 type adminUsecase struct {
-	rfFunc service.RepositoryFactoryFunc
+	transaction service.Transaction
 }
 
-func NewAdminUsecase(rfFunc service.RepositoryFactoryFunc) AdminUsecase {
-	return &adminUsecase{rfFunc: rfFunc}
+func NewAdminUsecase(transaction service.Transaction) AdminUsecase {
+	return &adminUsecase{
+		transaction: transaction,
+	}
 }
