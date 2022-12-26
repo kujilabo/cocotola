@@ -11,11 +11,34 @@ import (
 	"github.com/kujilabo/cocotola/lib/controller/middleware"
 )
 
-func NewRouter(adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecase, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) *gin.Engine {
-	if !debugConfig.GinMode {
-		gin.SetMode(gin.ReleaseMode)
-	}
+type InitRouterGroupFunc func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error
 
+func NewInitAdminRouterFunc(adminUsecase usecase.AdminUsecase) InitRouterGroupFunc {
+	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+		admin := parentRouterGroup.Group("admin")
+		adminHandler := NewAdminHandler(adminUsecase)
+		for _, m := range middleware {
+			admin.Use(m)
+		}
+		admin.POST("find", adminHandler.FindAudio)
+		return nil
+	}
+}
+
+func NewInitUserRouterFunc(userUsecase usecase.UserUsecase) InitRouterGroupFunc {
+	return func(parentRouterGroup *gin.RouterGroup, middleware ...gin.HandlerFunc) error {
+		user := parentRouterGroup.Group("user")
+		userHandler := NewUserHandler(userUsecase)
+		for _, m := range middleware {
+			user.Use(m)
+		}
+		user.POST("synthesize", userHandler.Synthesize)
+		user.GET("audio/:audioID", userHandler.FindAudioByAudioID)
+		return nil
+	}
+}
+
+func NewAppRouter(initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterFunc []InitRouterGroupFunc, corsConfig cors.Config, appConfig *config.AppConfig, authConfig *config.AuthConfig, debugConfig *config.DebugConfig) (*gin.Engine, error) {
 	router := gin.New()
 	router.Use(cors.New(corsConfig))
 	router.Use(gin.Recovery())
@@ -37,18 +60,18 @@ func NewRouter(adminUsecase usecase.AdminUsecase, userUsecase usecase.UserUsecas
 		v1.Use(otelgin.Middleware(appConfig.Name))
 		v1.Use(middleware.NewTraceLogMiddleware(appConfig.Name))
 		v1.Use(authMiddleware)
-		{
-			admin := v1.Group("admin")
-			adminHandler := NewAdminHandler(adminUsecase)
-			admin.POST("find", adminHandler.FindAudio)
+		for _, fn := range initPublicRouterFunc {
+			if err := fn(v1); err != nil {
+				return nil, err
+			}
 		}
-		{
-			user := v1.Group("user")
-			userHandler := NewUserHandler(userUsecase)
-			user.POST("synthesize", userHandler.Synthesize)
-			user.GET("audio/:audioID", userHandler.FindAudioByAudioID)
+
+		for _, fn := range initPrivateRouterFunc {
+			if err := fn(v1, authMiddleware); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	return router
+	return router, nil
 }
