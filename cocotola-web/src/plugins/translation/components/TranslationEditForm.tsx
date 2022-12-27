@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FormikProps } from 'formik';
 import { Form } from 'formik-semantic-ui-react';
-import { Button, Card, Header } from 'semantic-ui-react';
+import { Card, Header } from 'semantic-ui-react';
 
 import { DeleteButton, UpdateButton } from '@/components/buttons';
 

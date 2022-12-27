@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button, Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
+import { Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { AudioButton, DangerModal, ErrorMessage } from '@/components';
