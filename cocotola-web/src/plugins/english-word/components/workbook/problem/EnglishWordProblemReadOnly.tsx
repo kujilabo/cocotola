@@ -48,7 +48,7 @@ export const EnglishWordProblemReadOnly: React.FC<
         </Grid>
       </Card.Content>
       <Card.Content extra>
-        <Button.Group floated="left">
+        <div className="ui fluid buttons">
           <Button
             basic
             color="teal"
@@ -62,7 +62,7 @@ export const EnglishWordProblemReadOnly: React.FC<
           >
             Play
           </Button>
-        </Button.Group>
+        </div>
       </Card.Content>
     </Card>
   );

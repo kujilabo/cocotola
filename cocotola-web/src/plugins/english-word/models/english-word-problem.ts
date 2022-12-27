@@ -65,6 +65,8 @@ export class EnglishWordProblemModel {
       note: '',
     };
 
+    console.log('p', p);
+
     if (p.properties) {
       const properties = p.properties;
       const sentences = properties['sentences'] as property2[];

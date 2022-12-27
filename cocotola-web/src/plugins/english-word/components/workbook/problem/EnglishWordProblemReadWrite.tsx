@@ -122,7 +122,7 @@ export const EnglishWordProblemReadWrite: React.FC<
       </Card.Content>
       <Card.Content extra>
         {problem.audioId !== 0 ? (
-          <Button.Group floated="left">
+          <div className="ui fluid buttons">
             <AudioButton
               id={problem.audioId}
               loadAndPlay={(postFunc: (value: string) => void) =>
@@ -130,7 +130,7 @@ export const EnglishWordProblemReadWrite: React.FC<
               }
               disabled={audioViewLoading}
             />
-          </Button.Group>
+          </div>
         ) : (
           <div />
         )}
