@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Link } from 'react-router-dom';
-import { Button, Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
+import { Card, Label, Grid, Header, Dropdown } from 'semantic-ui-react';
 
 import { useAppSelector, useAppDispatch } from '@/app/hooks';
 import { AudioButton, DangerModal, ErrorMessage } from '@/components';
@@ -122,7 +122,7 @@ export const EnglishWordProblemReadWrite: React.FC<
       </Card.Content>
       <Card.Content extra>
         {problem.audioId !== 0 ? (
-          <Button.Group floated="left">
+          <div className="ui fluid buttons">
             <AudioButton
               id={problem.audioId}
               loadAndPlay={(postFunc: (value: string) => void) =>
@@ -130,7 +130,7 @@ export const EnglishWordProblemReadWrite: React.FC<
               }
               disabled={audioViewLoading}
             />
-          </Button.Group>
+          </div>
         ) : (
           <div />
         )}

@@ -84,7 +84,7 @@ export const TranslationList = (): React.ReactElement => {
                       <Card.Content>{toDsiplayText(m.pos)}</Card.Content>
                       <Card.Content>{m.translated}</Card.Content>
                       <Card.Content>
-                        <Button.Group>
+                        <div className="ui fluid buttons">
                           <Button color="teal">
                             <Link
                               style={{ textDecoration: 'none', color: 'white' }}
@@ -93,8 +93,8 @@ export const TranslationList = (): React.ReactElement => {
                               Translation
                             </Link>
                           </Button>
-                        </Button.Group>
-                        <Button.Group floated="right">
+                        </div>
+                        <div className="ui fluid buttons">
                           {m.provider === 'azure' ? (
                             <Label as="a" color="orange" size="tiny" tag>
                               Azure
@@ -102,7 +102,7 @@ export const TranslationList = (): React.ReactElement => {
                           ) : (
                             <div />
                           )}
-                        </Button.Group>
+                        </div>
                       </Card.Content>
                     </Card>
                   </Grid.Column>

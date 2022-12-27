@@ -102,20 +102,19 @@ export const EnglishWordMemorizationAnswer: FC<
         contentList={[
           <p>{toDsiplayText(+problem.pos)}</p>,
           <p>{problem.translated}</p>,
-          <Button.Group fluid>
+          <div className="ui fluid buttons">
             <LinkButton to={`${baseUrl}/edit`} value={t('Edit')} />
-          </Button.Group>,
+          </div>,
           <Form.Checkbox
             checked={mastered}
             label="完璧に覚えた"
             onClick={onMemorizeButtonClick}
           />,
-
-          <Button.Group fluid>
+          <div className="ui fluid buttons">
             <Button color="teal" onClick={onNextButtonClick}>
               Next
             </Button>
-          </Button.Group>,
+          </div>,
         ]}
         setErrorMessage={setErrorMessage}
       ></EnglishWordMemorizationCard>

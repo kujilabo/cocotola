@@ -42,7 +42,7 @@ export const EnglishSentenceProblemReadOnly: FC<
         </Grid>
       </Card.Content>
       <Card.Content extra>
-        <Button.Group floated="left">
+        <div className="ui fluid buttons">
           <Button
             basic
             color="teal"
@@ -56,7 +56,7 @@ export const EnglishSentenceProblemReadOnly: FC<
           >
             Play
           </Button>
-        </Button.Group>
+        </div>
       </Card.Content>
     </Card>
   );

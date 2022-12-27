@@ -24,7 +24,7 @@ export const AudioButton: FC<AudioButtonProps> = (
   }
 
   return (
-    <Button.Group floated="right" icon>
+    <div className="ui fluid buttons">
       <Button
         basic
         color="teal"
@@ -33,6 +33,6 @@ export const AudioButton: FC<AudioButtonProps> = (
       >
         <Icon name="play" />
       </Button>
-    </Button.Group>
+    </div>
   );
 };

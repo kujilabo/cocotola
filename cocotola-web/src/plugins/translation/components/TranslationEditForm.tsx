@@ -2,7 +2,7 @@ import React from 'react';
 
 import { FormikProps } from 'formik';
 import { Form } from 'formik-semantic-ui-react';
-import { Button, Card, Header } from 'semantic-ui-react';
+import { Card, Header } from 'semantic-ui-react';
 
 import { DeleteButton, UpdateButton } from '@/components/buttons';
 
@@ -35,18 +35,18 @@ export const TranslationEditForm = (
           <InputTrasnslatedWord />
         </Card.Content>
         <Card.Content>
-          <Button.Group floated="left">
+          <div className="ui fluid buttons">
             <UpdateButton type="submit" disabled={isSubmitting} />
-          </Button.Group>
+          </div>
 
           {props.values.provider === 'custom' ? (
-            <Button.Group floated="right">
+            <div className="ui fluid buttons">
               <DeleteButton
                 type="button"
                 disabled={isSubmitting}
                 onClick={props.values.onRemoveClick}
               />
-            </Button.Group>
+            </div>
           ) : (
             <div />
           )}

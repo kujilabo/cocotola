@@ -38,6 +38,14 @@ export const EnglishWordMemorizationQuestion: FC<
   }
 
   const problemId = englishWordRecordbook.records[0].problemId;
+  if (!problemMap[problemId]) {
+    console.log('problemMap', problemMap);
+    return (
+      <Message error>
+        <p>ERROR! ProblemID {problemId} is not found.</p>
+      </Message>
+    );
+  }
   const problem = EnglishWordProblemModel.of(problemMap[problemId]);
   // onsole.log('englishWordRecordbook.records', englishWordRecordbook.records);
   // onsole.log('problemMap', problemMap);
@@ -81,13 +89,13 @@ export const EnglishWordMemorizationQuestion: FC<
         updatedAt={problem.updatedAt}
         headerText={problem.text}
         contentList={[
-          <Button.Group fluid>
+          <div className="ui fluid buttons">
             <Button onClick={onNoButtonClick}>わからない</Button>
             <Button.Or />
             <Button positive onClick={onYesButtonClick}>
               わかる
             </Button>
-          </Button.Group>,
+          </div>,
           <Accordion>
             <Accordion.Title
               active={answerOpen}
