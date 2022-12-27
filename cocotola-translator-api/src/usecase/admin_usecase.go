@@ -92,8 +92,7 @@ func (u *adminUsecase) FindTranslationByTextAndPos(ctx context.Context, lang2 do
 	var result domain.Translation
 	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		customRepo := rf.NewCustomTranslationRepository(ctx)
-		customResult, err := customRepo.FindByTextAndPos(ctx, lang2, text, pos)
-		if err == nil {
+		if customResult, err := customRepo.FindByTextAndPos(ctx, lang2, text, pos); err == nil {
 			result = customResult
 			return nil
 		} else if !errors.Is(err, service.ErrTranslationNotFound) {
@@ -111,6 +110,7 @@ func (u *adminUsecase) FindTranslationByTextAndPos(ctx context.Context, lang2 do
 	}); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
