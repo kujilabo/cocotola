@@ -12,6 +12,17 @@ import (
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 )
 
+func Test_DB(t *testing.T) {
+	t.Parallel()
+	// logrus.SetLevel(logrus.DebugLevel)
+
+	fn := func(t *testing.T, ctx context.Context, ts testService) {
+		orgID, _, _ := setupOrganization(ctx, t, ts)
+		defer teardownOrganization(t, ts, orgID)
+	}
+	testDB(t, fn)
+}
+
 func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 	t.Parallel()
 	// logrus.SetLevel(logrus.DebugLevel)
@@ -98,7 +109,6 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 			})
 		}
 	}
-
 	testDB(t, fn)
 }
 
