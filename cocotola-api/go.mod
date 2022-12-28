@@ -10,7 +10,7 @@ require (
 	github.com/go-co-op/gocron v1.18.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/go-cmp v0.5.9
-	github.com/kujilabo/cocotola/lib v0.0.0-20221224170227-eae90a0c5859
+	github.com/kujilabo/cocotola/lib v0.0.0-20221227133217-2a702f087223
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221103022908-251fac8c039e
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.10.0
@@ -103,7 +103,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/ugorji/go/codec v1.2.7 // indirect
+	github.com/ugorji/go/codec v1.2.8 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.11.2 // indirect
 	go.opentelemetry.io/otel/metric v0.34.0 // indirect

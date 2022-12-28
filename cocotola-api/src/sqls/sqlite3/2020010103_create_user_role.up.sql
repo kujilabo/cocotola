@@ -1,5 +1,6 @@
 create table `user_role` (
- `created_at` datetime not null default current_timestamp
+ `id` varchar(26) primary key
+,`created_at` datetime not null default current_timestamp
 ,`updated_at` datetime not null default current_timestamp
 ,`created_by` int not null
 ,`updated_by` int not null

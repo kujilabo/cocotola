@@ -63,6 +63,9 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 	ctx := context.Background()
 	location := time.Local
 	for driverName, db := range testlibG.ListDB() {
+		if driverName == "sqlite3" {
+			continue
+		}
 		driverName := driverName
 		db := db
 		t.Run(driverName, func(t *testing.T) {
