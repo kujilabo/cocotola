@@ -29,7 +29,7 @@ func (h *jobHandler) AggregateStudyResultsOfAllUsers(c *gin.Context) {
 	systemAdminModel := userD.NewSystemAdminModel()
 
 	// now := time.Now()
-	// yesterday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local).AddDate(0, 0, -1)
+	// yesterday := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC).AddDate(0, 0, -1)
 
 	controllerhelper.HandleSecuredFunction(c, func(organizationID userD.OrganizationID, operatorID userD.AppUserID) error {
 		if err := h.jobUsecaseStat.AggregateStudyResultsOfAllUsers(ctx, systemAdminModel); err != nil {

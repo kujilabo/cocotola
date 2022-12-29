@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4/database"
@@ -26,8 +27,9 @@ func OpenMySQL(username, password, host string, port int, database string) (*gor
 		MultiStatements:      true,
 		Params:               map[string]string{"charset": "utf8"},
 		Collation:            "utf8mb4_unicode_ci",
-		Loc:                  jst,
 		AllowNativePasswords: true,
+		Loc:                  time.UTC,
+		// Loc:                  jst,
 	}
 	dsn := c.FormatDSN()
 	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&multiStatements=true", username, password, host, port, database)

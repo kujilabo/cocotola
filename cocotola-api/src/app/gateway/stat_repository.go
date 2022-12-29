@@ -32,7 +32,7 @@ func newStatRepository(ctx context.Context, db *gorm.DB) service.StatRepository 
 
 func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserID) (service.Stat, error) {
 	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	dateFormat := "2006-01-02"
 
 	startDate := today.AddDate(0, 0, -hisotrySize+1)
@@ -73,7 +73,7 @@ func (r *statRepository) FindStat(ctx context.Context, operatorID userD.AppUserI
 		t := startDate.AddDate(0, 0, i)
 		s := t.Format(dateFormat)
 		results[i] = domain.StatHistoryResult{
-			Date:     t,
+			Date:     t.In(time.UTC),
 			Mastered: m[s].Mastered,
 			Answered: m[s].Answered,
 		}

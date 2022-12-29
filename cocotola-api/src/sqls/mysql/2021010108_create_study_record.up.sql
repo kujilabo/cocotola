@@ -6,7 +6,7 @@ create table `study_record` (
 ,`problem_type_id` int not null
 ,`study_type_id` int not null
 ,`problem_id` int not null
-,`record_date` date not null
+,`record_date` datetime not null
 ,`mastered` tinyint
 ,primary key (`id`)
 ,unique(`app_user_id`, `workbook_id`, `problem_type_id`, `study_type_id`, `problem_id`, `record_date`)

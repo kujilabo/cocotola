@@ -18,12 +18,12 @@ import (
 func Test_statRepository_FindStat(t *testing.T) {
 	t.Parallel()
 	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	// logrus.Warnf("today: %v", today)
 
 	logrus.SetLevel(logrus.WarnLevel)
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
-		logrus.SetLevel(logrus.DebugLevel)
+		// logrus.SetLevel(logrus.DebugLevel)
 		orgID, sysOwner, owner := setupOrganization(ctx, t, ts)
 		defer teardownOrganization(t, ts, orgID)
 		workbookRepo := ts.rf.NewWorkbookRepository(ctx)

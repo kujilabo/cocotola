@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "service",
@@ -9,6 +9,7 @@ go_library(
         "job_status.go",
         "job_status_repository.go",
         "repository_factory.go",
+        "transaction.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/job/service",
     visibility = ["//visibility:public"],
@@ -17,5 +18,19 @@ go_library(
         "//lib/domain",
         "//lib/errors",
         "//lib/log",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = ["job_service_test.go"],
+    deps = [
+        ":service",
+        "//cocotola-api/src/job/domain",
+        "//cocotola-api/src/job/service/mock",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
     ],
 )

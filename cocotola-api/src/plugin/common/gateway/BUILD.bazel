@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "gateway",
@@ -20,5 +20,20 @@ go_library(
         "@io_opentelemetry_go_otel//:otel",
         "@org_golang_google_grpc//:go_default_library",
         "@org_golang_google_grpc//metadata",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "gateway_test.go",
+        "repository_test.go",
+    ],
+    deps = [
+        "//cocotola-api/src/sqls",
+        "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@io_gorm_gorm//:gorm",
     ],
 )

@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "converter",
@@ -17,5 +17,20 @@ go_library(
         "//lib/domain",
         "//lib/errors",
         "//lib/log",
+    ],
+)
+
+go_test(
+    name = "converter_test",
+    srcs = ["workbook_converter_test.go"],
+    embed = [":converter"],
+    deps = [
+        "//cocotola-api/src/app/controller/entity",
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/app/service/mock",
+        "//cocotola-api/src/user/domain",
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_stretchr_testify//require",
     ],
 )

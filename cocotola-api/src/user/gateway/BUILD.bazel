@@ -35,8 +35,11 @@ go_library(
 go_test(
     name = "gateway_test",
     srcs = [
+        "app_user_repository_test.go",
         "db_test.go",
         "gateway_test.go",
+        "organization_repository_test.go",
+        "space_repository_test.go",
     ],
     deps = [
         ":gateway",

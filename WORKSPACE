@@ -2191,8 +2191,8 @@ go_repository(
     name = "com_github_jackc_pgservicefile",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/jackc/pgservicefile",
-    sum = "h1:C8S2+VttkHFdOOCXJe+YGfa4vHYwlt4Zx+IVXQ97jYg=",
-    version = "v0.0.0-20200714003250-2b9c44734f2b",
+    sum = "h1:bbPeKD0xmW/Y25WS6cokEszi5g+S0QxI/d45PkRi7Nk=",
+    version = "v0.0.0-20221227161230-091c0ba34f0a",
 )
 
 go_repository(
@@ -2559,8 +2559,8 @@ go_repository(
     name = "com_github_mattn_go_isatty",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/mattn/go-isatty",
-    sum = "h1:bq3VjFmv/sOjHtdEhmkEV4x1AJtvUvOJ2PFAZ5+peKQ=",
-    version = "v0.0.16",
+    sum = "h1:BTarxUcIeDqL27Mc+vyvdWYSL28zpIhv3RoTdsLMPng=",
+    version = "v0.0.17",
 )
 
 go_repository(
@@ -3463,8 +3463,8 @@ go_repository(
     name = "com_github_ugorji_go_codec",
     build_file_proto_mode = "disable_global",
     importpath = "github.com/ugorji/go/codec",
-    sum = "h1:YPXUKf7fYbp/y8xloBqZOw2qaVggbfwMlI8WM3wZUJ0=",
-    version = "v1.2.7",
+    sum = "h1:sgBJS6COt0b/P40VouWKdseidkDgHxYGm0SAglUHfP0=",
+    version = "v1.2.8",
 )
 
 go_repository(
@@ -4239,8 +4239,8 @@ go_repository(
     name = "org_golang_google_genproto",
     build_file_proto_mode = "disable_global",
     importpath = "google.golang.org/genproto",
-    sum = "h1:jmIfw8+gSvXcZSgaFAGyInDXeWzUhvYH57G/5GKMn70=",
-    version = "v0.0.0-20221207170731-23e4bf6bdc37",
+    sum = "h1:uQ2vjV/sHTsWSqdKeLqmwitzgvjMl7o4IdtHwUDXSJY=",
+    version = "v0.0.0-20221227171554-f9683d7f8bef",
 )
 
 go_repository(
@@ -4543,8 +4543,8 @@ go_repository(
     name = "org_modernc_sqlite",
     build_file_proto_mode = "disable_global",
     importpath = "modernc.org/sqlite",
-    sum = "h1:80zmD3BGkm8BZ5fUi/4lwJQHiO3GXgIUvZRXpoIfROY=",
-    version = "v1.20.0",
+    sum = "h1:z6qRLw72B0VfRrJjs3l6hWkzYDx1bo0WGVrBGP4ohhM=",
+    version = "v1.20.1",
 )
 
 go_repository(
