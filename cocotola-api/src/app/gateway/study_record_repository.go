@@ -12,7 +12,6 @@ import (
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
-	"github.com/kujilabo/cocotola/lib/log"
 )
 
 type studyRecordEntity struct {
@@ -97,18 +96,17 @@ func (r *studyRecordRepository) AddRecord(ctx context.Context, operator domain.S
 }
 
 func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, operator userD.SystemOwnerModel, targetUserID userD.AppUserID, targetDate time.Time) (*service.CountAnsweredResults, error) {
-	// dateFormat := "2006-01-02 15:04:05"
 	_, span := tracer.Start(ctx, "recordbookRepository.CountMasteredProblem")
 	defer span.End()
-	logger := log.FromContext(ctx)
-	{
-		var e []studyRecordEntity
-		r.db.Find(&e)
-		for _, e2 := range e {
-			logger.Infof("%+v", e2)
-			logger.Infof("%s", e2.RecordDate.Format(time.RFC3339))
-		}
-	}
+	// logger := log.FromContext(ctx)
+	// {
+	// 	var e []studyRecordEntity
+	// 	r.db.Find(&e)
+	// 	for _, e2 := range e {
+	// 		logger.Infof("%+v", e2)
+	// 		logger.Infof("%s", e2.RecordDate.Format(time.RFC3339))
+	// 	}
+	// }
 
 	type countEntity struct {
 		WorkbookID    uint
@@ -122,7 +120,6 @@ func (r *studyRecordRepository) CountAnsweredProblems(ctx context.Context, opera
 	if result := r.db.Select("count(*) as answered, sum(mastered) as mastered, workbook_id, problem_type_id, study_type_id").
 		Model(&studyRecordEntity{}).
 		Where("app_user_id = ?", uint(targetUserID)).
-		// Where("record_date = ?", targetDate.Format(dateFormat)).
 		Where("record_date = ?", targetDate).
 		Group("workbook_id").
 		Group("problem_type_id").
