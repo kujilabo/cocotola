@@ -15,7 +15,8 @@ import (
 func Test_studyRecordRepository_CountAnsweredProblems(t *testing.T) {
 	t.Parallel()
 	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	loc := time.UTC
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
 
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		// logrus.SetLevel(logrus.DebugLevel)

@@ -3,7 +3,6 @@ package gateway
 import (
 	"database/sql"
 	"embed"
-	"log"
 	"os"
 
 	"github.com/golang-migrate/migrate/v4/database"
@@ -24,23 +23,42 @@ func openSQLiteForTest() (*gorm.DB, error) {
 	})
 }
 
-func InitSQLite(sqlFS embed.FS) {
-	testDBFile = "./test.db"
-	os.Remove(testDBFile)
-	setupSQLite(sqlFS)
+func OpenSQLiteInMemory(sqlFS embed.FS) (*gorm.DB, error) {
+	db, err := gorm.Open(gormSQLite.Open("file:memdb1?mode=memory&cache=shared"), &gorm.Config{
+		Logger: gorm_logrus.New(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	if err := setupSQLite(sqlFS, db); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
 
-func setupSQLite(sqlFS embed.FS) {
+func setupSQLite(sqlFS embed.FS, db *gorm.DB) error {
 	driverName := "sqlite3"
-	db, err := openSQLiteForTest()
-	if err != nil {
-		log.Fatal(err)
-	}
 	sourceDriver, err := iofs.New(sqlFS, driverName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	setupDB(db, driverName, sourceDriver, func(sqlDB *sql.DB) (database.Driver, error) {
+	return setupDB(db, driverName, sourceDriver, func(sqlDB *sql.DB) (database.Driver, error) {
 		return sqlite3.WithInstance(sqlDB, &sqlite3.Config{})
 	})
+}
+
+func InitSQLiteInFile(sqlFS embed.FS) (*gorm.DB, error) {
+	testDBFile = "./test.db"
+	os.Remove(testDBFile)
+	db, err := openSQLiteForTest()
+	if err != nil {
+		return nil, err
+	}
+	if err := setupSQLite(sqlFS, db); err != nil {
+		return nil, err
+	}
+	return db, nil
 }

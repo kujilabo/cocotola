@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "gateway",
@@ -15,6 +15,7 @@ go_library(
         "study_stat_repository.go",
         "study_type_repository.go",
         "synthesizer_client.go",
+        "transaction.go",
         "user_quota_repository.go",
         "workbook_repository.go",
     ],
@@ -38,5 +39,34 @@ go_library(
         "@io_gorm_gorm//clause",
         "@io_opentelemetry_go_contrib_instrumentation_net_http_otelhttp//:otelhttp",
         "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "gateway_test",
+    srcs = [
+        "db_test.go",
+        "gateway_test.go",
+        "stat_repository_test.go",
+        "study_record_repository_test.go",
+        "workbook_repository_test.go",
+    ],
+    deps = [
+        ":gateway",
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/app/service/mock",
+        "//cocotola-api/src/job/gateway",
+        "//cocotola-api/src/job/service",
+        "//cocotola-api/src/sqls",
+        "//cocotola-api/src/user/domain",
+        "//cocotola-api/src/user/gateway",
+        "//cocotola-api/src/user/service",
+        "//lib/domain",
+        "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+        "@io_gorm_gorm//:gorm",
     ],
 )

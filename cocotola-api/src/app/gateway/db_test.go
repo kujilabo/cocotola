@@ -61,11 +61,13 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 	pf := service.NewProcessorFactory(problemAddProcessor, problemUpdateProcessor, problemRemoveProcessor, problemImportProcessor, problemQuotaProcessor)
 
 	ctx := context.Background()
-	location := time.Local
+	location := time.UTC
 	for driverName, db := range testlibG.ListDB() {
+		// FIXME
 		if driverName == "sqlite3" {
 			continue
 		}
+
 		driverName := driverName
 		db := db
 		t.Run(driverName, func(t *testing.T) {

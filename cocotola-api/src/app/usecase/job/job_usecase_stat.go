@@ -67,7 +67,7 @@ func (u *jobUsecaseStat) getTargetDateList(ctx context.Context, makeJobName func
 	targetDateList := make([]time.Time, 0)
 
 	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		jobRf, err := rf.NewJobRepositoryFactory(ctx)
 		if err != nil {

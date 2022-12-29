@@ -6,7 +6,6 @@ go_library(
         "db.go",
         "db_mysql.go",
         "db_sqlite.go",
-        "init.go",
     ],
     importpath = "github.com/kujilabo/cocotola/test-lib/gateway",
     visibility = ["//visibility:public"],

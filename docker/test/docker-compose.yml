@@ -11,7 +11,8 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      TZ: "Asia/Tokyo"
+      # TZ: "Asia/Tokyo"
+      TZ: "Etc/GMT"
     ports:
       - 3307:3306
   test-translator-mysql:
@@ -24,6 +25,7 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+      TZ: "Etc/GMT"
     ports:
       - 3317:3306
   test-tatoeba-mysql:
@@ -36,6 +38,7 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+      TZ: "Etc/GMT"
     ports:
       - 3327:3306
   test-synthesizer-mysql:
@@ -48,5 +51,6 @@ services:
       MYSQL_DATABASE: testdb
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+      TZ: "Etc/GMT"
     ports:
       - 3337:3306

@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "service",
@@ -24,5 +24,25 @@ go_library(
         "//lib/errors",
         "//lib/log",
         "@io_opentelemetry_go_otel//:otel",
+    ],
+)
+
+go_test(
+    name = "service_test",
+    srcs = ["english_word_problem_processor_test.go"],
+    deps = [
+        ":service",
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/domain/mock",
+        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/app/service/mock",
+        "//cocotola-api/src/plugin/common/domain",
+        "//cocotola-api/src/plugin/common/domain/mock",
+        "//cocotola-api/src/plugin/common/service/mock",
+        "//cocotola-api/src/plugin/english/domain",
+        "//lib/domain",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
     ],
 )

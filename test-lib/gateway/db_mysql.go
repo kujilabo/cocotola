@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"log"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4/database"
@@ -30,8 +30,9 @@ func openMySQLForTest() (*gorm.DB, error) {
 		MultiStatements:      true,
 		Params:               map[string]string{"charset": "utf8"},
 		Collation:            "utf8mb4_unicode_ci",
-		Loc:                  jst,
 		AllowNativePasswords: true,
+		Loc:                  time.UTC,
+		// Loc:                  jst,
 	}
 	dsn := c.FormatDSN()
 	return gorm.Open(gorm_mysql.Open(dsn), &gorm.Config{
@@ -39,23 +40,29 @@ func openMySQLForTest() (*gorm.DB, error) {
 	})
 }
 
-func InitMySQL(sqlFS embed.FS, dbHost string, dbPort int) {
-	testDBHost = dbHost
-	testDBPort = dbPort
-	setupMySQL(sqlFS)
-}
-
-func setupMySQL(sqlFS embed.FS) {
+func setupMySQL(sqlFS embed.FS, db *gorm.DB) error {
 	driverName := "mysql"
-	db, err := openMySQLForTest()
-	if err != nil {
-		log.Fatal(err)
-	}
 	sourceDriver, err := iofs.New(sqlFS, driverName)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	setupDB(db, driverName, sourceDriver, func(sqlDB *sql.DB) (database.Driver, error) {
+
+	return setupDB(db, driverName, sourceDriver, func(sqlDB *sql.DB) (database.Driver, error) {
 		return migrate_mysql.WithInstance(sqlDB, &migrate_mysql.Config{})
 	})
+}
+
+func InitMySQL(sqlFS embed.FS, dbHost string, dbPort int) (*gorm.DB, error) {
+	testDBHost = dbHost
+	testDBPort = dbPort
+	db, err := openMySQLForTest()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := setupMySQL(sqlFS, db); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
