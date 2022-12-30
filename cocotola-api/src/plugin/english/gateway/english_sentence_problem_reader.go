@@ -26,7 +26,7 @@ func NewEnglishSentenceProblemAddParameterCSVReader(workbookID appD.WorkbookID, 
 	}
 }
 
-func (r *englishSentenceProblemAddParameterCSVReader) Next() (appS.ProblemAddParameter, error) {
+func (r *englishSentenceProblemAddParameterCSVReader) Next() (appD.ProblemAddParameter, error) {
 	var line []string
 	line, err := r.reader.Read()
 	if errors.Is(err, io.EOF) {
@@ -44,7 +44,7 @@ func (r *englishSentenceProblemAddParameterCSVReader) Next() (appS.ProblemAddPar
 		"translated": line[2],
 	}
 
-	param, err := appS.NewProblemAddParameter(r.workbookID /*r.num,*/, properties)
+	param, err := appD.NewProblemAddParameter(r.workbookID /*r.num,*/, properties)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}

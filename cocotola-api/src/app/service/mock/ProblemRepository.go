@@ -19,18 +19,18 @@ type ProblemRepository struct {
 }
 
 // AddProblem provides a mock function with given fields: ctx, operator, param
-func (_m *ProblemRepository) AddProblem(ctx context.Context, operator domain.StudentModel, param service.ProblemAddParameter) (domain.ProblemID, error) {
+func (_m *ProblemRepository) AddProblem(ctx context.Context, operator domain.StudentModel, param domain.ProblemAddParameter) (domain.ProblemID, error) {
 	ret := _m.Called(ctx, operator, param)
 
 	var r0 domain.ProblemID
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) domain.ProblemID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemAddParameter) domain.ProblemID); ok {
 		r0 = rf(ctx, operator, param)
 	} else {
 		r0 = ret.Get(0).(domain.ProblemID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemAddParameter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.ProblemAddParameter) error); ok {
 		r1 = rf(ctx, operator, param)
 	} else {
 		r1 = ret.Error(1)
@@ -61,15 +61,15 @@ func (_m *ProblemRepository) CountProblems(ctx context.Context, operator domain.
 }
 
 // FindAllProblems provides a mock function with given fields: ctx, operator, workbookID
-func (_m *ProblemRepository) FindAllProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (service.ProblemSearchResult, error) {
+func (_m *ProblemRepository) FindAllProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (domain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, operator, workbookID)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID) service.ProblemSearchResult); ok {
+	var r0 domain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.WorkbookID) domain.ProblemSearchResult); ok {
 		r0 = rf(ctx, operator, workbookID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(domain.ProblemSearchResult)
 		}
 	}
 
@@ -84,11 +84,11 @@ func (_m *ProblemRepository) FindAllProblems(ctx context.Context, operator domai
 }
 
 // FindProblemByID provides a mock function with given fields: ctx, operator, id
-func (_m *ProblemRepository) FindProblemByID(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter1) (service.Problem, error) {
+func (_m *ProblemRepository) FindProblemByID(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter1) (service.Problem, error) {
 	ret := _m.Called(ctx, operator, id)
 
 	var r0 service.Problem
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter1) service.Problem); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemSelectParameter1) service.Problem); ok {
 		r0 = rf(ctx, operator, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -97,7 +97,7 @@ func (_m *ProblemRepository) FindProblemByID(ctx context.Context, operator domai
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter1) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.ProblemSelectParameter1) error); ok {
 		r1 = rf(ctx, operator, id)
 	} else {
 		r1 = ret.Error(1)
@@ -130,20 +130,20 @@ func (_m *ProblemRepository) FindProblemIDs(ctx context.Context, operator domain
 }
 
 // FindProblems provides a mock function with given fields: ctx, operator, param
-func (_m *ProblemRepository) FindProblems(ctx context.Context, operator domain.StudentModel, param service.ProblemSearchCondition) (service.ProblemSearchResult, error) {
+func (_m *ProblemRepository) FindProblems(ctx context.Context, operator domain.StudentModel, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, operator, param)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSearchCondition) service.ProblemSearchResult); ok {
+	var r0 domain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemSearchCondition) domain.ProblemSearchResult); ok {
 		r0 = rf(ctx, operator, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(domain.ProblemSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemSearchCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.ProblemSearchCondition) error); ok {
 		r1 = rf(ctx, operator, param)
 	} else {
 		r1 = ret.Error(1)
@@ -176,20 +176,20 @@ func (_m *ProblemRepository) FindProblemsByCustomCondition(ctx context.Context, 
 }
 
 // FindProblemsByProblemIDs provides a mock function with given fields: ctx, operator, param
-func (_m *ProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param service.ProblemIDsCondition) (service.ProblemSearchResult, error) {
+func (_m *ProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, operator, param)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemIDsCondition) service.ProblemSearchResult); ok {
+	var r0 domain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemIDsCondition) domain.ProblemSearchResult); ok {
 		r0 = rf(ctx, operator, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(domain.ProblemSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, service.ProblemIDsCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.StudentModel, domain.ProblemIDsCondition) error); ok {
 		r1 = rf(ctx, operator, param)
 	} else {
 		r1 = ret.Error(1)
@@ -199,11 +199,11 @@ func (_m *ProblemRepository) FindProblemsByProblemIDs(ctx context.Context, opera
 }
 
 // RemoveProblem provides a mock function with given fields: ctx, operator, id
-func (_m *ProblemRepository) RemoveProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2) error {
+func (_m *ProblemRepository) RemoveProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2) error {
 	ret := _m.Called(ctx, operator, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemSelectParameter2) error); ok {
 		r0 = rf(ctx, operator, id)
 	} else {
 		r0 = ret.Error(0)
@@ -213,11 +213,11 @@ func (_m *ProblemRepository) RemoveProblem(ctx context.Context, operator domain.
 }
 
 // UpdateProblem provides a mock function with given fields: ctx, operator, id, param
-func (_m *ProblemRepository) UpdateProblem(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (_m *ProblemRepository) UpdateProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	ret := _m.Called(ctx, operator, id, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemSelectParameter2, domain.ProblemUpdateParameter) error); ok {
 		r0 = rf(ctx, operator, id, param)
 	} else {
 		r0 = ret.Error(0)
@@ -227,11 +227,11 @@ func (_m *ProblemRepository) UpdateProblem(ctx context.Context, operator domain.
 }
 
 // UpdateProblemProperty provides a mock function with given fields: ctx, operator, id, param
-func (_m *ProblemRepository) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (_m *ProblemRepository) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	ret := _m.Called(ctx, operator, id, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, domain.ProblemSelectParameter2, domain.ProblemUpdateParameter) error); ok {
 		r0 = rf(ctx, operator, id, param)
 	} else {
 		r0 = ret.Error(0)

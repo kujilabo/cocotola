@@ -200,7 +200,7 @@ const docTemplate = `{
                 "level": {
                     "type": "integer"
                 },
-                "memorized": {
+                "mastered": {
                     "type": "boolean"
                 },
                 "problemId": {

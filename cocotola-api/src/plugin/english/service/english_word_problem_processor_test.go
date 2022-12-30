@@ -12,7 +12,6 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appDM "github.com/kujilabo/cocotola/cocotola-api/src/app/domain/mock"
-	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	appSM "github.com/kujilabo/cocotola/cocotola-api/src/app/service/mock"
 	pluginD "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 	pluginDM "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain/mock"
@@ -83,7 +82,7 @@ func Test_englishWordProblemProcessor_AddProblem_singleProblem_audioDisabled(t *
 	require.Equal(t, 100, int(added[0]))
 	require.Equal(t, 0, len(updated))
 	require.Equal(t, 0, len(removed))
-	paramCheck := mock.MatchedBy(func(p appS.ProblemAddParameter) bool {
+	paramCheck := mock.MatchedBy(func(p appD.ProblemAddParameter) bool {
 		require.Equal(t, 1, int(p.GetWorkbookID()))
 		require.Equal(t, "ペン", p.GetProperties()["translated"])
 		require.Equal(t, "pen", p.GetProperties()["text"])
@@ -134,7 +133,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 	require.Equal(t, 0, len(removed))
 	problemRepo.AssertNumberOfCalls(t, "AddProblem", 2)
 	{
-		param := (problemRepo.Calls[0].Arguments[2]).(appS.ProblemAddParameter)
+		param := (problemRepo.Calls[0].Arguments[2]).(appD.ProblemAddParameter)
 		assert.Equal(t, 1, int(param.GetWorkbookID()))
 		assert.Equal(t, "本", param.GetProperties()["translated"])
 		assert.Equal(t, "book", param.GetProperties()["text"])
@@ -143,7 +142,7 @@ func Test_englishWordProblemProcessor_AddProblem_multipleProblem_audioDisabled(t
 		assert.Equal(t, "6", param.GetProperties()["pos"])
 	}
 	{
-		param := (problemRepo.Calls[1].Arguments[2]).(appS.ProblemAddParameter)
+		param := (problemRepo.Calls[1].Arguments[2]).(appD.ProblemAddParameter)
 		assert.Equal(t, 1, int(param.GetWorkbookID()))
 		assert.Equal(t, "予約する", param.GetProperties()["translated"])
 		assert.Equal(t, "book", param.GetProperties()["text"])
@@ -187,7 +186,7 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	require.Equal(t, 0, len(removed))
 	problemRepo.AssertNumberOfCalls(t, "UpdateProblem", 1)
 	{
-		param := (problemRepo.Calls[0].Arguments[3]).(appS.ProblemUpdateParameter)
+		param := (problemRepo.Calls[0].Arguments[3]).(appD.ProblemUpdateParameter)
 		assert.Equal(t, "ペン", param.GetProperties()["translated"])
 		assert.Equal(t, "pen", param.GetProperties()["text"])
 		assert.Equal(t, "0", param.GetProperties()["audioId"])
@@ -196,7 +195,7 @@ func Test_englishWordProblemProcessor_UpdateProblem(t *testing.T) {
 	}
 }
 
-func testNewProblemAddParameter_EnglishWord(properties map[string]string) appS.ProblemAddParameter {
+func testNewProblemAddParameter_EnglishWord(properties map[string]string) appD.ProblemAddParameter {
 	param := new(appSM.ProblemAddParameter)
 	param.On("GetProperties").Return(properties)
 	param.On("GetIntProperty", "number").Return(1, nil)
@@ -206,7 +205,7 @@ func testNewProblemAddParameter_EnglishWord(properties map[string]string) appS.P
 func TestNewEnglishWordProblemAddParemeter(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		param appS.ProblemAddParameter
+		param appD.ProblemAddParameter
 	}
 	tests := []struct {
 		name    string

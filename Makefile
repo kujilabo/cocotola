@@ -2,12 +2,12 @@ SHELL=/bin/bash
 
 .PHONY: all
 all:
-	$(MAKE) lint
+	# $(MAKE) lint
 	$(MAKE) gen-swagger
 	$(MAKE) gen-src
 	$(MAKE) gen-proto
-	$(MAKE) update-mod
 	$(MAKE) gazelle
+	$(MAKE) update-mod
 	$(MAKE) build
 	$(MAKE) test
 	$(MAKE) dev-docker-build

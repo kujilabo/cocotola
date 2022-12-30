@@ -6,7 +6,7 @@ go_library(
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/service/mock",
     visibility = ["//visibility:public"],
     deps = [
-        "//cocotola-api/src/app/service",
+        "//cocotola-api/src/app/domain",
         "@com_github_stretchr_testify//mock",
     ],
 )

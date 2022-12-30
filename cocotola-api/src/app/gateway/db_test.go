@@ -159,17 +159,17 @@ func testNewAppUserAddParameter(t *testing.T, loginID, username string) userS.Ap
 	return p
 }
 
-func testNewProblemType(t *testing.T, id uint, name string) domain.ProblemType {
-	p, err := domain.NewProblemType(id, name)
-	require.NoError(t, err)
-	return p
-}
+// func testNewProblemType(t *testing.T, id uint, name string) domain.ProblemType {
+// 	p, err := domain.NewProblemType(id, name)
+// 	require.NoError(t, err)
+// 	return p
+// }
 
-func testNewStudyType(t *testing.T, id uint, name string) domain.StudyType {
-	p, err := domain.NewStudyType(id, name)
-	require.NoError(t, err)
-	return p
-}
+// func testNewStudyType(t *testing.T, id uint, name string) domain.StudyType {
+// 	p, err := domain.NewStudyType(id, name)
+// 	require.NoError(t, err)
+// 	return p
+// }
 
 func testNewWorkbookSearchCondition(t *testing.T) domain.WorkbookSearchCondition {
 	p, err := domain.NewWorkbookSearchCondition(1, 10, []userD.SpaceID{})

@@ -19,7 +19,7 @@ type englishPhraseProblemAddParemeter struct {
 	Translated string `validate:"required"`
 }
 
-func toEnglishPhraseProblemAddParemeter(param appS.ProblemAddParameter) (*englishPhraseProblemAddParemeter, error) {
+func toEnglishPhraseProblemAddParemeter(param appD.ProblemAddParameter) (*englishPhraseProblemAddParemeter, error) {
 	if _, ok := param.GetProperties()["lang2"]; !ok {
 		return nil, liberrors.Errorf("lang2 is not defined. err: %w", libD.ErrInvalidArgument)
 	}
@@ -62,7 +62,7 @@ func NewEnglishPhraseProblemProcessor(synthesizerClient appS.SynthesizerClient, 
 	}
 }
 
-func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appD.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("AddProblem1")
 
@@ -89,7 +89,7 @@ func (p *englishPhraseProblemProcessor) AddProblem(ctx context.Context, repo app
 	return []appD.ProblemID{problemID}, nil, nil, nil
 }
 
-func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, operator appD.StudentModel, problemRepo appS.ProblemRepository, param appS.ProblemAddParameter, extractedParam *englishPhraseProblemAddParemeter, audioID appD.AudioID) (appD.ProblemID, error) {
+func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, operator appD.StudentModel, problemRepo appS.ProblemRepository, param appD.ProblemAddParameter, extractedParam *englishPhraseProblemAddParemeter, audioID appD.AudioID) (appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("AddProblem1")
 
@@ -101,7 +101,7 @@ func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, op
 		"lang2":      extractedParam.Lang2,
 		"audioId":    strconv.Itoa(int(audioID)),
 	}
-	newParam, err := appS.NewProblemAddParameter(param.GetWorkbookID() /*param.GetNumber(),*/, properties)
+	newParam, err := appD.NewProblemAddParameter(param.GetWorkbookID() /*param.GetNumber(),*/, properties)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to NewParameter. err: %w", err)
 	}
@@ -115,7 +115,7 @@ func (p *englishPhraseProblemProcessor) addSingleProblem(ctx context.Context, op
 
 }
 
-func (p *englishPhraseProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishPhraseProblemProcessor) RemoveProblem(ctx context.Context, repo appS.RepositoryFactory, operator appD.StudentModel, id appD.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	problemRepo, err := repo.NewProblemRepository(ctx, domain.EnglishPhraseProblemType)
 	if err != nil {
 		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)

@@ -93,7 +93,7 @@ type englishPhraseProblemAddParameter struct {
 	Translated string
 }
 
-func toNewEnglishPhraseProblemParam(param appS.ProblemAddParameter) (*englishPhraseProblemAddParameter, error) {
+func toNewEnglishPhraseProblemParam(param appD.ProblemAddParameter) (*englishPhraseProblemAddParameter, error) {
 	audioID, err := strconv.Atoi(param.GetProperties()["audioId"])
 	if err != nil {
 		return nil, liberrors.Errorf("strconv.Atoi. err: %w", err)
@@ -135,7 +135,7 @@ func NewEnglishPhraseProblemRepository(db *gorm.DB, synthesizerClient appS.Synth
 	}, nil
 }
 
-func (r *englishPhraseProblemRepository) FindProblems(ctx context.Context, operator appD.StudentModel, param appS.ProblemSearchCondition) (appS.ProblemSearchResult, error) {
+func (r *englishPhraseProblemRepository) FindProblems(ctx context.Context, operator appD.StudentModel, param appD.ProblemSearchCondition) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishPhraseProblemRepository.FindProblems")
 	defer span.End()
 
@@ -170,7 +170,7 @@ func (r *englishPhraseProblemRepository) FindProblems(ctx context.Context, opera
 		return nil, errors.New("overflow")
 	}
 
-	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appD.NewProblemSearchResult(int(count), problems)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -178,7 +178,7 @@ func (r *englishPhraseProblemRepository) FindProblems(ctx context.Context, opera
 	return foundProblems, nil
 }
 
-func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) (appS.ProblemSearchResult, error) {
+func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishPhraseProblemRepository.FindAllProblems")
 	defer span.End()
 
@@ -213,7 +213,7 @@ func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, op
 		return nil, errors.New("overflow")
 	}
 
-	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appD.NewProblemSearchResult(int(count), problems)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -221,7 +221,7 @@ func (r *englishPhraseProblemRepository) FindAllProblems(ctx context.Context, op
 	return foundProblems, nil
 }
 
-func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator appD.StudentModel, param appS.ProblemIDsCondition) (appS.ProblemSearchResult, error) {
+func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator appD.StudentModel, param appD.ProblemIDsCondition) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishPhraseProblemRepository.FindProblemsByProblemIDs")
 	defer span.End()
 
@@ -250,7 +250,7 @@ func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Co
 		problems[i] = p
 	}
 
-	foundProblems, err := appS.NewProblemSearchResult(0, problems)
+	foundProblems, err := appD.NewProblemSearchResult(0, problems)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -258,7 +258,7 @@ func (r *englishPhraseProblemRepository) FindProblemsByProblemIDs(ctx context.Co
 	return foundProblems, nil
 }
 
-func (r *englishPhraseProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter1) (appS.Problem, error) {
+func (r *englishPhraseProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter1) (appS.Problem, error) {
 	_, span := tracer.Start(ctx, "englishPhraseProblemRepository.FindProblemByID")
 	defer span.End()
 
@@ -323,7 +323,7 @@ func (r *englishPhraseProblemRepository) FindProblemsByCustomCondition(ctx conte
 	return nil, errors.New("not implement")
 }
 
-func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operator appD.StudentModel, param appS.ProblemAddParameter) (appD.ProblemID, error) {
+func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operator appD.StudentModel, param appD.ProblemAddParameter) (appD.ProblemID, error) {
 	ctx, span := tracer.Start(ctx, "englishPhraseProblemRepository.AddProblem")
 	defer span.End()
 
@@ -356,15 +356,15 @@ func (r *englishPhraseProblemRepository) AddProblem(ctx context.Context, operato
 	return appD.ProblemID(englishPhraseProblem.ID), nil
 }
 
-func (r *englishPhraseProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+func (r *englishPhraseProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) error {
 	return errors.New("not implemented")
 }
 
-func (r *englishPhraseProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+func (r *englishPhraseProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) error {
 	return errors.New("not implemented")
 }
 
-func (r *englishPhraseProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
+func (r *englishPhraseProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2) error {
 	ctx, span := tracer.Start(ctx, "englishPhraseProblemRepository.RemoveProblem")
 	defer span.End()
 

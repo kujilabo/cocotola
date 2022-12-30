@@ -22,11 +22,11 @@ type StudentUsecaseProblem struct {
 }
 
 // AddProblem provides a mock function with given fields: ctx, organizationID, operatorID, param
-func (_m *StudentUsecaseProblem) AddProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, param service.ProblemAddParameter) ([]appdomain.ProblemID, error) {
+func (_m *StudentUsecaseProblem) AddProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, param appdomain.ProblemAddParameter) ([]appdomain.ProblemID, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, param)
 
 	var r0 []appdomain.ProblemID
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemAddParameter) []appdomain.ProblemID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemAddParameter) []appdomain.ProblemID); ok {
 		r0 = rf(ctx, organizationID, operatorID, param)
 	} else {
 		if ret.Get(0) != nil {
@@ -35,7 +35,7 @@ func (_m *StudentUsecaseProblem) AddProblem(ctx context.Context, organizationID 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemAddParameter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemAddParameter) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, param)
 	} else {
 		r1 = ret.Error(1)
@@ -45,15 +45,15 @@ func (_m *StudentUsecaseProblem) AddProblem(ctx context.Context, organizationID 
 }
 
 // FindAllProblemsByWorkbookID provides a mock function with given fields: ctx, organizationID, operatorID, workbookID
-func (_m *StudentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID) (service.ProblemSearchResult, error) {
+func (_m *StudentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID) (appdomain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID) service.ProblemSearchResult); ok {
+	var r0 appdomain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID) appdomain.ProblemSearchResult); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(appdomain.ProblemSearchResult)
 		}
 	}
 
@@ -68,11 +68,11 @@ func (_m *StudentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context
 }
 
 // FindProblemByID provides a mock function with given fields: ctx, organizationID, operatorID, id
-func (_m *StudentUsecaseProblem) FindProblemByID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id service.ProblemSelectParameter1) (appdomain.ProblemModel, error) {
+func (_m *StudentUsecaseProblem) FindProblemByID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id appdomain.ProblemSelectParameter1) (appdomain.ProblemModel, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, id)
 
 	var r0 appdomain.ProblemModel
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemSelectParameter1) appdomain.ProblemModel); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemSelectParameter1) appdomain.ProblemModel); ok {
 		r0 = rf(ctx, organizationID, operatorID, id)
 	} else {
 		if ret.Get(0) != nil {
@@ -81,7 +81,7 @@ func (_m *StudentUsecaseProblem) FindProblemByID(ctx context.Context, organizati
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemSelectParameter1) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemSelectParameter1) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, id)
 	} else {
 		r1 = ret.Error(1)
@@ -114,20 +114,20 @@ func (_m *StudentUsecaseProblem) FindProblemIDs(ctx context.Context, organizatio
 }
 
 // FindProblemsByProblemIDs provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, param
-func (_m *StudentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, param service.ProblemIDsCondition) (service.ProblemSearchResult, error) {
+func (_m *StudentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, param appdomain.ProblemIDsCondition) (appdomain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, param)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, service.ProblemIDsCondition) service.ProblemSearchResult); ok {
+	var r0 appdomain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.ProblemIDsCondition) appdomain.ProblemSearchResult); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(appdomain.ProblemSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, service.ProblemIDsCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.ProblemIDsCondition) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, workbookID, param)
 	} else {
 		r1 = ret.Error(1)
@@ -137,20 +137,20 @@ func (_m *StudentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, o
 }
 
 // FindProblemsByWorkbookID provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, param
-func (_m *StudentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, param service.ProblemSearchCondition) (service.ProblemSearchResult, error) {
+func (_m *StudentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, param appdomain.ProblemSearchCondition) (appdomain.ProblemSearchResult, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, param)
 
-	var r0 service.ProblemSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, service.ProblemSearchCondition) service.ProblemSearchResult); ok {
+	var r0 appdomain.ProblemSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.ProblemSearchCondition) appdomain.ProblemSearchResult); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.ProblemSearchResult)
+			r0 = ret.Get(0).(appdomain.ProblemSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, service.ProblemSearchCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, appdomain.ProblemSearchCondition) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, workbookID, param)
 	} else {
 		r1 = ret.Error(1)
@@ -174,11 +174,11 @@ func (_m *StudentUsecaseProblem) ImportProblems(ctx context.Context, organizatio
 }
 
 // RemoveProblem provides a mock function with given fields: ctx, organizationID, operatorID, id
-func (_m *StudentUsecaseProblem) RemoveProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id service.ProblemSelectParameter2) error {
+func (_m *StudentUsecaseProblem) RemoveProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id appdomain.ProblemSelectParameter2) error {
 	ret := _m.Called(ctx, organizationID, operatorID, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemSelectParameter2) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemSelectParameter2) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, id)
 	} else {
 		r0 = ret.Error(0)
@@ -188,11 +188,11 @@ func (_m *StudentUsecaseProblem) RemoveProblem(ctx context.Context, organization
 }
 
 // UpdateProblem provides a mock function with given fields: ctx, organizationID, operatorID, id, param
-func (_m *StudentUsecaseProblem) UpdateProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (_m *StudentUsecaseProblem) UpdateProblem(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id appdomain.ProblemSelectParameter2, param appdomain.ProblemUpdateParameter) error {
 	ret := _m.Called(ctx, organizationID, operatorID, id, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemSelectParameter2, appdomain.ProblemUpdateParameter) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, id, param)
 	} else {
 		r0 = ret.Error(0)
@@ -202,11 +202,11 @@ func (_m *StudentUsecaseProblem) UpdateProblem(ctx context.Context, organization
 }
 
 // UpdateProblemProperty provides a mock function with given fields: ctx, organizationID, operatorID, id, param
-func (_m *StudentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (_m *StudentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, id appdomain.ProblemSelectParameter2, param appdomain.ProblemUpdateParameter) error {
 	ret := _m.Called(ctx, organizationID, operatorID, id, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.ProblemSelectParameter2, service.ProblemUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.ProblemSelectParameter2, appdomain.ProblemUpdateParameter) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, id, param)
 	} else {
 		r0 = ret.Error(0)

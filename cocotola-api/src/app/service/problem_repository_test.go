@@ -51,7 +51,7 @@ func TestNewProlemAddParameter(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := NewProblemAddParameter(tt.args.workbookID /*tt.args.number,*/, tt.args.properties)
+			got, err := domain.NewProblemAddParameter(tt.args.workbookID /*tt.args.number,*/, tt.args.properties)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewProblemAddParameter() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -93,7 +93,7 @@ func TestNewProlemUpdateParameter(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			got, err := NewProblemUpdateParameter( /*tt.args.number,*/ tt.args.properties)
+			got, err := domain.NewProblemUpdateParameter( /*tt.args.number,*/ tt.args.properties)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewProblemUpdateParameter() error = %v, wantErr %v", err, tt.wantErr)
 				return

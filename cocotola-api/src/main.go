@@ -64,8 +64,6 @@ const readHeaderTimeout = time.Duration(30) * time.Second
 
 const jobIntervalSec = 300
 
-type mainObject struct{}
-
 func getValue(values ...string) string {
 	for _, v := range values {
 		if len(v) != 0 {

@@ -15,24 +15,24 @@ type Workbook interface {
 	domain.WorkbookModel
 
 	// FindProblems searches for problems based on search condition
-	FindProblems(ctx context.Context, operator domain.StudentModel, param ProblemSearchCondition) (ProblemSearchResult, error)
+	FindProblems(ctx context.Context, operator domain.StudentModel, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error)
 
-	FindAllProblems(ctx context.Context, operator domain.StudentModel) (ProblemSearchResult, error)
+	FindAllProblems(ctx context.Context, operator domain.StudentModel) (domain.ProblemSearchResult, error)
 
-	FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param ProblemIDsCondition) (ProblemSearchResult, error)
+	FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error)
 
 	FindProblemIDs(ctx context.Context, operator domain.StudentModel) ([]domain.ProblemID, error)
 
 	// FindProblems searches for problem based on a problem ID
 	FindProblemByID(ctx context.Context, operator domain.StudentModel, problemID domain.ProblemID) (Problem, error)
 
-	AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	AddProblem(ctx context.Context, operator domain.StudentModel, param domain.ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	UpdateProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	RemoveProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
 	UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter domain.WorkbookUpdateParameter) error
 
@@ -76,7 +76,7 @@ func (m *workbook) GetWorkbookModel() domain.WorkbookModel {
 	return m.WorkbookModel
 }
 
-func (m *workbook) FindProblems(ctx context.Context, operator domain.StudentModel, param ProblemSearchCondition) (ProblemSearchResult, error) {
+func (m *workbook) FindProblems(ctx context.Context, operator domain.StudentModel, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error) {
 	problems, err := m.problemRepo.FindProblems(ctx, operator, param)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
@@ -85,7 +85,7 @@ func (m *workbook) FindProblems(ctx context.Context, operator domain.StudentMode
 	return problems, nil
 }
 
-func (m *workbook) FindAllProblems(ctx context.Context, operator domain.StudentModel) (ProblemSearchResult, error) {
+func (m *workbook) FindAllProblems(ctx context.Context, operator domain.StudentModel) (domain.ProblemSearchResult, error) {
 	problems, err := m.problemRepo.FindAllProblems(ctx, operator, m.GetWorkbookModel().GetWorkbookID())
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
@@ -94,7 +94,7 @@ func (m *workbook) FindAllProblems(ctx context.Context, operator domain.StudentM
 	return problems, nil
 }
 
-func (m *workbook) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param ProblemIDsCondition) (ProblemSearchResult, error) {
+func (m *workbook) FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error) {
 	problems, err := m.problemRepo.FindProblemsByProblemIDs(ctx, operator, param)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
@@ -113,7 +113,7 @@ func (m *workbook) FindProblemIDs(ctx context.Context, operator domain.StudentMo
 }
 
 func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentModel, problemID domain.ProblemID) (Problem, error) {
-	id, err := NewProblemSelectParameter1(m.GetWorkbookModel().GetWorkbookID(), problemID)
+	id, err := domain.NewProblemSelectParameter1(m.GetWorkbookModel().GetWorkbookID(), problemID)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -126,7 +126,7 @@ func (m *workbook) FindProblemByID(ctx context.Context, operator domain.StudentM
 	return problem, nil
 }
 
-func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
+func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel, param domain.ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.AddProblem")
 
@@ -146,7 +146,7 @@ func (m *workbook) AddProblem(ctx context.Context, operator domain.StudentModel,
 	return added, updated, removed, nil
 }
 
-func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
+func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.UpdateProblem")
 
@@ -167,7 +167,7 @@ func (m *workbook) UpdateProblem(ctx context.Context, operator domain.StudentMod
 	return added, updated, removed, nil
 }
 
-func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
+func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.UpdateProblemProperty")
 
@@ -187,7 +187,7 @@ func (m *workbook) UpdateProblemProperty(ctx context.Context, operator domain.St
 	return added, updated, removed, nil
 }
 
-func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
+func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Infof("workbook.RemoveProblem")
 

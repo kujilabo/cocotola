@@ -387,7 +387,7 @@ func (h *problemHandler) ImportProblems(c *gin.Context) {
 	}, h.errorHandle)
 }
 
-func (h *problemHandler) toProblemSelectParameter1(c *gin.Context) (service.ProblemSelectParameter1, error) {
+func (h *problemHandler) toProblemSelectParameter1(c *gin.Context) (domain.ProblemSelectParameter1, error) {
 	workbookID, err := helper.GetUintFromPath(c, "workbookID")
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
@@ -396,7 +396,7 @@ func (h *problemHandler) toProblemSelectParameter1(c *gin.Context) (service.Prob
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
 	}
-	param, err := service.NewProblemSelectParameter1(domain.WorkbookID(workbookID), domain.ProblemID(problemID))
+	param, err := domain.NewProblemSelectParameter1(domain.WorkbookID(workbookID), domain.ProblemID(problemID))
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
 	}
@@ -404,7 +404,7 @@ func (h *problemHandler) toProblemSelectParameter1(c *gin.Context) (service.Prob
 	return param, nil
 }
 
-func (h *problemHandler) toProblemSelectParameter2(c *gin.Context) (service.ProblemSelectParameter2, error) {
+func (h *problemHandler) toProblemSelectParameter2(c *gin.Context) (domain.ProblemSelectParameter2, error) {
 	workbookID, err := helper.GetUintFromPath(c, "workbookID")
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
@@ -417,7 +417,7 @@ func (h *problemHandler) toProblemSelectParameter2(c *gin.Context) (service.Prob
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
 	}
-	param, err := service.NewProblemSelectParameter2(domain.WorkbookID(workbookID), domain.ProblemID(problemID), version)
+	param, err := domain.NewProblemSelectParameter2(domain.WorkbookID(workbookID), domain.ProblemID(problemID), version)
 	if err != nil {
 		return nil, libD.ErrInvalidArgument
 	}

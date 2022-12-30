@@ -7,18 +7,17 @@ import (
 	"strconv"
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	pluginS "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
 type ToEnglishWordProblemAddParameter interface {
-	Run(ctx context.Context) ([]appS.ProblemAddParameter, error)
+	Run(ctx context.Context) ([]appD.ProblemAddParameter, error)
 }
 
 type ToEnglishWordProblemUpdateParameter interface {
-	Run(ctx context.Context) ([]appS.ProblemUpdateParameter, error)
+	Run(ctx context.Context) ([]appD.ProblemUpdateParameter, error)
 }
 
 type toSingleEnglishWordProblemAddParameter struct {
@@ -39,7 +38,7 @@ func NewToSingleEnglishWordProblemAddParameter(translatorClient pluginS.Translat
 	}
 }
 
-func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]appS.ProblemAddParameter, error) {
+func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]appD.ProblemAddParameter, error) {
 	translated := c.param.Translated
 	if translated == "" {
 		translation, err := c.translatorClient.DictionaryLookupWithPos(ctx, appD.Lang2EN, c.param.Lang2, c.param.Text, c.param.Pos)
@@ -56,12 +55,12 @@ func (c *toSingleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]app
 	properties[EnglishSentenceProblemAddPropertyTranslated] = translated
 	properties[EnglishWordProblemAddPropertyAudioID] = strconv.Itoa(int(uint(c.audioID)))
 
-	param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
+	param, err := appD.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}
 
-	return []appS.ProblemAddParameter{param}, nil
+	return []appD.ProblemAddParameter{param}, nil
 }
 
 type toMultipleEnglishWordProblemAddParameter struct {
@@ -82,7 +81,7 @@ func NewToMultipleEnglishWordProblemAddParameter(translatorClient pluginS.Transl
 	}
 }
 
-func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]appS.ProblemAddParameter, error) {
+func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]appD.ProblemAddParameter, error) {
 	logger := log.FromContext(ctx)
 
 	translated, err := c.translatorClient.DictionaryLookup(ctx, appD.Lang2EN, c.param.Lang2, c.param.Text)
@@ -96,17 +95,17 @@ func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]a
 		properties := c.param.toProperties()
 		properties[EnglishWordProblemAddPropertyAudioID] = strconv.Itoa(int(uint(c.audioID)))
 
-		param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
+		param, err := appD.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 		if err != nil {
 			return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 		}
 
-		return []appS.ProblemAddParameter{param}, nil
+		return []appD.ProblemAddParameter{param}, nil
 	}
 
 	logger.Infof("translated: %v", translated)
 
-	params := make([]appS.ProblemAddParameter, len(translated))
+	params := make([]appD.ProblemAddParameter, len(translated))
 	for i, t := range translated {
 
 		properties := c.param.toProperties()
@@ -114,7 +113,7 @@ func (c *toMultipleEnglishWordProblemAddParameter) Run(ctx context.Context) ([]a
 		properties[EnglishWordProblemAddPropertyTranslated] = t.GetTranslated()
 		properties[EnglishWordProblemAddPropertyPos] = strconv.Itoa(int(t.GetPos()))
 
-		param, err := appS.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
+		param, err := appD.NewProblemAddParameter(c.workbookID /*c.number,*/, properties)
 		if err != nil {
 			return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 		}
@@ -143,7 +142,7 @@ func NewToSingleEnglishWordProblemUpdateParameter(translatorClient pluginS.Trans
 	}
 }
 
-func (c *toSingleEnglishWordProblemUpdateParameter) Run(ctx context.Context) ([]appS.ProblemUpdateParameter, error) {
+func (c *toSingleEnglishWordProblemUpdateParameter) Run(ctx context.Context) ([]appD.ProblemUpdateParameter, error) {
 	// translated := c.param.Translated
 	// if translated == "" {
 	// 	translation, err := c.translatorClient.DictionaryLookupWithPos(ctx, appD.Lang2EN, appD.Lang2JA, c.param.Text, c.param.Pos)
@@ -163,10 +162,10 @@ func (c *toSingleEnglishWordProblemUpdateParameter) Run(ctx context.Context) ([]
 		EnglishWordProblemUpdatePropertySentenceID1: strconv.Itoa(int(c.sentenceID1)),
 	}
 
-	param, err := appS.NewProblemUpdateParameter( /*c.number,*/ properties)
+	param, err := appD.NewProblemUpdateParameter( /*c.number,*/ properties)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}
 
-	return []appS.ProblemUpdateParameter{param}, nil
+	return []appD.ProblemUpdateParameter{param}, nil
 }

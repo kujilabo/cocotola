@@ -1,8 +1,4 @@
 //go:generate mockery --output mock --name WorkbookRepository
-//go:generate mockery --output mock --name WorkbookSearchCondition
-//go:generate mockery --output mock --name WorkbookSearchResult
-//go:generate mockery --output mock --name WorkbookAddParameter
-//go:generate mockery --output mock --name WorkbookUpdateParameter
 package service
 
 import (

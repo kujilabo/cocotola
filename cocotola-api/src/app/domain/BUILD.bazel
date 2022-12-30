@@ -9,6 +9,7 @@ go_library(
         "lang.go",
         "plugin.go",
         "problem_model.go",
+        "problem_repository.go",
         "problem_type.go",
         "rbac.go",
         "stat_model.go",
