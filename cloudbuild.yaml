@@ -127,8 +127,8 @@ steps:
       - -c
       - |
         diff_cocotola=$(cat /workspace/diff_cocotola.txt)
-        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0; fi
-        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0; fi
+        if [ $diff_cocotola == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0; fi
+        if [ $diff_cocotola == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"

@@ -7,7 +7,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
@@ -22,13 +21,15 @@ type studentUsecaseAudio struct {
 	transaction       service.Transaction
 	pf                service.ProcessorFactory
 	synthesizerClient service.SynthesizerClient
+	findStudentFunc   FindStudentFunc
 }
 
-func NewStudentUsecaseAudio(transaction service.Transaction, pf service.ProcessorFactory, synthesizerClient service.SynthesizerClient) StudentUsecaseAudio {
+func NewStudentUsecaseAudio(transaction service.Transaction, pf service.ProcessorFactory, synthesizerClient service.SynthesizerClient, findStudentFunc FindStudentFunc) StudentUsecaseAudio {
 	return &studentUsecaseAudio{
 		transaction:       transaction,
 		pf:                pf,
 		synthesizerClient: synthesizerClient,
+		findStudentFunc:   findStudentFunc,
 	}
 }
 
@@ -73,13 +74,13 @@ func (s *studentUsecaseAudio) FindAudioByID(ctx context.Context, organizationID 
 }
 
 func (s *studentUsecaseAudio) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
-	studentService, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
+	student, err := s.findStudentFunc(ctx, rf, organizationID, operatorID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("failed to findStudent. err: %w", err)
 	}
-	workbookService, err := studentService.FindWorkbookByID(ctx, workbookID)
+	workbookService, err := student.FindWorkbookByID(ctx, workbookID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("studentService.FindWorkbookByID. err: %w", err)
 	}
-	return studentService, workbookService, nil
+	return student, workbookService, nil
 }

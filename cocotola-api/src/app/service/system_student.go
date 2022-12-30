@@ -38,9 +38,7 @@ func NewSystemStudent(rf RepositoryFactory, systemStudentModel domain.SystemStud
 
 func (s *systemStudent) FindWorkbookFromSystemSpace(ctx context.Context, name string) (Workbook, error) {
 	systemSpaceID := GetSystemSpaceID()
-
 	workbookRepo := s.rf.NewWorkbookRepository(ctx)
-
 	workbook, err := workbookRepo.FindWorkbookByName(ctx, s, systemSpaceID, name)
 	if err != nil {
 		return nil, liberrors.Errorf("failed to FindWorkbookByName. err: %w", err)
@@ -59,7 +57,7 @@ func (s *systemStudent) AddWorkbookToSystemSpace(ctx context.Context, parameter 
 
 	workbookID, err := workbookRepo.AddWorkbook(ctx, s, systemSpaceID, parameter)
 	if err != nil {
-		return 0, liberrors.Errorf("failed to AddWorkbook. err: %w", err)
+		return 0, liberrors.Errorf("workbookRepo.AddWorkbook. err: %w", err)
 	}
 
 	return workbookID, nil
