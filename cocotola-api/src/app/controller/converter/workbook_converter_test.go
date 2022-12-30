@@ -7,7 +7,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	serviceM "github.com/kujilabo/cocotola/cocotola-api/src/app/service/mock"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	"github.com/stretchr/testify/require"
@@ -16,7 +15,7 @@ import (
 func TestToWorkbookSearchResponse(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		result service.WorkbookSearchResult
+		result domain.WorkbookSearchResult
 	}
 
 	time1 := time.Now()

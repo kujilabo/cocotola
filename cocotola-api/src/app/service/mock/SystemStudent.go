@@ -23,18 +23,18 @@ type SystemStudent struct {
 }
 
 // AddWorkbookToSystemSpace provides a mock function with given fields: ctx, parameter
-func (_m *SystemStudent) AddWorkbookToSystemSpace(ctx context.Context, parameter service.WorkbookAddParameter) (domain.WorkbookID, error) {
+func (_m *SystemStudent) AddWorkbookToSystemSpace(ctx context.Context, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error) {
 	ret := _m.Called(ctx, parameter)
 
 	var r0 domain.WorkbookID
-	if rf, ok := ret.Get(0).(func(context.Context, service.WorkbookAddParameter) domain.WorkbookID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.WorkbookAddParameter) domain.WorkbookID); ok {
 		r0 = rf(ctx, parameter)
 	} else {
 		r0 = ret.Get(0).(domain.WorkbookID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, service.WorkbookAddParameter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.WorkbookAddParameter) error); ok {
 		r1 = rf(ctx, parameter)
 	} else {
 		r1 = ret.Error(1)

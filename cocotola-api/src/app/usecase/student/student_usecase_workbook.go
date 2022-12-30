@@ -15,13 +15,13 @@ const DefaultPageNo = 1
 const DefaultPageSize = 10
 
 type StudentUsecaseWorkbook interface {
-	FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.WorkbookSearchResult, error)
+	FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (domain.WorkbookSearchResult, error)
 
 	FindWorkbookByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workBookID domain.WorkbookID) (domain.WorkbookModel, error)
 
-	AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter service.WorkbookAddParameter) (domain.WorkbookID, error)
+	AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error)
 
-	UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter service.WorkbookUpdateParameter) error
+	UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter domain.WorkbookUpdateParameter) error
 
 	RemoveWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int) error
 }
@@ -38,10 +38,10 @@ func NewStudentUsecaseWorkbook(transaction service.Transaction, pf service.Proce
 	}
 }
 
-func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (service.WorkbookSearchResult, error) {
-	var result service.WorkbookSearchResult
+func (s *studentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID) (domain.WorkbookSearchResult, error) {
+	var result domain.WorkbookSearchResult
 	fn := func(student service.Student) error {
-		condition, err := service.NewWorkbookSearchCondition(DefaultPageNo, DefaultPageSize, []userD.SpaceID{})
+		condition, err := domain.NewWorkbookSearchCondition(DefaultPageNo, DefaultPageSize, []userD.SpaceID{})
 		if err != nil {
 			return liberrors.Errorf("service.NewWorkbookSearchCondition. err: %w", err)
 		}
@@ -80,7 +80,7 @@ func (s *studentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organizat
 	return result, nil
 }
 
-func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter service.WorkbookAddParameter) (domain.WorkbookID, error) {
+func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error) {
 	var addedWorkbookID domain.WorkbookID
 	fn := func(student service.Student) error {
 		tmpAddedWorkbookID, err := student.AddWorkbookToPersonalSpace(ctx, parameter)
@@ -98,7 +98,7 @@ func (s *studentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID
 	return addedWorkbookID, nil
 }
 
-func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter service.WorkbookUpdateParameter) error {
+func (s *studentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, version int, parameter domain.WorkbookUpdateParameter) error {
 	fn := func(student service.Student) error {
 		if err := student.UpdateWorkbook(ctx, workbookID, version, parameter); err != nil {
 			return liberrors.Errorf("student.UpdateWorkbook. err: %w", err)

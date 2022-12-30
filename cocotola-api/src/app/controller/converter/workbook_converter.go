@@ -3,12 +3,11 @@ package converter
 import (
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
-func ToWorkbookSearchResponse(result service.WorkbookSearchResult) (*entity.WorkbookSearchResponse, error) {
+func ToWorkbookSearchResponse(result domain.WorkbookSearchResult) (*entity.WorkbookSearchResponse, error) {
 	workbooks := make([]*entity.WorkbookResponseHTTPEntity, len(result.GetResults()))
 	for i, w := range result.GetResults() {
 		model, err := entity.NewModel(w)
@@ -58,8 +57,8 @@ func ToWorkbookHTTPEntity(workbook domain.WorkbookModel) (entity.WorkbookRespons
 	return e, nil
 }
 
-func ToWorkbookAddParameter(param *entity.WorkbookAddParameter) (service.WorkbookAddParameter, error) {
-	domainParam, err := service.NewWorkbookAddParameter(domain.ProblemTypeName(param.ProblemType), param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
+func ToWorkbookAddParameter(param *entity.WorkbookAddParameter) (domain.WorkbookAddParameter, error) {
+	domainParam, err := domain.NewWorkbookAddParameter(domain.ProblemTypeName(param.ProblemType), param.Name, domain.Lang2JA, param.QuestionText, map[string]string{
 		"audioEnabled": "false",
 	})
 
@@ -70,8 +69,8 @@ func ToWorkbookAddParameter(param *entity.WorkbookAddParameter) (service.Workboo
 	return domainParam, nil
 }
 
-func ToWorkbookUpdateParameter(param *entity.WorkbookUpdateParameter) (service.WorkbookUpdateParameter, error) {
-	domainParam, err := service.NewWorkbookUpdateParameter(param.Name, param.QuestionText)
+func ToWorkbookUpdateParameter(param *entity.WorkbookUpdateParameter) (domain.WorkbookUpdateParameter, error) {
+	domainParam, err := domain.NewWorkbookUpdateParameter(param.Name, param.QuestionText)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}

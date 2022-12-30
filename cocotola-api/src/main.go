@@ -671,7 +671,7 @@ func initApp2_3(ctx context.Context, appTransaction service.Transaction) {
 				return liberrors.Errorf(". err: %w", err)
 			}
 
-			paramToAddWorkbook, err := appS.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, appS.TatoebaWorkbookName, appD.Lang2JA, "", map[string]string{})
+			paramToAddWorkbook, err := appD.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, appS.TatoebaWorkbookName, appD.Lang2JA, "", map[string]string{})
 			if err != nil {
 				return liberrors.Errorf("NewWorkbookAddParameter. err: %w", err)
 			}

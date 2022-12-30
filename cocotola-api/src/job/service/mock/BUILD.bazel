@@ -3,7 +3,10 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mock",
     srcs = [
+        "Job.go",
         "JobHistoryRepository.go",
+        "JobService.go",
+        "JobStatus.go",
         "JobStatusRepository.go",
         "RepositoryFactory.go",
         "Transaction.go",

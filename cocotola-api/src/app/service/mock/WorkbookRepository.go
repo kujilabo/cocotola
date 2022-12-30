@@ -22,18 +22,18 @@ type WorkbookRepository struct {
 }
 
 // AddWorkbook provides a mock function with given fields: ctx, operator, spaceID, param
-func (_m *WorkbookRepository) AddWorkbook(ctx context.Context, operator domain.AppUserModel, spaceID domain.SpaceID, param service.WorkbookAddParameter) (appdomain.WorkbookID, error) {
+func (_m *WorkbookRepository) AddWorkbook(ctx context.Context, operator domain.AppUserModel, spaceID domain.SpaceID, param appdomain.WorkbookAddParameter) (appdomain.WorkbookID, error) {
 	ret := _m.Called(ctx, operator, spaceID, param)
 
 	var r0 appdomain.WorkbookID
-	if rf, ok := ret.Get(0).(func(context.Context, domain.AppUserModel, domain.SpaceID, service.WorkbookAddParameter) appdomain.WorkbookID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.AppUserModel, domain.SpaceID, appdomain.WorkbookAddParameter) appdomain.WorkbookID); ok {
 		r0 = rf(ctx, operator, spaceID, param)
 	} else {
 		r0 = ret.Get(0).(appdomain.WorkbookID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.AppUserModel, domain.SpaceID, service.WorkbookAddParameter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.AppUserModel, domain.SpaceID, appdomain.WorkbookAddParameter) error); ok {
 		r1 = rf(ctx, operator, spaceID, param)
 	} else {
 		r1 = ret.Error(1)
@@ -43,20 +43,20 @@ func (_m *WorkbookRepository) AddWorkbook(ctx context.Context, operator domain.A
 }
 
 // FindPersonalWorkbooks provides a mock function with given fields: ctx, operator, param
-func (_m *WorkbookRepository) FindPersonalWorkbooks(ctx context.Context, operator appdomain.StudentModel, param service.WorkbookSearchCondition) (service.WorkbookSearchResult, error) {
+func (_m *WorkbookRepository) FindPersonalWorkbooks(ctx context.Context, operator appdomain.StudentModel, param appdomain.WorkbookSearchCondition) (appdomain.WorkbookSearchResult, error) {
 	ret := _m.Called(ctx, operator, param)
 
-	var r0 service.WorkbookSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, appdomain.StudentModel, service.WorkbookSearchCondition) service.WorkbookSearchResult); ok {
+	var r0 appdomain.WorkbookSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, appdomain.StudentModel, appdomain.WorkbookSearchCondition) appdomain.WorkbookSearchResult); ok {
 		r0 = rf(ctx, operator, param)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.WorkbookSearchResult)
+			r0 = ret.Get(0).(appdomain.WorkbookSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, appdomain.StudentModel, service.WorkbookSearchCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, appdomain.StudentModel, appdomain.WorkbookSearchCondition) error); ok {
 		r1 = rf(ctx, operator, param)
 	} else {
 		r1 = ret.Error(1)
@@ -126,11 +126,11 @@ func (_m *WorkbookRepository) RemoveWorkbook(ctx context.Context, operator appdo
 }
 
 // UpdateWorkbook provides a mock function with given fields: ctx, operator, workbookID, version, param
-func (_m *WorkbookRepository) UpdateWorkbook(ctx context.Context, operator appdomain.StudentModel, workbookID appdomain.WorkbookID, version int, param service.WorkbookUpdateParameter) error {
+func (_m *WorkbookRepository) UpdateWorkbook(ctx context.Context, operator appdomain.StudentModel, workbookID appdomain.WorkbookID, version int, param appdomain.WorkbookUpdateParameter) error {
 	ret := _m.Called(ctx, operator, workbookID, version, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, appdomain.StudentModel, appdomain.WorkbookID, int, service.WorkbookUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, appdomain.StudentModel, appdomain.WorkbookID, int, appdomain.WorkbookUpdateParameter) error); ok {
 		r0 = rf(ctx, operator, workbookID, version, param)
 	} else {
 		r0 = ret.Error(0)

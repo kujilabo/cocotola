@@ -551,11 +551,11 @@ func (_m *Workbook) UpdateProblemProperty(ctx context.Context, operator domain.S
 }
 
 // UpdateWorkbook provides a mock function with given fields: ctx, operator, version, parameter
-func (_m *Workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter service.WorkbookUpdateParameter) error {
+func (_m *Workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter domain.WorkbookUpdateParameter) error {
 	ret := _m.Called(ctx, operator, version, parameter)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, int, service.WorkbookUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.StudentModel, int, domain.WorkbookUpdateParameter) error); ok {
 		r0 = rf(ctx, operator, version, parameter)
 	} else {
 		r0 = ret.Error(0)

@@ -102,7 +102,7 @@ func newWorkbookRepository(ctx context.Context, driverName string, pf service.Pr
 	}
 }
 
-func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator domain.StudentModel, param service.WorkbookSearchCondition) (service.WorkbookSearchResult, error) {
+func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator domain.StudentModel, param domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error) {
 	ctx, span := tracer.Start(ctx, "workbookRepository.FindPersonalWorkbooks")
 	defer span.End()
 
@@ -163,7 +163,7 @@ func (r *workbookRepository) FindPersonalWorkbooks(ctx context.Context, operator
 		return nil, errors.New("overflow")
 	}
 
-	workbooks, err := service.NewWorkbookSearchResult(int(count), results)
+	workbooks, err := domain.NewWorkbookSearchResult(int(count), results)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -325,7 +325,7 @@ func (r *workbookRepository) getPrivileges(ctx context.Context, operator userD.A
 	return r.checkPrivileges(e, userObject, workbookObject, privs)
 }
 
-func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.AppUserModel, spaceID userD.SpaceID, param service.WorkbookAddParameter) (domain.WorkbookID, error) {
+func (r *workbookRepository) AddWorkbook(ctx context.Context, operator userD.AppUserModel, spaceID userD.SpaceID, param domain.WorkbookAddParameter) (domain.WorkbookID, error) {
 	_, span := tracer.Start(ctx, "workbookRepository.AddWorkbook")
 	defer span.End()
 
@@ -403,7 +403,7 @@ func (r *workbookRepository) RemoveWorkbook(ctx context.Context, operator domain
 	return nil
 }
 
-func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, id domain.WorkbookID, version int, param service.WorkbookUpdateParameter) error {
+func (r *workbookRepository) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, id domain.WorkbookID, version int, param domain.WorkbookUpdateParameter) error {
 	_, span := tracer.Start(ctx, "workbookRepository.UpdateWorkbook")
 	defer span.End()
 

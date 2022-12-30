@@ -17,6 +17,7 @@ go_library(
         "study_type.go",
         "system_student_model.go",
         "workbook_model.go",
+        "workbook_repository.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/app/domain",
     visibility = ["//visibility:public"],

@@ -171,14 +171,14 @@ func testNewStudyType(t *testing.T, id uint, name string) domain.StudyType {
 	return p
 }
 
-func testNewWorkbookSearchCondition(t *testing.T) service.WorkbookSearchCondition {
-	p, err := service.NewWorkbookSearchCondition(1, 10, []userD.SpaceID{})
+func testNewWorkbookSearchCondition(t *testing.T) domain.WorkbookSearchCondition {
+	p, err := domain.NewWorkbookSearchCondition(1, 10, []userD.SpaceID{})
 	require.NoError(t, err)
 	return p
 }
 
-func testNewWorkbookAddParameter(t *testing.T, name string) service.WorkbookAddParameter {
-	p, err := service.NewWorkbookAddParameter("english_word", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
+func testNewWorkbookAddParameter(t *testing.T, name string) domain.WorkbookAddParameter {
+	p, err := domain.NewWorkbookAddParameter("english_word", name, domain.Lang2JA, "", map[string]string{"audioEnabled": "false"})
 	require.NoError(t, err)
 	return p
 }

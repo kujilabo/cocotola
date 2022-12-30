@@ -27,7 +27,6 @@ go_test(
     deps = [
         "//cocotola-api/src/app/controller/entity",
         "//cocotola-api/src/app/domain",
-        "//cocotola-api/src/app/service",
         "//cocotola-api/src/app/service/mock",
         "//cocotola-api/src/user/domain",
         "@com_github_google_go_cmp//cmp",
