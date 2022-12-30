@@ -2,6 +2,7 @@ package english_sentence
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
@@ -50,8 +51,8 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 		}
 
 		added, _, _, err := workbook.AddProblem(ctx, student, param)
-		if err != nil {
-			return liberrors.Errorf("workbook.NewProblemAddParameter. err: %w", err)
+		if err != nil && !errors.Is(err, appS.ErrProblemAlreadyExists) {
+			return liberrors.Errorf("AddProblem. err: %w", err)
 		}
 		logger.Infof("problemIDs: %v", added)
 	}
