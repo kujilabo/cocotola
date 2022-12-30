@@ -7,6 +7,7 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	"github.com/kujilabo/cocotola/cocotola-api/src/data"
 	pluginCommonDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain"
 	pluginEnglishDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
@@ -376,20 +377,9 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 		return liberrors.Errorf("failed to NewWorkbookAddParameter. err: %w", err)
 	}
 
-	if _, err := student.FindWorkbookByName(ctx, workbookName); err == nil {
-		return nil
-	} else if !errors.Is(err, appS.ErrWorkbookNotFound) {
-		return liberrors.Errorf("student.FindWorkbookByName. err: %w", err)
-	}
-
-	workbookID, err := student.AddWorkbookToPersonalSpace(ctx, param)
+	workbook, err := data.CreateWorkbookIfNotExists(ctx, student, workbookName, param)
 	if err != nil {
-		return liberrors.Errorf("failed to AddWorkbookToPersonalSpace. err: %w", err)
-	}
-
-	workbook, err := student.FindWorkbookByID(ctx, workbookID)
-	if err != nil {
-		return liberrors.Errorf("failed to FindWorkbookByID. err: %w", err)
+		return liberrors.Errorf("createWorkbookIfNotExists. err: %w", err)
 	}
 
 	for i, word := range words {
@@ -399,18 +389,18 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 			"lang2":  "ja",
 			"pos":    strconv.Itoa(int(pos)),
 		}
-		param, err := appS.NewProblemAddParameter(workbookID, properties)
+		param, err := appS.NewProblemAddParameter(workbook.GetWorkbookID(), properties)
 		if err != nil {
 			return liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 		}
 
 		added, _, _, err := workbook.AddProblem(ctx, student, param)
-		if err != nil {
-			return liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
+		if err != nil && !errors.Is(err, appS.ErrProblemAlreadyExists) {
+			return liberrors.Errorf("AddProblem. err: %w", err)
 		}
 		logger.Infof("problemIDs: %v", added)
 	}
 
-	logger.Infof("Example %d", workbookID)
+	logger.Infof("Example %d", workbook.GetWorkbookID())
 	return nil
 }
