@@ -35,25 +35,28 @@ import (
 
 const readHeaderTimeout = time.Duration(30) * time.Second
 
+func getValue(values ...string) string {
+	for _, v := range values {
+		if len(v) != 0 {
+			return v
+		}
+	}
+	return ""
+}
+
 // @securityDefinitions.basic BasicAuth
 func main() {
 	ctx := context.Background()
 	env := flag.String("env", "", "environment")
 	flag.Parse()
-	if len(*env) == 0 {
-		appEnv := os.Getenv("APP_ENV")
-		if len(appEnv) == 0 {
-			*env = "local"
-		} else {
-			*env = appEnv
-		}
-	}
+	appEnv := getValue(*env, os.Getenv("APP_ENV"), "local")
+	logrus.Infof("env: %s", appEnv)
 
-	logrus.Infof("env: %s", *env)
+	logrus.Infof("env: %s", appEnv)
 
 	liberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp, err := initialize(ctx, *env)
+	cfg, db, sqlDB, tp, err := initialize(ctx, appEnv)
 	if err != nil {
 		panic(err)
 	}
