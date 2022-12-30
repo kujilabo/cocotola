@@ -19,3 +19,4 @@ lint:
 	@golangci-lint run --disable-all --enable forbidigo       --config ../.github/.golangci.yml --skip-files ".*_test.go" --skip-files "tools/.*"
 	@golangci-lint run --disable-all --enable bodyclose       --config ../.github/.golangci.yml --skip-files ".*_test.go"
 	@golangci-lint run --disable-all --enable exhaustive      --config ../.github/.golangci.yml --skip-files ".*_test.go"
+	@golangci-lint run --disable-all --enable forbidigo       --config ../.github/.golangci_forbidigo_001.yml  --skip-files ".*/main.go" --skip-files ".*/.*_test.go" --skip-files ".*/system_admin.go" --skip-files ".*/system_admin_model.go"
