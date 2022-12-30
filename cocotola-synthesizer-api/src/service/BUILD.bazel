@@ -8,6 +8,7 @@ go_library(
         "init.go",
         "repository_factory.go",
         "synthesizer_client.go",
+        "transaction.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-synthesizer-api/src/service",
     visibility = ["//visibility:public"],

@@ -12,6 +12,5 @@ go_library(
         "//cocotola-synthesizer-api/src/domain",
         "//cocotola-synthesizer-api/src/service",
         "//lib/errors",
-        "@io_gorm_gorm//:gorm",
     ],
 )
