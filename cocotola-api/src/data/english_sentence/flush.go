@@ -6,6 +6,7 @@ import (
 
 	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	appS "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
+	"github.com/kujilabo/cocotola/cocotola-api/src/data"
 	pluginEnglishDomain "github.com/kujilabo/cocotola/cocotola-api/src/plugin/english/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -31,14 +32,9 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 		return liberrors.Errorf("NewWorkbookAddParameter. err: %w", err)
 	}
 
-	workbookID, err := student.AddWorkbookToPersonalSpace(ctx, param)
+	workbook, err := data.CreateWorkbookIfNotExists(ctx, student, workbookName, param)
 	if err != nil {
-		return liberrors.Errorf("student.AddWorkbookToPersonalSpace. err: %w", err)
-	}
-
-	workbook, err := student.FindWorkbookByID(ctx, workbookID)
-	if err != nil {
-		return liberrors.Errorf("student.FindWorkbookByID. err: %w", err)
+		return liberrors.Errorf("createWorkbookIfNotExists. err: %w", err)
 	}
 
 	for i, sentence := range sentences {
@@ -48,7 +44,7 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 			"lang2":      "ja",
 			"translated": sentence[1],
 		}
-		param, err := appS.NewProblemAddParameter(workbookID, properties)
+		param, err := appS.NewProblemAddParameter(workbook.GetWorkbookID(), properties)
 		if err != nil {
 			return liberrors.Errorf("NewProblemAddParameter. err: %w", err)
 		}
@@ -60,6 +56,6 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 		logger.Infof("problemIDs: %v", added)
 	}
 
-	logger.Infof("Example %d", workbookID)
+	logger.Infof("Example %d", workbook.GetWorkbookID())
 	return nil
 }
