@@ -8,7 +8,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/usecase"
 	userD "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
@@ -38,16 +37,18 @@ type StudentUsecaseProblem interface {
 }
 
 type studentUsecaseProblem struct {
-	transaction    service.Transaction
-	pf             service.ProcessorFactory
-	problemMonitor service.ProblemMonitor
+	transaction     service.Transaction
+	pf              service.ProcessorFactory
+	problemMonitor  service.ProblemMonitor
+	findStudentFunc FindStudentFunc
 }
 
-func NewStudentUsecaseProblem(transaction service.Transaction, pf service.ProcessorFactory, problemMonitor service.ProblemMonitor) StudentUsecaseProblem {
+func NewStudentUsecaseProblem(transaction service.Transaction, pf service.ProcessorFactory, problemMonitor service.ProblemMonitor, findStudentFunc FindStudentFunc) StudentUsecaseProblem {
 	return &studentUsecaseProblem{
-		transaction:    transaction,
-		pf:             pf,
-		problemMonitor: problemMonitor,
+		transaction:     transaction,
+		pf:              pf,
+		problemMonitor:  problemMonitor,
+		findStudentFunc: findStudentFunc,
 	}
 }
 
@@ -293,7 +294,7 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 }
 
 func (s *studentUsecaseProblem) findStudentAndWorkbook(ctx context.Context, rf service.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.Student, service.Workbook, error) {
-	student, err := usecase.FindStudent(ctx, s.pf, rf, organizationID, operatorID)
+	student, err := s.findStudentFunc(ctx, rf, organizationID, operatorID)
 	if err != nil {
 		return nil, nil, liberrors.Errorf("FindStudent. err: %w", err)
 	}
