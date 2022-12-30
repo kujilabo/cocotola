@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -212,7 +211,6 @@ func (h *privateWorkbookHandler) RemoveWorkbook(c *gin.Context) {
 func (h *privateWorkbookHandler) errorHandle(c *gin.Context, err error) bool {
 	ctx := c.Request.Context()
 	logger := log.FromContext(ctx)
-	fmt.Println(err)
 	if errors.Is(err, service.ErrWorkbookAlreadyExists) {
 		logger.Warnf("workbookHandler err: %+v", err)
 		c.JSON(http.StatusConflict, gin.H{"message": "Workbook already exists"})

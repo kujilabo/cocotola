@@ -300,11 +300,12 @@ func appServer(ctx context.Context, cfg *config.Config, pf appS.ProcessorFactory
 	if err := studyMonitor.Attach(&studyStatUpdater); err != nil {
 		return liberrors.Errorf(". err: %w", err)
 	}
+
 	findStudentFunc := func(ctx context.Context, rf appS.RepositoryFactory, organizationID userD.OrganizationID, operatorID userD.AppUserID) (appS.Student, error) {
 		return findStudent(ctx, pf, rf, organizationID, operatorID)
 	}
 
-	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback)
+	googleUserUsecase := authU.NewGoogleUserUsecase(authTransaction, googleAuthClient, authTokenManager, registerAppUserCallback, findSystemOwnerByOrganizationName)
 	guestUserUsecase := authU.NewGuestUserUsecase(authTransaction, authTokenManager)
 	studentUsecaseWorkbook := studentU.NewStudentUsecaseWorkbook(appTransaction, pf, findStudentFunc)
 	studentUsecaseProblem := studentU.NewStudentUsecaseProblem(appTransaction, pf, problemMonitor, findStudentFunc)
@@ -506,12 +507,12 @@ func getSystemAdmin(ctx context.Context, rf appS.RepositoryFactory) (userS.Syste
 	return systemAdmin, nil
 }
 
-func getSystemOwner(ctx context.Context, getSystemAdminFunc func(ctx context.Context) (userS.SystemAdmin, error)) (userS.SystemOwner, error) {
+func getSystemOwner(ctx context.Context, orgName string, getSystemAdminFunc func(ctx context.Context) (userS.SystemAdmin, error)) (userS.SystemOwner, error) {
 	systemAdmin, err := getSystemAdminFunc(ctx)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
-	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, appS.OrganizationName)
+	systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, orgName)
 	if err != nil {
 		return nil, liberrors.Errorf("systemAdmin.FindSystemOwnerByOrganizationName. err: %w", err)
 	}
@@ -564,7 +565,7 @@ func systemOwnerAction(ctx context.Context, appTransaction appS.Transaction, fn 
 			return getSystemAdmin(ctx, rf)
 		}
 
-		systemOwner, err := getSystemOwner(ctx, getSystemAdminFunc)
+		systemOwner, err := getSystemOwner(ctx, appS.OrganizationName, getSystemAdminFunc)
 		if err != nil {
 			return liberrors.Errorf(". err: %w", err)
 		}
@@ -580,7 +581,7 @@ func systemStudentAction(ctx context.Context, appTransaction appS.Transaction, f
 		}
 
 		getSystemOwnerFunc := func(ctx context.Context) (userS.SystemOwner, error) {
-			return getSystemOwner(ctx, getSystemAdminFunc)
+			return getSystemOwner(ctx, appS.OrganizationName, getSystemAdminFunc)
 		}
 
 		systemStudent, err := getSystemStudent(ctx, rf, getSystemOwnerFunc)
@@ -793,4 +794,17 @@ func findStudent(ctx context.Context, pf appS.ProcessorFactory, rf appS.Reposito
 	}
 
 	return student, nil
+}
+
+func findSystemOwnerByOrganizationName(ctx context.Context, userRf userS.RepositoryFactory, orgName string) (userS.SystemOwner, error) {
+	getSystemAdminFunc := func(ctx context.Context) (userS.SystemAdmin, error) {
+		return userS.NewSystemAdmin(ctx, userRf)
+	}
+
+	systemOwner, err := getSystemOwner(ctx, orgName, getSystemAdminFunc)
+	if err != nil {
+		return nil, liberrors.Errorf("systemAdmin.FindSystemOwnerByOrganizationID. err: %w", err)
+	}
+
+	return systemOwner, nil
 }

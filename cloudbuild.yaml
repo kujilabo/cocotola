@@ -342,7 +342,7 @@ availableSecrets:
       env: "SSH_KEY"
 
 images:
-  - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api"
-  - "gcr.io/$PROJECT_ID/cocotola-translator-api"
-  - "gcr.io/$PROJECT_ID/cocotola-tatoeba-api"
-  - "gcr.io/$PROJECT_ID/cocotola-api"
+  - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest"
+  - "gcr.io/$PROJECT_ID/cocotola-translator-api:latest"
+  - "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest"
+  - "gcr.io/$PROJECT_ID/cocotola-api:latest"

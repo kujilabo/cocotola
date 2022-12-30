@@ -11,6 +11,8 @@ import (
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
+type FindSystemOwnerByOrganizationNameFunc func(context.Context, userS.RepositoryFactory, string) (userS.SystemOwner, error)
+
 type GoogleUserUsecase interface {
 	RetrieveAccessToken(ctx context.Context, code string) (*service.GoogleAuthResponse, error)
 
@@ -20,18 +22,20 @@ type GoogleUserUsecase interface {
 }
 
 type googleUserUsecase struct {
-	transaction             service.Transaction
-	googleAuthClient        service.GoogleAuthClient
-	authTokenManager        service.AuthTokenManager
-	registerAppUserCallback func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error
+	transaction                           service.Transaction
+	googleAuthClient                      service.GoogleAuthClient
+	authTokenManager                      service.AuthTokenManager
+	registerAppUserCallback               func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error
+	findSystemOwnerByOrganizationNameFunc FindSystemOwnerByOrganizationNameFunc
 }
 
-func NewGoogleUserUsecase(transaction service.Transaction, googleAuthClient service.GoogleAuthClient, authTokenManager service.AuthTokenManager, registerAppUserCallback func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error) GoogleUserUsecase {
+func NewGoogleUserUsecase(transaction service.Transaction, googleAuthClient service.GoogleAuthClient, authTokenManager service.AuthTokenManager, registerAppUserCallback func(ctx context.Context, organizationName string, appUser userD.AppUserModel) error, findSystemOwnerByOrganizationNameFunc FindSystemOwnerByOrganizationNameFunc) GoogleUserUsecase {
 	return &googleUserUsecase{
-		transaction:             transaction,
-		googleAuthClient:        googleAuthClient,
-		authTokenManager:        authTokenManager,
-		registerAppUserCallback: registerAppUserCallback,
+		transaction:                           transaction,
+		googleAuthClient:                      googleAuthClient,
+		authTokenManager:                      authTokenManager,
+		registerAppUserCallback:               registerAppUserCallback,
+		findSystemOwnerByOrganizationNameFunc: findSystemOwnerByOrganizationNameFunc,
 	}
 }
 
@@ -59,12 +63,7 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	var organization userS.Organization
 	var appUser userS.AppUser
 	if err := s.transaction.Do(ctx, func(rf userS.RepositoryFactory) error {
-		systemAdmin, err := userS.NewSystemAdmin(ctx, rf)
-		if err != nil {
-			return liberrors.Errorf("userS.NewSystemAdmin. err: %w", err)
-		}
-
-		tmpOrganization, tmpAppUser, err := s.registerAppUser(ctx, systemAdmin, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
+		tmpOrganization, tmpAppUser, err := s.registerAppUser(ctx, rf, organizationName, googleUserInfo.Email, googleUserInfo.Name, googleUserInfo.Email, googleAuthResponse.AccessToken, googleAuthResponse.RefreshToken)
 		if err != nil && !errors.Is(err, userS.ErrAppUserAlreadyExists) {
 			return liberrors.Errorf("s.registerAppUser. err: %w", err)
 		}
@@ -88,7 +87,7 @@ func (s *googleUserUsecase) RegisterAppUser(ctx context.Context, googleUserInfo 
 	return tokenSet, nil
 }
 
-func (s *googleUserUsecase) registerAppUser(ctx context.Context, systemAdmin userS.SystemAdmin, organizationName string, loginID string, username string,
+func (s *googleUserUsecase) registerAppUser(ctx context.Context, rf userS.RepositoryFactory, organizationName string, loginID string, username string,
 	providerID, providerAccessToken, providerRefreshToken string) (userS.Organization, userS.AppUser, error) {
 	logger := log.FromContext(ctx)
 
@@ -96,7 +95,7 @@ func (s *googleUserUsecase) registerAppUser(ctx context.Context, systemAdmin use
 	var appUser userS.AppUser
 
 	if err := func() error {
-		systemOwner, err := systemAdmin.FindSystemOwnerByOrganizationName(ctx, organizationName)
+		systemOwner, err := s.findSystemOwnerByOrganizationNameFunc(ctx, rf, organizationName)
 		if err != nil {
 			return liberrors.Errorf("failed to FindSystemOwnerByOrganizationName. err: %w", err)
 		}
