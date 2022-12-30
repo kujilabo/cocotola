@@ -12,6 +12,5 @@ go_library(
         "//cocotola-tatoeba-api/src/service",
         "//lib/errors",
         "//lib/log",
-        "@io_gorm_gorm//:gorm",
     ],
 )
