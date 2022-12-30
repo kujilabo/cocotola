@@ -54,7 +54,7 @@ func main() {
 
 	liberrors.UseXerrorsErrorf()
 
-	cfg, db, sqlDB, tp, err := initialize(ctx, *env)
+	cfg, db, sqlDB, tp, err := initialize(ctx, appEnv)
 	if err != nil {
 		panic(err)
 	}
