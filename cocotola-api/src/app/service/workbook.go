@@ -34,7 +34,7 @@ type Workbook interface {
 
 	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter WorkbookUpdateParameter) error
+	UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter domain.WorkbookUpdateParameter) error
 
 	RemoveWorkbook(ctx context.Context, operator domain.StudentModel, version int) error
 
@@ -208,7 +208,7 @@ func (m *workbook) RemoveProblem(ctx context.Context, operator domain.StudentMod
 	return added, updated, removed, nil
 }
 
-func (m *workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter WorkbookUpdateParameter) error {
+func (m *workbook) UpdateWorkbook(ctx context.Context, operator domain.StudentModel, version int, parameter domain.WorkbookUpdateParameter) error {
 	if !m.GetWorkbookModel().HasPrivilege(domain.PrivilegeUpdate) {
 		return ErrWorkbookPermissionDenied
 	}

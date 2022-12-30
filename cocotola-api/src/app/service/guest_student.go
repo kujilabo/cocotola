@@ -16,7 +16,7 @@ type GuestStudent interface {
 
 	GetDefaultSpace(ctx context.Context) (userS.Space, error)
 
-	FindWorkbooksFromPublicSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error)
+	FindWorkbooksFromPublicSpace(ctx context.Context, condition domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error)
 }
 
 type guestStudent struct {
@@ -57,7 +57,7 @@ func (s *guestStudent) GetDefaultSpace(ctx context.Context) (userS.Space, error)
 	return space, nil
 }
 
-func (s *guestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {
+func (s *guestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error) {
 	return nil, errors.New("aaa")
 	// space, err := s.GetPersonalSpace(ctx)
 	// if err != nil {

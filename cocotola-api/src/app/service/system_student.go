@@ -15,7 +15,7 @@ type SystemStudent interface {
 
 	FindWorkbookFromSystemSpace(ctx context.Context, name string) (Workbook, error)
 
-	AddWorkbookToSystemSpace(ctx context.Context, parameter WorkbookAddParameter) (domain.WorkbookID, error)
+	AddWorkbookToSystemSpace(ctx context.Context, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error)
 }
 
 type systemStudent struct {
@@ -49,7 +49,7 @@ func (s *systemStudent) FindWorkbookFromSystemSpace(ctx context.Context, name st
 	return workbook, nil
 }
 
-func (s *systemStudent) AddWorkbookToSystemSpace(ctx context.Context, parameter WorkbookAddParameter) (domain.WorkbookID, error) {
+func (s *systemStudent) AddWorkbookToSystemSpace(ctx context.Context, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error) {
 	systemSpaceID := GetSystemSpaceID()
 	if uint(systemSpaceID) == 0 {
 		return 0, errors.New("invalid system space ID")

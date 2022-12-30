@@ -11,8 +11,6 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	service "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
-
 	testing "testing"
 )
 
@@ -22,18 +20,18 @@ type StudentUsecaseWorkbook struct {
 }
 
 // AddWorkbook provides a mock function with given fields: ctx, organizationID, operatorID, parameter
-func (_m *StudentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, parameter service.WorkbookAddParameter) (appdomain.WorkbookID, error) {
+func (_m *StudentUsecaseWorkbook) AddWorkbook(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, parameter appdomain.WorkbookAddParameter) (appdomain.WorkbookID, error) {
 	ret := _m.Called(ctx, organizationID, operatorID, parameter)
 
 	var r0 appdomain.WorkbookID
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.WorkbookAddParameter) appdomain.WorkbookID); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookAddParameter) appdomain.WorkbookID); ok {
 		r0 = rf(ctx, organizationID, operatorID, parameter)
 	} else {
 		r0 = ret.Get(0).(appdomain.WorkbookID)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, service.WorkbookAddParameter) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookAddParameter) error); ok {
 		r1 = rf(ctx, organizationID, operatorID, parameter)
 	} else {
 		r1 = ret.Error(1)
@@ -66,15 +64,15 @@ func (_m *StudentUsecaseWorkbook) FindWorkbookByID(ctx context.Context, organiza
 }
 
 // FindWorkbooks provides a mock function with given fields: ctx, organizationID, operatorID
-func (_m *StudentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID) (service.WorkbookSearchResult, error) {
+func (_m *StudentUsecaseWorkbook) FindWorkbooks(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID) (appdomain.WorkbookSearchResult, error) {
 	ret := _m.Called(ctx, organizationID, operatorID)
 
-	var r0 service.WorkbookSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID) service.WorkbookSearchResult); ok {
+	var r0 appdomain.WorkbookSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID) appdomain.WorkbookSearchResult); ok {
 		r0 = rf(ctx, organizationID, operatorID)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.WorkbookSearchResult)
+			r0 = ret.Get(0).(appdomain.WorkbookSearchResult)
 		}
 	}
 
@@ -103,11 +101,11 @@ func (_m *StudentUsecaseWorkbook) RemoveWorkbook(ctx context.Context, organizati
 }
 
 // UpdateWorkbook provides a mock function with given fields: ctx, organizationID, operatorID, workbookID, version, parameter
-func (_m *StudentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, version int, parameter service.WorkbookUpdateParameter) error {
+func (_m *StudentUsecaseWorkbook) UpdateWorkbook(ctx context.Context, organizationID domain.OrganizationID, operatorID domain.AppUserID, workbookID appdomain.WorkbookID, version int, parameter appdomain.WorkbookUpdateParameter) error {
 	ret := _m.Called(ctx, organizationID, operatorID, workbookID, version, parameter)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, int, service.WorkbookUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.OrganizationID, domain.AppUserID, appdomain.WorkbookID, int, appdomain.WorkbookUpdateParameter) error); ok {
 		r0 = rf(ctx, organizationID, operatorID, workbookID, version, parameter)
 	} else {
 		r0 = ret.Error(0)

@@ -26,7 +26,7 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 	workbookProperties := map[string]string{
 		"audioEnabled": "false",
 	}
-	param, err := appS.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, workbookName, appD.Lang2JA, "", workbookProperties)
+	param, err := appD.NewWorkbookAddParameter(pluginEnglishDomain.EnglishSentenceProblemType, workbookName, appD.Lang2JA, "", workbookProperties)
 	if err != nil {
 		return liberrors.Errorf("NewWorkbookAddParameter. err: %w", err)
 	}

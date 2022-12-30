@@ -116,11 +116,11 @@ func Test_student_FindWorkbooksFromPersonalSpace(t *testing.T) {
 	student, err := service.NewStudent(ctx, pf, rf, studentModel)
 	require.NoError(t, err)
 	// given
-	expected, err := service.NewWorkbookSearchResult(123, nil)
+	expected, err := domain.NewWorkbookSearchResult(123, nil)
 	require.NoError(t, err)
 	workbookRepo.On("FindPersonalWorkbooks", ctx, mock.Anything, mock.Anything).Return(expected, nil)
 	// when
-	condition, err := service.NewWorkbookSearchCondition(1, 100, nil)
+	condition, err := domain.NewWorkbookSearchCondition(1, 100, nil)
 	require.NoError(t, err)
 	actual, err := student.FindWorkbooksFromPersonalSpace(ctx, condition)
 	require.NoError(t, err)

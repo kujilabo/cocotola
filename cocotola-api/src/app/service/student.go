@@ -18,15 +18,15 @@ type Student interface {
 	GetDefaultSpace(ctx context.Context) (userS.Space, error)
 	GetPersonalSpace(ctx context.Context) (userS.Space, error)
 
-	FindWorkbooksFromPersonalSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error)
+	FindWorkbooksFromPersonalSpace(ctx context.Context, condition domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error)
 
 	FindWorkbookByID(ctx context.Context, id domain.WorkbookID) (Workbook, error)
 
 	FindWorkbookByName(ctx context.Context, name string) (Workbook, error)
 
-	AddWorkbookToPersonalSpace(ctx context.Context, parameter WorkbookAddParameter) (domain.WorkbookID, error)
+	AddWorkbookToPersonalSpace(ctx context.Context, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error)
 
-	UpdateWorkbook(ctx context.Context, workbookID domain.WorkbookID, version int, parameter WorkbookUpdateParameter) error
+	UpdateWorkbook(ctx context.Context, workbookID domain.WorkbookID, version int, parameter domain.WorkbookUpdateParameter) error
 
 	RemoveWorkbook(ctx context.Context, id domain.WorkbookID, version int) error
 
@@ -95,14 +95,14 @@ func (s *student) GetPersonalSpace(ctx context.Context) (userS.Space, error) {
 	return space, nil
 }
 
-func (s *student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition WorkbookSearchCondition) (WorkbookSearchResult, error) {
+func (s *student) FindWorkbooksFromPersonalSpace(ctx context.Context, condition domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error) {
 	space, err := s.GetPersonalSpace(ctx)
 	if err != nil {
 		return nil, liberrors.Errorf("GetPersonalSpace. err: %w", err)
 	}
 
 	// specify space
-	newCondition, err := NewWorkbookSearchCondition(condition.GetPageNo(), condition.GetPageSize(), []userD.SpaceID{userD.SpaceID(space.GetID())})
+	newCondition, err := domain.NewWorkbookSearchCondition(condition.GetPageNo(), condition.GetPageSize(), []userD.SpaceID{userD.SpaceID(space.GetID())})
 	if err != nil {
 		return nil, liberrors.Errorf("NewWorkbookSearchCondition. err: %w", err)
 	}
@@ -141,7 +141,7 @@ func (s *student) FindWorkbookByName(ctx context.Context, name string) (Workbook
 	return workbook, nil
 }
 
-func (s *student) AddWorkbookToPersonalSpace(ctx context.Context, parameter WorkbookAddParameter) (domain.WorkbookID, error) {
+func (s *student) AddWorkbookToPersonalSpace(ctx context.Context, parameter domain.WorkbookAddParameter) (domain.WorkbookID, error) {
 	space, err := s.GetPersonalSpace(ctx)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to GetPersonalSpace. err: %w", err)
@@ -156,7 +156,7 @@ func (s *student) AddWorkbookToPersonalSpace(ctx context.Context, parameter Work
 	return workbookID, nil
 }
 
-func (s *student) UpdateWorkbook(ctx context.Context, workbookID domain.WorkbookID, version int, parameter WorkbookUpdateParameter) error {
+func (s *student) UpdateWorkbook(ctx context.Context, workbookID domain.WorkbookID, version int, parameter domain.WorkbookUpdateParameter) error {
 	workbook, err := s.FindWorkbookByID(ctx, workbookID)
 	if err != nil {
 		return liberrors.Errorf("s.FindWorkbookByID. err: %w", err)

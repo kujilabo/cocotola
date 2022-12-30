@@ -5,14 +5,14 @@ package mocks
 import (
 	context "context"
 
-	domain "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
+	domain "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	mock "github.com/stretchr/testify/mock"
-
-	service "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 
 	testing "testing"
 
 	time "time"
+
+	userdomain "github.com/kujilabo/cocotola/cocotola-api/src/user/domain"
 
 	userservice "github.com/kujilabo/cocotola/cocotola-api/src/user/service"
 )
@@ -23,20 +23,20 @@ type GuestStudent struct {
 }
 
 // FindWorkbooksFromPublicSpace provides a mock function with given fields: ctx, condition
-func (_m *GuestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition service.WorkbookSearchCondition) (service.WorkbookSearchResult, error) {
+func (_m *GuestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condition domain.WorkbookSearchCondition) (domain.WorkbookSearchResult, error) {
 	ret := _m.Called(ctx, condition)
 
-	var r0 service.WorkbookSearchResult
-	if rf, ok := ret.Get(0).(func(context.Context, service.WorkbookSearchCondition) service.WorkbookSearchResult); ok {
+	var r0 domain.WorkbookSearchResult
+	if rf, ok := ret.Get(0).(func(context.Context, domain.WorkbookSearchCondition) domain.WorkbookSearchResult); ok {
 		r0 = rf(ctx, condition)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.WorkbookSearchResult)
+			r0 = ret.Get(0).(domain.WorkbookSearchResult)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, service.WorkbookSearchCondition) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, domain.WorkbookSearchCondition) error); ok {
 		r1 = rf(ctx, condition)
 	} else {
 		r1 = ret.Error(1)
@@ -46,14 +46,14 @@ func (_m *GuestStudent) FindWorkbooksFromPublicSpace(ctx context.Context, condit
 }
 
 // GetAppUserID provides a mock function with given fields:
-func (_m *GuestStudent) GetAppUserID() domain.AppUserID {
+func (_m *GuestStudent) GetAppUserID() userdomain.AppUserID {
 	ret := _m.Called()
 
-	var r0 domain.AppUserID
-	if rf, ok := ret.Get(0).(func() domain.AppUserID); ok {
+	var r0 userdomain.AppUserID
+	if rf, ok := ret.Get(0).(func() userdomain.AppUserID); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.AppUserID)
+		r0 = ret.Get(0).(userdomain.AppUserID)
 	}
 
 	return r0
@@ -139,14 +139,14 @@ func (_m *GuestStudent) GetLoginID() string {
 }
 
 // GetOrganizationID provides a mock function with given fields:
-func (_m *GuestStudent) GetOrganizationID() domain.OrganizationID {
+func (_m *GuestStudent) GetOrganizationID() userdomain.OrganizationID {
 	ret := _m.Called()
 
-	var r0 domain.OrganizationID
-	if rf, ok := ret.Get(0).(func() domain.OrganizationID); ok {
+	var r0 userdomain.OrganizationID
+	if rf, ok := ret.Get(0).(func() userdomain.OrganizationID); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(domain.OrganizationID)
+		r0 = ret.Get(0).(userdomain.OrganizationID)
 	}
 
 	return r0

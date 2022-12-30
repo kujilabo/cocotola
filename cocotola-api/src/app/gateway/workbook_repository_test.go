@@ -47,7 +47,7 @@ func Test_workbookRepository_FindPersonalWorkbooks(t *testing.T) {
 
 		type args struct {
 			operator service.Student
-			param    service.WorkbookSearchCondition
+			param    domain.WorkbookSearchCondition
 		}
 		type want struct {
 			workbookID   domain.WorkbookID
