@@ -34,10 +34,12 @@ steps:
   # synthesizer
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest || exit 0"]
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
+    args:
+      - -c
+      - |
+        diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
+        if [ $diff_synthesizer == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest || exit 0; fi
+        if [ $diff_synthesizer == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -61,10 +63,12 @@ steps:
   # translator
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest || exit 0"]
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
+    args:
+      - -c
+      - |
+        diff_translator=$(cat /workspace/diff_translator.txt)
+        if [ $diff_translator == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-translator-api-builder:latest || exit 0; fi
+        if [ $diff_translator == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -89,10 +93,12 @@ steps:
   # tatoeba
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest || exit 0"]
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
+    args:
+      - -c
+      - |
+        diff_tatoeba=$(cat /workspace/diff_tatoeba.txt)
+        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api-builder:latest || exit 0; fi
+        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -117,10 +123,12 @@ steps:
   # cocotola
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0"]
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
+    args:
+      - -c
+      - |
+        diff_cocotola=$(cat /workspace/diff_cocotola.txt)
+        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api-builder:latest || exit 0; fi
+        if [ $diff_tatoeba == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -145,10 +153,12 @@ steps:
   # web
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-web-builder:latest || exit 0"]
-  - name: "gcr.io/cloud-builders/docker"
-    entrypoint: "bash"
-    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0"]
+    args:
+      - -c
+      - |
+        diff_web=$(cat /workspace/diff_web.txt)
+        if [ $diff_web == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-web-builder:latest || exit 0; fi
+        if [ $diff_web == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -332,7 +342,7 @@ availableSecrets:
       env: "SSH_KEY"
 
 images:
-  - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest"
-  - "gcr.io/$PROJECT_ID/cocotola-translator-api:latest"
-  - "gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest"
-  - "gcr.io/$PROJECT_ID/cocotola-api:latest"
+  - "gcr.io/$PROJECT_ID/cocotola-synthesizer-api"
+  - "gcr.io/$PROJECT_ID/cocotola-translator-api"
+  - "gcr.io/$PROJECT_ID/cocotola-tatoeba-api"
+  - "gcr.io/$PROJECT_ID/cocotola-api"
