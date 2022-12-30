@@ -21,15 +21,22 @@ go_test(
     srcs = [
         "admin_usecase_test.go",
         "init_test.go",
+        "service_test.go",
         "usecase_test.go",
         "user_usecase_test.go",
     ],
     deps = [
         ":usecase",
         "//cocotola-translator-api/src/domain",
+        "//cocotola-translator-api/src/gateway",
         "//cocotola-translator-api/src/service",
         "//cocotola-translator-api/src/service/mock",
+        "//cocotola-translator-api/src/sqls",
+        "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+        "@io_gorm_gorm//:gorm",
     ],
 )
