@@ -3,11 +3,12 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "gateway",
     srcs = [
+        "azure_translation_client.go",
         "azure_translation_repository.go",
-        "azure_translator.go",
         "custom_translation_repository.go",
         "init.go",
         "repository_factory.go",
+        "transaction.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-translator-api/src/gateway",
     visibility = ["//visibility:public"],
@@ -30,11 +31,19 @@ go_test(
     name = "gateway_test",
     srcs = [
         "azure_translator_test.go",
+        "custom_translation_repository_test.go",
+        "db_test.go",
         "gateway_test.go",
     ],
     deps = [
+        ":gateway",
+        "//cocotola-translator-api/src/domain",
         "//cocotola-translator-api/src/service",
         "//cocotola-translator-api/src/sqls",
         "//test-lib/gateway",
+        "@com_github_sirupsen_logrus//:logrus",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+        "@io_gorm_gorm//:gorm",
     ],
 )

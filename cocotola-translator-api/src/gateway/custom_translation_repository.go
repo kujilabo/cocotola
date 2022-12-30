@@ -104,7 +104,10 @@ func (r *customTranslationRepository) Remove(ctx context.Context, lang2 domain.L
 		Delete(&customTranslationDBEntity{})
 	if result.Error != nil {
 		return result.Error
+	} else if result.RowsAffected == 0 {
+		return service.ErrTranslationNotFound
 	}
+
 	return nil
 }
 

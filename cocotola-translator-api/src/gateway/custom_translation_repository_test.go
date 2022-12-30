@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
@@ -14,6 +15,7 @@ import (
 
 func Test_customTranslationRepository_FindByFirstLetter(t *testing.T) {
 	// logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetLevel(logrus.DebugLevel)
 
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		type args struct {
