@@ -38,8 +38,8 @@ steps:
       - -c
       - |
         diff_synthesizer=$(cat /workspace/diff_synthesizer.txt)
-        if [ $diff_synthesizer == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest || exit 0; fi
-        if [ $diff_synthesizer == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0; fi
+        if [ $diff_synthesizer == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api-builder:latest || exit 0; fi
+        if [ $diff_synthesizer == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
@@ -157,8 +157,8 @@ steps:
       - -c
       - |
         diff_web=$(cat /workspace/diff_web.txt)
-        if [ $diff_web == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-web-builder:latest || exit 0; fi
-        if [ $diff_web == '0' ]; docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0; fi
+        if [ $diff_web == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-web-builder:latest || exit 0; fi
+        if [ $diff_web == '0' ]; then docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0; fi
 
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
