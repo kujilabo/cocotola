@@ -34,6 +34,10 @@ steps:
   # synthesizer
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-synthesizer-api:latest || exit 0"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
       - -c
       - |
@@ -61,6 +65,10 @@ steps:
         if [ $diff_synthesizer == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-synthesizer-api:$SHORT_SHA; fi
 
   # translator
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-translator-api:latest || exit 0"]
+
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args:
@@ -93,6 +101,10 @@ steps:
   # tatoeba
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-tatoeba-api:latest || exit 0"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
       - -c
       - |
@@ -123,6 +135,10 @@ steps:
   # cocotola
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-api:latest || exit 0"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
     args:
       - -c
       - |
@@ -151,6 +167,10 @@ steps:
         if [ $diff_cocotola == '0' ]; then docker push     gcr.io/$PROJECT_ID/cocotola-api:latest; fi
 
   # web
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args: ["-c", "docker pull gcr.io/$PROJECT_ID/cocotola-web:latest || exit 0"]
+
   - name: "gcr.io/cloud-builders/docker"
     entrypoint: "bash"
     args:
