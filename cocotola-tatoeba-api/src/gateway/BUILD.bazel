@@ -9,13 +9,13 @@ go_library(
         "tatoeba_link_repository.go",
         "tatoeba_sentence_iterator.go",
         "tatoeba_sentence_repository.go",
+        "transaction.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-tatoeba-api/src/gateway",
     visibility = ["//visibility:public"],
     deps = [
         "//cocotola-tatoeba-api/src/domain",
         "//cocotola-tatoeba-api/src/service",
-        "//lib/domain",
         "//lib/errors",
         "//lib/gateway",
         "//lib/log",
@@ -35,5 +35,6 @@ go_test(
         "//test-lib/gateway",
         "@com_github_sirupsen_logrus//:logrus",
         "@com_github_stretchr_testify//assert",
+        "@io_gorm_gorm//:gorm",
     ],
 )
