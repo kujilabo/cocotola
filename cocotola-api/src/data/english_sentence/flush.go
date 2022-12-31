@@ -38,14 +38,39 @@ func CreateWorkbook(ctx context.Context, student appS.Student, workbookName stri
 		return liberrors.Errorf("createWorkbookIfNotExists. err: %w", err)
 	}
 
+	problems, err := workbook.FindAllProblems(ctx, student)
+	if err != nil {
+		return liberrors.Errorf("createWorkbookIfNotExists. err: %w", err)
+	}
+
+	problemMap := make(map[string]struct{})
+	for _, problem := range problems.GetResults() {
+		properties := problem.GetProperties(ctx)
+		text1, ok := properties["text"]
+		if !ok {
+			continue
+		}
+		text2, ok := text1.(string)
+		if !ok {
+			continue
+		}
+		problemMap[text2] = struct{}{}
+	}
+
 	for i, sentence := range sentences {
+		// skip if the sentence is already registered
+		if _, ok := problemMap[sentence[0]]; ok {
+			logger.Infof("Skip %s", sentence[0])
+			continue
+		}
+
 		properties := map[string]string{
 			"number":     strconv.Itoa(i + 1),
 			"text":       sentence[0],
 			"lang2":      "ja",
 			"translated": sentence[1],
 		}
-		param, err := appS.NewProblemAddParameter(workbook.GetWorkbookID(), properties)
+		param, err := appD.NewProblemAddParameter(workbook.GetWorkbookID(), properties)
 		if err != nil {
 			return liberrors.Errorf("NewProblemAddParameter. err: %w", err)
 		}

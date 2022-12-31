@@ -53,7 +53,7 @@ func (p *EnglishWordProblemAddParemeter) toProperties() map[string]string {
 	}
 }
 
-func NewEnglishWordProblemAddParemeter(param appS.ProblemAddParameter) (*EnglishWordProblemAddParemeter, error) {
+func NewEnglishWordProblemAddParemeter(param appD.ProblemAddParameter) (*EnglishWordProblemAddParemeter, error) {
 	posS := param.GetProperties()["pos"]
 	pos, err := strconv.Atoi(posS)
 	if err != nil {
@@ -110,7 +110,7 @@ type EnglishWordProblemUpdateParemeter struct {
 	// tatoebaSentenceNumberToS := param.GetProperties()["tatoebaSentenceNumber2"]
 }
 
-func NewEnglishWordProblemUpdateParemeter(param appS.ProblemUpdateParameter) (*EnglishWordProblemUpdateParemeter, error) {
+func NewEnglishWordProblemUpdateParemeter(param appD.ProblemUpdateParameter) (*EnglishWordProblemUpdateParemeter, error) {
 	if _, ok := param.GetProperties()["text"]; !ok {
 		return nil, liberrors.Errorf("text is not defined. err: %w", libD.ErrInvalidArgument)
 	}
@@ -195,7 +195,7 @@ func NewEnglishWordProblemProcessor(synthesizerClient appS.SynthesizerClient, tr
 	}
 }
 
-func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appS.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, param appD.ProblemAddParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	ctx, span := tracer.Start(ctx, "englishWordProblemProcessor.AddProblem")
 	defer span.End()
 
@@ -252,7 +252,33 @@ func (p *englishWordProblemProcessor) AddProblem(ctx context.Context, rf appS.Re
 	return idsOfAddedProblem, nil, nil, nil
 }
 
-func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishWordProblemProcessor) synthesize(ctx context.Context, workbook appD.WorkbookModel, text string) (appD.AudioID, error) {
+	if workbook.GetProperties()["audioEnabled"] != "true" {
+		return appD.AudioID(0), nil
+	}
+
+	audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, text)
+	if err != nil {
+		return 0, liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
+	}
+
+	return appD.AudioID(audio.GetAudioModel().GetID()), nil
+}
+
+func (p *englishWordProblemProcessor) findTatoebaSentenceID(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, sentenceProvider string, tatoebaSentenceNumberFrom, tatoebaSentenceNumberTo int, lang2 appD.Lang2) (appD.ProblemID, error) {
+	if sentenceProvider != "tatoeba" {
+		return appD.ProblemID(0), nil
+	}
+	sentenceID, err := p.findOrAddSentenceFromTatoeba(ctx, rf, operator, tatoebaSentenceNumberFrom, tatoebaSentenceNumberTo, lang2)
+	if err != nil {
+		return 0, liberrors.Errorf("failed to findOrAddSentenceFromTatoeba. err: %w", err)
+	}
+
+	return sentenceID, nil
+
+}
+
+func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishWordProblemProcessor.UpdateProblem, param: %+v", param)
 
@@ -264,23 +290,14 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 			return liberrors.Errorf("failed to toNewEnglishWordProblemParemeter. param: %+v, err: %w", param, appD.NewPluginError(appD.ErrorType(appD.ErrorTypeClient), message, []string{message, err.Error()}, err))
 		}
 
-		audioID := appD.AudioID(0)
-		if workbook.GetProperties()["audioEnabled"] == "true" {
-			audio, err := p.synthesizerClient.Synthesize(ctx, appD.Lang2EN, extractedParam.Text)
-			if err != nil {
-				return liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
-			}
-
-			audioID = appD.AudioID(audio.GetAudioModel().GetID())
+		audioID, err := p.synthesize(ctx, workbook, extractedParam.Text)
+		if err != nil {
+			return liberrors.Errorf("p.synthesizerClient.Synthesize. err: %w", err)
 		}
 
-		sentenceID := appD.ProblemID(0)
-		if extractedParam.SentenceProvider == "tatoeba" {
-			sentenceIDtmp, err := p.findOrAddSentenceFromTatoeba(ctx, rf, operator, extractedParam.TatoebaSentenceNumberFrom, extractedParam.TatoebaSentenceNumberTo, extractedParam.Lang2)
-			if err != nil {
-				return liberrors.Errorf("failed to findOrAddSentenceFromTatoeba. err: %w", err)
-			}
-			sentenceID = sentenceIDtmp
+		sentenceID, err := p.findTatoebaSentenceID(ctx, rf, operator, extractedParam.SentenceProvider, extractedParam.TatoebaSentenceNumberFrom, extractedParam.TatoebaSentenceNumberTo, extractedParam.Lang2)
+		if err != nil {
+			return liberrors.Errorf("failed to findOrAddSentenceFromTatoeba. err: %w", err)
 		}
 
 		converter := NewToSingleEnglishWordProblemUpdateParameter(p.translatorClient, extractedParam.Number, extractedParam, audioID, sentenceID)
@@ -310,14 +327,14 @@ func (p *englishWordProblemProcessor) UpdateProblem(ctx context.Context, rf appS
 	return nil, []appD.ProblemID{id.GetProblemID()}, nil, nil
 }
 
-func (p *englishWordProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishWordProblemProcessor) UpdateProblemProperty(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, workbook appD.WorkbookModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	logger.Debugf("englishWordProblemProcessor.UpdateProblem, param: %+v", param)
 
 	return nil, nil, nil, errors.New("not implemented")
 }
 
-func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, id appS.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
+func (p *englishWordProblemProcessor) RemoveProblem(ctx context.Context, rf appS.RepositoryFactory, operator appD.StudentModel, id appD.ProblemSelectParameter2) ([]appD.ProblemID, []appD.ProblemID, []appD.ProblemID, error) {
 	problemRepo, err := rf.NewProblemRepository(ctx, domain.EnglishWordProblemType)
 	if err != nil {
 		return nil, nil, nil, liberrors.Errorf("failed to NewProblemRepository. err: %w", err)
@@ -399,7 +416,7 @@ func (p *englishWordProblemProcessor) findOrAddSentenceFromTatoeba(ctx context.C
 	}
 	sentenceAddProperties := sentenceAddParam.toProperties(0)
 
-	param, err := appS.NewProblemAddParameter(tatoebaWorkbook.GetWorkbookID(), sentenceAddProperties)
+	param, err := appD.NewProblemAddParameter(tatoebaWorkbook.GetWorkbookID(), sentenceAddProperties)
 	if err != nil {
 		return 0, liberrors.Errorf("failed to NewProblemAddParameter. err: %w", err)
 	}

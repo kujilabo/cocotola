@@ -4,13 +4,13 @@ go 1.18
 
 require (
 	github.com/casbin/casbin/v2 v2.60.0
-	github.com/casbin/gorm-adapter/v3 v3.13.1
+	github.com/casbin/gorm-adapter/v3 v3.14.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.2
 	github.com/go-co-op/gocron v1.18.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/go-cmp v0.5.9
-	github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b
+	github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38
 	github.com/kujilabo/cocotola/test-lib v0.0.0-20221227153357-053e2d97474b
 	github.com/ohler55/ojg v1.14.5
 	github.com/onrik/logrus v0.10.0

@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//cocotola-api/src/app/domain",
         "//cocotola-api/src/app/service",
+        "//cocotola-api/src/data",
         "//cocotola-api/src/plugin/english/domain",
         "//lib/errors",
         "//lib/log",

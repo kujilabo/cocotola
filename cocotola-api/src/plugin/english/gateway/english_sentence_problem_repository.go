@@ -88,7 +88,7 @@ type englishSentenceProblemAddParameter struct {
 	Note       string
 }
 
-func makeTatoebaNote(param appS.ProblemAddParameter) (string, error) {
+func makeTatoebaNote(param appD.ProblemAddParameter) (string, error) {
 	provider, ok := param.GetProperties()[service.EnglishSentenceProblemAddPropertyProvider]
 	if !ok {
 		return "{}", nil
@@ -156,7 +156,7 @@ func makeTatoebaNote(param appS.ProblemAddParameter) (string, error) {
 // 	return "", nil
 // }
 
-func toEnglishSentenceProblemAddParameter(param appS.ProblemAddParameter) (*englishSentenceProblemAddParameter, error) {
+func toEnglishSentenceProblemAddParameter(param appD.ProblemAddParameter) (*englishSentenceProblemAddParameter, error) {
 	for _, key := range []string{
 		service.EnglishSentenceProblemAddPropertyAudioID,
 		service.EnglishSentenceProblemAddPropertyLang2,
@@ -199,7 +199,7 @@ func toEnglishSentenceProblemAddParameter(param appS.ProblemAddParameter) (*engl
 	return m, nil
 }
 
-func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy uint, param appS.ProblemUpdateParameter) (*englishSentenceProblemEntity, error) {
+func toEnglishSentenceProblemPropertyUpdateParameter(newVersion int, updatedBy uint, param appD.ProblemUpdateParameter) (*englishSentenceProblemEntity, error) {
 	// if _, ok := param.GetProperties()[service.EnglishWordProblemUpdatePropertyAudioID]; !ok {
 	// 	return nil, liberrors.Errorf("audioId is not defined. err: %w", libD.ErrInvalidArgument)
 	// }
@@ -249,7 +249,7 @@ func NewEnglishSentenceProblemRepository(db *gorm.DB, synthesizerClient appS.Syn
 	}, nil
 }
 
-func (r *englishSentenceProblemRepository) FindProblems(ctx context.Context, operator appD.StudentModel, param appS.ProblemSearchCondition) (appS.ProblemSearchResult, error) {
+func (r *englishSentenceProblemRepository) FindProblems(ctx context.Context, operator appD.StudentModel, param appD.ProblemSearchCondition) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.FindProblems")
 	defer span.End()
 
@@ -276,7 +276,7 @@ func (r *englishSentenceProblemRepository) FindProblems(ctx context.Context, ope
 	return r.toProblemSearchResult(ctx, count, problemEntities)
 }
 
-func (r *englishSentenceProblemRepository) FindAllProblems(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) (appS.ProblemSearchResult, error) {
+func (r *englishSentenceProblemRepository) FindAllProblems(ctx context.Context, operator appD.StudentModel, workbookID appD.WorkbookID) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.FindAllProblems")
 	defer span.End()
 
@@ -302,7 +302,7 @@ func (r *englishSentenceProblemRepository) FindAllProblems(ctx context.Context, 
 	return r.toProblemSearchResult(ctx, count, problemEntities)
 }
 
-func (r *englishSentenceProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator appD.StudentModel, param appS.ProblemIDsCondition) (appS.ProblemSearchResult, error) {
+func (r *englishSentenceProblemRepository) FindProblemsByProblemIDs(ctx context.Context, operator appD.StudentModel, param appD.ProblemIDsCondition) (appD.ProblemSearchResult, error) {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.FindProblemsByProblemIDs")
 	defer span.End()
 
@@ -381,7 +381,7 @@ func (r *englishSentenceProblemRepository) FindProblemsByCustomCondition(ctx con
 	return []appD.ProblemModel{problem}, nil
 }
 
-func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Context, count int64, problemEntities []englishSentenceProblemEntity) (appS.ProblemSearchResult, error) {
+func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Context, count int64, problemEntities []englishSentenceProblemEntity) (appD.ProblemSearchResult, error) {
 	problems := make([]appD.ProblemModel, len(problemEntities))
 	for i, e := range problemEntities {
 		p, err := e.toProblem(ctx, r.synthesizerClient)
@@ -395,7 +395,7 @@ func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Con
 		return nil, errors.New("overflow")
 	}
 
-	foundProblems, err := appS.NewProblemSearchResult(int(count), problems)
+	foundProblems, err := appD.NewProblemSearchResult(int(count), problems)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
@@ -403,7 +403,7 @@ func (r *englishSentenceProblemRepository) toProblemSearchResult(ctx context.Con
 	return foundProblems, nil
 }
 
-func (r *englishSentenceProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter1) (appS.Problem, error) {
+func (r *englishSentenceProblemRepository) FindProblemByID(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter1) (appS.Problem, error) {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.FindProblemByID")
 	defer span.End()
 
@@ -460,7 +460,7 @@ func (r *englishSentenceProblemRepository) FindProblemIDs(ctx context.Context, o
 	return ids, nil
 }
 
-func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, operator appD.StudentModel, param appS.ProblemAddParameter) (appD.ProblemID, error) {
+func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, operator appD.StudentModel, param appD.ProblemAddParameter) (appD.ProblemID, error) {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.AddProblem")
 	defer span.End()
 
@@ -494,11 +494,11 @@ func (r *englishSentenceProblemRepository) AddProblem(ctx context.Context, opera
 	return appD.ProblemID(englishSentenceProblem.ID), nil
 }
 
-func (r *englishSentenceProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+func (r *englishSentenceProblemRepository) UpdateProblem(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) error {
 	return errors.New("not implemented")
 }
 
-func (r *englishSentenceProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2, param appS.ProblemUpdateParameter) error {
+func (r *englishSentenceProblemRepository) UpdateProblemProperty(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2, param appD.ProblemUpdateParameter) error {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.UpdateProblemProperty")
 	defer span.End()
 
@@ -525,7 +525,7 @@ func (r *englishSentenceProblemRepository) UpdateProblemProperty(ctx context.Con
 	return nil
 }
 
-func (r *englishSentenceProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appS.ProblemSelectParameter2) error {
+func (r *englishSentenceProblemRepository) RemoveProblem(ctx context.Context, operator appD.StudentModel, id appD.ProblemSelectParameter2) error {
 	_, span := tracer.Start(ctx, "englishSentenceProblemRepository.RemoveProblem")
 	defer span.End()
 

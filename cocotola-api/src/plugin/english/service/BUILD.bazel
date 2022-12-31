@@ -34,7 +34,6 @@ go_test(
         ":service",
         "//cocotola-api/src/app/domain",
         "//cocotola-api/src/app/domain/mock",
-        "//cocotola-api/src/app/service",
         "//cocotola-api/src/app/service/mock",
         "//cocotola-api/src/plugin/common/domain",
         "//cocotola-api/src/plugin/common/domain/mock",

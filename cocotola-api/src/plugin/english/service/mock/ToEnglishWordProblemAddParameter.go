@@ -5,9 +5,8 @@ package mocks
 import (
 	context "context"
 
+	domain "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	mock "github.com/stretchr/testify/mock"
-
-	service "github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 
 	testing "testing"
 )
@@ -18,15 +17,15 @@ type ToEnglishWordProblemAddParameter struct {
 }
 
 // Run provides a mock function with given fields: ctx
-func (_m *ToEnglishWordProblemAddParameter) Run(ctx context.Context) ([]service.ProblemAddParameter, error) {
+func (_m *ToEnglishWordProblemAddParameter) Run(ctx context.Context) ([]domain.ProblemAddParameter, error) {
 	ret := _m.Called(ctx)
 
-	var r0 []service.ProblemAddParameter
-	if rf, ok := ret.Get(0).(func(context.Context) []service.ProblemAddParameter); ok {
+	var r0 []domain.ProblemAddParameter
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.ProblemAddParameter); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]service.ProblemAddParameter)
+			r0 = ret.Get(0).([]domain.ProblemAddParameter)
 		}
 	}
 

@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "data",
+    srcs = ["data.go"],
+    importpath = "github.com/kujilabo/cocotola/cocotola-api/src/data",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//cocotola-api/src/app/domain",
+        "//cocotola-api/src/app/service",
+        "//lib/errors",
+    ],
+)

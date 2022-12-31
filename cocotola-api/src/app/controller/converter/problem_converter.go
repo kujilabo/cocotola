@@ -6,14 +6,13 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	"github.com/kujilabo/cocotola/cocotola-api/src/app/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 	"github.com/kujilabo/cocotola/lib/log"
 )
 
-func ToProblemSearchCondition(ctx context.Context, param *entity.ProblemFindParameter, workbookID domain.WorkbookID) (service.ProblemSearchCondition, error) {
-	condition, err := service.NewProblemSearchCondition(workbookID, param.PageNo, param.PageSize, param.Keyword)
+func ToProblemSearchCondition(ctx context.Context, param *entity.ProblemFindParameter, workbookID domain.WorkbookID) (domain.ProblemSearchCondition, error) {
+	condition, err := domain.NewProblemSearchCondition(workbookID, param.PageNo, param.PageSize, param.Keyword)
 	if err != nil {
 		return nil, liberrors.Errorf("new Model. err: %w", err)
 	}
@@ -21,7 +20,7 @@ func ToProblemSearchCondition(ctx context.Context, param *entity.ProblemFindPara
 	return condition, nil
 }
 
-func ToProblemFindResponse(ctx context.Context, result service.ProblemSearchResult) (*entity.ProblemFindResponse, error) {
+func ToProblemFindResponse(ctx context.Context, result domain.ProblemSearchResult) (*entity.ProblemFindResponse, error) {
 	problems := make([]*entity.Problem, len(result.GetResults()))
 	for i, p := range result.GetResults() {
 		properties := p.GetProperties(ctx)
@@ -54,7 +53,7 @@ func ToProblemFindResponse(ctx context.Context, result service.ProblemSearchResu
 	return e, nil
 }
 
-func ToProblemFindAllResponse(ctx context.Context, result service.ProblemSearchResult) (*entity.ProblemFindAllResponse, error) {
+func ToProblemFindAllResponse(ctx context.Context, result domain.ProblemSearchResult) (*entity.ProblemFindAllResponse, error) {
 	problems := make([]*entity.SimpleProblem, len(result.GetResults()))
 	for i, p := range result.GetResults() {
 		bytes, err := json.Marshal(p.GetProperties(ctx))
@@ -115,12 +114,12 @@ func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entit
 	return e, nil
 }
 
-func ToProblemIDsCondition(ctx context.Context, param *entity.ProblemIDsParameter, workbookID domain.WorkbookID) (service.ProblemIDsCondition, error) {
+func ToProblemIDsCondition(ctx context.Context, param *entity.ProblemIDsParameter, workbookID domain.WorkbookID) (domain.ProblemIDsCondition, error) {
 	ids := make([]domain.ProblemID, 0)
 	for _, id := range param.IDs {
 		ids = append(ids, domain.ProblemID(id))
 	}
-	domainParam, err := service.NewProblemIDsCondition(workbookID, ids)
+	domainParam, err := domain.NewProblemIDsCondition(workbookID, ids)
 	if err != nil {
 		return nil, liberrors.Errorf("service.NewProblemIDsCondition. err: %w", err)
 	}
@@ -129,13 +128,13 @@ func ToProblemIDsCondition(ctx context.Context, param *entity.ProblemIDsParamete
 
 }
 
-func ToProblemAddParameter(workbookID domain.WorkbookID, param *entity.ProblemAddParameter) (service.ProblemAddParameter, error) {
+func ToProblemAddParameter(workbookID domain.WorkbookID, param *entity.ProblemAddParameter) (domain.ProblemAddParameter, error) {
 	var properties map[string]string
 	if err := json.Unmarshal(param.Properties, &properties); err != nil {
 		return nil, liberrors.Errorf("Unmarshal. err: %w", err)
 	}
 
-	domainParam, err := service.NewProblemAddParameter(workbookID /*param.Number, */, properties)
+	domainParam, err := domain.NewProblemAddParameter(workbookID /*param.Number, */, properties)
 	if err != nil {
 		return nil, liberrors.Errorf("service.NewProblemAddParameter. err: %w", err)
 	}
@@ -143,13 +142,13 @@ func ToProblemAddParameter(workbookID domain.WorkbookID, param *entity.ProblemAd
 	return domainParam, nil
 }
 
-func ToProblemUpdateParameter(param *entity.ProblemUpdateParameter) (service.ProblemUpdateParameter, error) {
+func ToProblemUpdateParameter(param *entity.ProblemUpdateParameter) (domain.ProblemUpdateParameter, error) {
 	var properties map[string]string
 	if err := json.Unmarshal(param.Properties, &properties); err != nil {
 		return nil, liberrors.Errorf("Unmarshal. err: %w", err)
 	}
 
-	domainParam, err := service.NewProblemUpdateParameter( /*param.Number, */ properties)
+	domainParam, err := domain.NewProblemUpdateParameter( /*param.Number, */ properties)
 	if err != nil {
 		return nil, liberrors.Errorf("service.NewProblemUpdateParameter. err: %w", err)
 	}

@@ -1,341 +1,39 @@
-//go:generate mockery --output mock --name ProblemAddParameter
-//go:generate mockery --output mock --name ProblemSelectParameter1
-//go:generate mockery --output mock --name ProblemSelectParameter2
-//go:generate mockery --output mock --name ProblemUpdateParameter
-//go:generate mockery --output mock --name ProblemSearchCondition
-//go:generate mockery --output mock --name ProblemTypeRepository
 //go:generate mockery --output mock --name ProblemRepository
 package service
 
 import (
 	"context"
 	"errors"
-	"strconv"
 
 	"github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
-	libD "github.com/kujilabo/cocotola/lib/domain"
-	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 var ErrProblemAlreadyExists = errors.New("problem already exists")
 var ErrProblemNotFound = errors.New("problem not found")
 var ErrProblemOtherError = errors.New("problem other error")
 
-type ProblemAddParameter interface {
-	GetWorkbookID() domain.WorkbookID
-	GetProperties() map[string]string
-	GetStringProperty(name string) (string, error)
-	GetIntProperty(name string) (int, error)
-}
-
-type problemAddParameter struct {
-	WorkbookID domain.WorkbookID `validate:"required"`
-	Properties map[string]string
-}
-
-func NewProblemAddParameter(workbookID domain.WorkbookID, properties map[string]string) (ProblemAddParameter, error) {
-	m := &problemAddParameter{
-		WorkbookID: workbookID,
-		Properties: properties,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (p *problemAddParameter) GetWorkbookID() domain.WorkbookID {
-	return p.WorkbookID
-}
-
-func (p *problemAddParameter) GetProperties() map[string]string {
-	return p.Properties
-}
-
-func (p *problemAddParameter) GetStringProperty(name string) (string, error) {
-	s, ok := p.Properties[name]
-	if !ok {
-		return "", errors.New("key not found")
-	}
-	return s, nil
-}
-func (p *problemAddParameter) GetIntProperty(name string) (int, error) {
-	i, err := strconv.Atoi(p.Properties[name])
-	if err != nil {
-		return 0, liberrors.Errorf("%q property is not a integer. value: %s, err: %w", name, p.Properties[name], err)
-	}
-	return i, nil
-}
-
-type ProblemSelectParameter1 interface {
-	GetWorkbookID() domain.WorkbookID
-	GetProblemID() domain.ProblemID
-}
-
-type problemSelectParameter1 struct {
-	WorkbookID domain.WorkbookID
-	ProblemID  domain.ProblemID
-}
-
-func NewProblemSelectParameter1(WorkbookID domain.WorkbookID, problemID domain.ProblemID) (ProblemSelectParameter1, error) {
-	m := &problemSelectParameter1{
-		WorkbookID: WorkbookID,
-		ProblemID:  problemID,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (p *problemSelectParameter1) GetWorkbookID() domain.WorkbookID {
-	return p.WorkbookID
-}
-func (p *problemSelectParameter1) GetProblemID() domain.ProblemID {
-	return p.ProblemID
-}
-
-type ProblemSelectParameter2 interface {
-	GetWorkbookID() domain.WorkbookID
-	GetProblemID() domain.ProblemID
-	GetVersion() int
-}
-
-type problemSelectParameter2 struct {
-	WorkbookID domain.WorkbookID
-	ProblemID  domain.ProblemID
-	Version    int
-}
-
-func NewProblemSelectParameter2(WorkbookID domain.WorkbookID, problemID domain.ProblemID, version int) (ProblemSelectParameter2, error) {
-	m := &problemSelectParameter2{
-		WorkbookID: WorkbookID,
-		ProblemID:  problemID,
-		Version:    version,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (p *problemSelectParameter2) GetWorkbookID() domain.WorkbookID {
-	return p.WorkbookID
-}
-func (p *problemSelectParameter2) GetProblemID() domain.ProblemID {
-	return p.ProblemID
-}
-
-func (p *problemSelectParameter2) GetVersion() int {
-	return p.Version
-}
-
-type ProblemUpdateParameter interface {
-	GetProperties() map[string]string
-	GetStringProperty(name string) (string, error)
-	GetIntProperty(name string) (int, error)
-}
-
-type problemUpdateParameter struct {
-	Properties map[string]string
-}
-
-func NewProblemUpdateParameter(properties map[string]string) (ProblemUpdateParameter, error) {
-	m := &problemUpdateParameter{
-		Properties: properties,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (p *problemUpdateParameter) GetProperties() map[string]string {
-	return p.Properties
-}
-func (p *problemUpdateParameter) GetStringProperty(name string) (string, error) {
-	s, ok := p.Properties[name]
-	if !ok {
-		return "", errors.New("key not found")
-	}
-	return s, nil
-}
-func (p *problemUpdateParameter) GetIntProperty(name string) (int, error) {
-	i, err := strconv.Atoi(p.Properties[name])
-	if err != nil {
-		return 0, liberrors.Errorf("strconv.Atoi. err: %w", err)
-	}
-	return i, nil
-}
-
-type ProblemPropertyUpdateParameter interface {
-	GetKey() string
-	GetValue() string
-}
-
-type problemPropertyUpdateParameter struct {
-	Key   string
-	Value string
-}
-
-func NewProblemPropertyUpdateParameter(key, value string) (ProblemPropertyUpdateParameter, error) {
-	m := &problemPropertyUpdateParameter{
-		Key:   key,
-		Value: value,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (p *problemPropertyUpdateParameter) GetKey() string {
-	return p.Key
-}
-
-func (p *problemPropertyUpdateParameter) GetValue() string {
-	return p.Value
-}
-
-type ProblemSearchCondition interface {
-	GetWorkbookID() domain.WorkbookID
-	GetPageNo() int
-	GetPageSize() int
-	GetKeyword() string
-}
-
-type problemSearchCondition struct {
-	WorkbookID domain.WorkbookID
-	PageNo     int `validate:"required,gte=1"`
-	PageSize   int `validate:"required,gte=1,lte=1000"`
-	Keyword    string
-}
-
-func NewProblemSearchCondition(workbookID domain.WorkbookID, pageNo, pageSize int, keyword string) (ProblemSearchCondition, error) {
-	m := &problemSearchCondition{
-		WorkbookID: workbookID,
-		PageNo:     pageNo,
-		PageSize:   pageSize,
-		Keyword:    keyword,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (c *problemSearchCondition) GetWorkbookID() domain.WorkbookID {
-	return c.WorkbookID
-}
-
-func (c *problemSearchCondition) GetPageNo() int {
-	return c.PageNo
-}
-
-func (c *problemSearchCondition) GetPageSize() int {
-	return c.PageSize
-}
-
-func (c *problemSearchCondition) GetKeyword() string {
-	return c.Keyword
-}
-
-type ProblemIDsCondition interface {
-	GetWorkbookID() domain.WorkbookID
-	GetIDs() []domain.ProblemID
-}
-
-type problemIDsCondition struct {
-	WorkbookID domain.WorkbookID
-	IDs        []domain.ProblemID
-}
-
-func NewProblemIDsCondition(workbookID domain.WorkbookID, ids []domain.ProblemID) (ProblemIDsCondition, error) {
-	m := &problemIDsCondition{
-		WorkbookID: workbookID,
-		IDs:        ids,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (c *problemIDsCondition) GetWorkbookID() domain.WorkbookID {
-	return c.WorkbookID
-}
-
-func (c *problemIDsCondition) GetIDs() []domain.ProblemID {
-	return c.IDs
-}
-
-type ProblemSearchResult interface {
-	GetTotalCount() int
-	GetResults() []domain.ProblemModel
-}
-
-type problemSearchResult struct {
-	TotalCount int
-	Results    []domain.ProblemModel
-}
-
-func NewProblemSearchResult(totalCount int, results []domain.ProblemModel) (ProblemSearchResult, error) {
-	m := &problemSearchResult{
-		TotalCount: totalCount,
-		Results:    results,
-	}
-
-	if err := libD.Validator.Struct(m); err != nil {
-		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
-	}
-
-	return m, nil
-}
-
-func (m *problemSearchResult) GetTotalCount() int {
-	return m.TotalCount
-}
-
-func (m *problemSearchResult) GetResults() []domain.ProblemModel {
-	return m.Results
-}
-
 type ProblemRepository interface {
 	// FindProblems searches for problems based on search condition
-	FindProblems(ctx context.Context, operator domain.StudentModel, param ProblemSearchCondition) (ProblemSearchResult, error)
+	FindProblems(ctx context.Context, operator domain.StudentModel, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error)
 
-	FindAllProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (ProblemSearchResult, error)
+	FindAllProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (domain.ProblemSearchResult, error)
 
-	FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param ProblemIDsCondition) (ProblemSearchResult, error)
+	FindProblemsByProblemIDs(ctx context.Context, operator domain.StudentModel, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error)
 
 	FindProblemsByCustomCondition(ctx context.Context, operator domain.StudentModel, condition interface{}) ([]domain.ProblemModel, error)
 
-	FindProblemByID(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter1) (Problem, error)
+	FindProblemByID(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter1) (Problem, error)
 
 	FindProblemIDs(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) ([]domain.ProblemID, error)
 
 	// AddProblem register a new problem
-	AddProblem(ctx context.Context, operator domain.StudentModel, param ProblemAddParameter) (domain.ProblemID, error)
+	AddProblem(ctx context.Context, operator domain.StudentModel, param domain.ProblemAddParameter) (domain.ProblemID, error)
 
-	UpdateProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) error
+	UpdateProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error
 
-	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2, param ProblemUpdateParameter) error
+	UpdateProblemProperty(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error
 
-	RemoveProblem(ctx context.Context, operator domain.StudentModel, id ProblemSelectParameter2) error
+	RemoveProblem(ctx context.Context, operator domain.StudentModel, id domain.ProblemSelectParameter2) error
 
 	CountProblems(ctx context.Context, operator domain.StudentModel, workbookID domain.WorkbookID) (int, error)
 }

@@ -15,23 +15,23 @@ import (
 
 type StudentUsecaseProblem interface {
 	// problem
-	FindProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemSearchCondition) (service.ProblemSearchResult, error)
+	FindProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error)
 
-	FindAllProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.ProblemSearchResult, error)
+	FindAllProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (domain.ProblemSearchResult, error)
 
-	FindProblemsByProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemIDsCondition) (service.ProblemSearchResult, error)
+	FindProblemsByProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error)
 
-	FindProblemByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter1) (domain.ProblemModel, error)
+	FindProblemByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter1) (domain.ProblemModel, error)
 
 	FindProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) ([]domain.ProblemID, error)
 
-	AddProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, param service.ProblemAddParameter) ([]domain.ProblemID, error)
+	AddProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, param domain.ProblemAddParameter) ([]domain.ProblemID, error)
 
-	UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error
+	UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error
 
-	UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error
+	UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error
 
-	RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2) error
+	RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2) error
 
 	ImportProblems(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, newIterator func(workbookID domain.WorkbookID, problemType domain.ProblemTypeName) (service.ProblemAddParameterIterator, error)) error
 }
@@ -52,8 +52,8 @@ func NewStudentUsecaseProblem(transaction service.Transaction, pf service.Proces
 	}
 }
 
-func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemSearchCondition) (service.ProblemSearchResult, error) {
-	var result service.ProblemSearchResult
+func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param domain.ProblemSearchCondition) (domain.ProblemSearchResult, error) {
+	var result domain.ProblemSearchResult
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
@@ -71,8 +71,8 @@ func (s *studentUsecaseProblem) FindProblemsByWorkbookID(ctx context.Context, or
 	return result, nil
 }
 
-func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (service.ProblemSearchResult, error) {
-	var result service.ProblemSearchResult
+func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID) (domain.ProblemSearchResult, error) {
+	var result domain.ProblemSearchResult
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
@@ -90,8 +90,8 @@ func (s *studentUsecaseProblem) FindAllProblemsByWorkbookID(ctx context.Context,
 	return result, nil
 }
 
-func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param service.ProblemIDsCondition) (service.ProblemSearchResult, error) {
-	var result service.ProblemSearchResult
+func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, workbookID domain.WorkbookID, param domain.ProblemIDsCondition) (domain.ProblemSearchResult, error) {
+	var result domain.ProblemSearchResult
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, workbookID)
 		if err != nil {
@@ -109,7 +109,7 @@ func (s *studentUsecaseProblem) FindProblemsByProblemIDs(ctx context.Context, or
 	return result, nil
 }
 
-func (s *studentUsecaseProblem) FindProblemByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter1) (domain.ProblemModel, error) {
+func (s *studentUsecaseProblem) FindProblemByID(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter1) (domain.ProblemModel, error) {
 	var result domain.ProblemModel
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, id.GetWorkbookID())
@@ -147,7 +147,7 @@ func (s *studentUsecaseProblem) FindProblemIDs(ctx context.Context, organization
 	return result, nil
 }
 
-func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, param service.ProblemAddParameter) ([]domain.ProblemID, error) {
+func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, param domain.ProblemAddParameter) ([]domain.ProblemID, error) {
 	logger := log.FromContext(ctx)
 	var result []domain.ProblemID
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
@@ -168,7 +168,7 @@ func (s *studentUsecaseProblem) AddProblem(ctx context.Context, organizationID u
 	return result, nil
 }
 
-func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
@@ -184,7 +184,7 @@ func (s *studentUsecaseProblem) UpdateProblem(ctx context.Context, organizationI
 	return nil
 }
 
-func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		student, workbook, err := s.findStudentAndWorkbook(ctx, rf, organizationID, operatorID, id.GetWorkbookID())
 		if err != nil {
@@ -200,7 +200,7 @@ func (s *studentUsecaseProblem) UpdateProblemProperty(ctx context.Context, organ
 	return nil
 }
 
-func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id service.ProblemSelectParameter2) error {
+func (s *studentUsecaseProblem) RemoveProblem(ctx context.Context, organizationID userD.OrganizationID, operatorID userD.AppUserID, id domain.ProblemSelectParameter2) error {
 	logger := log.FromContext(ctx)
 	logger.Debug("ProblemService.RemoveProblem")
 
@@ -305,7 +305,7 @@ func (s *studentUsecaseProblem) findStudentAndWorkbook(ctx context.Context, rf s
 	return student, workbook, nil
 }
 
-func (s *studentUsecaseProblem) addProblem(ctx context.Context, student service.Student, workbook service.Workbook, param service.ProblemAddParameter) ([]domain.ProblemID, error) {
+func (s *studentUsecaseProblem) addProblem(ctx context.Context, student service.Student, workbook service.Workbook, param domain.ProblemAddParameter) ([]domain.ProblemID, error) {
 	problemType := workbook.GetProblemType()
 	if err := student.CheckQuota(ctx, problemType, "Size"); err != nil {
 		return nil, liberrors.Errorf("student.CheckQuota. err: %w", err)
@@ -326,7 +326,7 @@ func (s *studentUsecaseProblem) addProblem(ctx context.Context, student service.
 	return addedIDs, nil
 }
 
-func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student service.Student, workbook service.Workbook, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student service.Student, workbook service.Workbook, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	problemType := workbook.GetProblemType()
 	if err := student.CheckQuota(ctx, problemType, "Size"); err != nil {
 		return liberrors.Errorf("student.CheckQuota(size). err: %w", err)
@@ -376,7 +376,7 @@ func (s *studentUsecaseProblem) updateProblem(ctx context.Context, student servi
 	return nil
 }
 
-func (s *studentUsecaseProblem) updateProblemProperty(ctx context.Context, student service.Student, workbook service.Workbook, id service.ProblemSelectParameter2, param service.ProblemUpdateParameter) error {
+func (s *studentUsecaseProblem) updateProblemProperty(ctx context.Context, student service.Student, workbook service.Workbook, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) error {
 	problemType := workbook.GetProblemType()
 	if err := student.CheckQuota(ctx, problemType, "Size"); err != nil {
 		return liberrors.Errorf("student.CheckQuota(size). err: %w", err)

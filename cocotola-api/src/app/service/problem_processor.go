@@ -13,17 +13,17 @@ import (
 // type Updated int
 
 type ProblemAddProcessor interface {
-	AddProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, param ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	AddProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, param domain.ProblemAddParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemUpdateProcessor interface {
-	UpdateProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	UpdateProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 
-	UpdateProblemProperty(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id ProblemSelectParameter2, param ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	UpdateProblemProperty(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, workbookModel domain.WorkbookModel, id domain.ProblemSelectParameter2, param domain.ProblemUpdateParameter) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemRemoveProcessor interface {
-	RemoveProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, id ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
+	RemoveProblem(ctx context.Context, repo RepositoryFactory, operator domain.StudentModel, id domain.ProblemSelectParameter2) ([]domain.ProblemID, []domain.ProblemID, []domain.ProblemID, error)
 }
 
 type ProblemImportProcessor interface {

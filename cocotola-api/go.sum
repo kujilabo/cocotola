@@ -207,6 +207,8 @@ github.com/casbin/casbin/v2 v2.60.0 h1:ZmC0/t4wolfEsDpDxTEsu2z6dfbMNpc11F52ceLs2
 github.com/casbin/casbin/v2 v2.60.0/go.mod h1:vByNa/Fchek0KZUgG5wEsl7iFsiviAYKRtgrQfcJqHg=
 github.com/casbin/gorm-adapter/v3 v3.13.1 h1:0AuYv5WYihjHEZyPYDxCBpyCDwvJsVTm6VUXmT/Tgvs=
 github.com/casbin/gorm-adapter/v3 v3.13.1/go.mod h1:jqaf4bUITbCyMPUellaTd8IQJ77JfVAbe77gZZnx98w=
+github.com/casbin/gorm-adapter/v3 v3.14.0 h1:zZ6AIiNHJZ3ntdf5RBrqD+0Cb4UO+uKFk79R9yJ7mpw=
+github.com/casbin/gorm-adapter/v3 v3.14.0/go.mod h1:jqaf4bUITbCyMPUellaTd8IQJ77JfVAbe77gZZnx98w=
 github.com/cenkalti/backoff/v4 v4.1.1/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
 github.com/cenkalti/backoff/v4 v4.1.2/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
@@ -904,6 +906,8 @@ github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/ktrysmt/go-bitbucket v0.6.4/go.mod h1:9u0v3hsd2rqCHRIpbir1oP7F58uo5dq19sBYvuMoyQ4=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b h1:62e+1S5Mhr3e8El87fRk6Z0eQ+CEMzeqA2n7yNWba0U=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38 h1:p0EGh2kruRx0Q2BgTNuIOg+pPFYhwf9qUfnTIcbRE40=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221227153357-053e2d97474b h1:jx1mlnYn4tzRSTUsz6tZJNgK4CGwQ+evXAeklQXcj+o=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221227153357-053e2d97474b/go.mod h1:FOPDw1ZczFU+PZIwKOf2mWZNYLbQcmr+hfkBySVe9Qo=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
