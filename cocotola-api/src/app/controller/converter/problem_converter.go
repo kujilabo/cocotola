@@ -88,6 +88,7 @@ func ToProblemFindAllResponse(ctx context.Context, result domain.ProblemSearchRe
 
 func ToProblemResponse(ctx context.Context, problem domain.ProblemModel) (*entity.Problem, error) {
 	logger := log.FromContext(ctx)
+	// FIXME
 	logger.Infof("------properties: %+v", problem.GetProperties(ctx))
 
 	bytes, err := json.Marshal(problem.GetProperties(ctx))

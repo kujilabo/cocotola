@@ -102,6 +102,7 @@ func (e *englishWordProblemEntity) toProblem(ctx context.Context, synthesizerCli
 	}
 
 	logger := log.FromContext(ctx)
+	// FIXME
 	logger.Infof("properties: %+v", englishWordProblem.GetProperties(ctx))
 
 	return englishWordProblem, nil

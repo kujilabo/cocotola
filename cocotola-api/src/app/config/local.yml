@@ -27,7 +27,7 @@ auth:
   apiTimeoutSec: 5
 translator:
   endpoint: http://localhost:8180
-  timeoutSec: 3
+  timeoutSec: 5
   username: user
   password: password
   grpcAddr: localhost:50151

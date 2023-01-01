@@ -74,6 +74,7 @@ func (e *englishSentenceProblemEntity) toProblem(ctx context.Context, synthesize
 	}
 
 	logger := log.FromContext(ctx)
+	// FIXME
 	logger.Infof("properties: %+v", englishSentenceProblem.GetProperties(ctx))
 
 	return englishSentenceProblem, nil

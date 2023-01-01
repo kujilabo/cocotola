@@ -136,9 +136,9 @@ func main() {
 
 	gracefulShutdownTime2 := time.Duration(cfg.Shutdown.TimeSec2) * time.Second
 
-	if appEnv == "local" {
-		initLocalEnv(ctx, jobTransaction, appTransaction)
-	}
+	// if appEnv == "local" {
+	// 	initLocalEnv(ctx, jobTransaction, appTransaction)
+	// }
 
 	result := run(context.Background(), cfg, appTransaction, pf, authTransaction, jobTransaction, appTransaction, synthesizer, translatorClient, tatoebaClient, newIterator)
 

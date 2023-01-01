@@ -22,8 +22,12 @@ func ConvertDuplicatedError(err error, newErr error) error {
 	}
 
 	var sqlite3Err sqlite3.Error
-	if ok := errors.As(err, &sqlite3Err); ok && int(sqlite3Err.ExtendedCode) == 2067 {
-		return newErr
+	if ok := errors.As(err, &sqlite3Err); ok {
+		if int(sqlite3Err.ExtendedCode) == 1555 {
+			return newErr
+		} else if int(sqlite3Err.ExtendedCode) == 2067 {
+			return newErr
+		}
 	}
 
 	return err

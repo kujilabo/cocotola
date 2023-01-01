@@ -200,7 +200,7 @@ func NewAppRouter(initPublicRouterFunc []InitRouterGroupFunc, initPrivateRouterF
 		plugin.Use(authMiddleware)
 
 		for _, fn := range initPluginRouterFunc {
-			if err := fn(v1); err != nil {
+			if err := fn(plugin); err != nil {
 				return nil, err
 			}
 		}
