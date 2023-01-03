@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
@@ -27,7 +28,7 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 		driverName := driverName
 		db := db
 		t.Run(driverName, func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 			sqlDB, err := db.DB()
 			require.NoError(t, err)
 			defer sqlDB.Close()
@@ -39,4 +40,11 @@ func testDB(t *testing.T, fn func(t *testing.T, ctx context.Context, ts testServ
 			fn(t, ctx, testService)
 		})
 	}
+}
+
+func teardownDB(t *testing.T, ts testService) {
+	result := ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from azure_translation")
+	assert.NoError(t, result.Error)
+	result = ts.db.Debug().Session(&gorm.Session{AllowGlobalUpdate: true}).Exec("delete from custom_translation")
+	assert.NoError(t, result.Error)
 }

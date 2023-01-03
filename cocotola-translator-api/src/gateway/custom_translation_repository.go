@@ -53,7 +53,7 @@ func newCustomTranslationRepository(db *gorm.DB) service.CustomTranslationReposi
 	}
 }
 
-func (r *customTranslationRepository) Add(ctx context.Context, param service.TranslationAddParameter) error {
+func (r *customTranslationRepository) Add(ctx context.Context, param domain.TranslationAddParameter) error {
 	_, span := tracer.Start(ctx, "customTranslationRepository.Add")
 	defer span.End()
 
@@ -73,21 +73,21 @@ func (r *customTranslationRepository) Add(ctx context.Context, param service.Tra
 	return nil
 }
 
-func (r *customTranslationRepository) Update(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param service.TranslationUpdateParameter) error {
+func (r *customTranslationRepository) Update(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param domain.TranslationUpdateParameter) error {
 	_, span := tracer.Start(ctx, "customTranslationRepository.Update")
 	defer span.End()
 
 	result := r.db.Model(&customTranslationDBEntity{}).
-		Where("lang2 = ? and text = ? and pos = ?",
-			lang2.String(), text, int(pos)).
-		Updates(map[string]interface{}{
-			"translated": param.GetTranslated(),
-		})
+		Where(&customTranslationDBEntity{
+			Lang2: lang2.String(),
+			Text:  text,
+			Pos:   int(pos),
+		}).Updates(map[string]interface{}{
+		"translated": param.GetTranslated(),
+	})
 	if result.Error != nil {
 		return liberrors.Errorf(". err: %w", libG.ConvertDuplicatedError(result.Error, service.ErrTranslationAlreadyExists))
-	}
-
-	if result.RowsAffected != 1 {
+	} else if result.RowsAffected != 1 {
 		return errors.New("Error")
 	}
 
@@ -99,9 +99,11 @@ func (r *customTranslationRepository) Remove(ctx context.Context, lang2 domain.L
 	defer span.End()
 
 	result := r.db.
-		Where("lang2 = ? and text = ? and pos = ?",
-			lang2.String(), text, int(pos)).
-		Delete(&customTranslationDBEntity{})
+		Where(&customTranslationDBEntity{
+			Lang2: lang2.String(),
+			Text:  text,
+			Pos:   int(pos),
+		}).Delete(&customTranslationDBEntity{})
 	if result.Error != nil {
 		return result.Error
 	} else if result.RowsAffected == 0 {

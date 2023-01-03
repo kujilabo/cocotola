@@ -1,5 +1,4 @@
 //go:generate mockery --output mock --name RepositoryFactory
-//go:generate mockery --output mock --name Transaction
 package service
 
 import (

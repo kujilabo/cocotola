@@ -849,8 +849,12 @@ github.com/kujilabo/cocotola/cocotola-api v0.0.0-20221227153357-053e2d97474b h1:
 github.com/kujilabo/cocotola/cocotola-api v0.0.0-20221227153357-053e2d97474b/go.mod h1:KVFIDbysn9DYAdPMwWiTT2OYfKHRE5Do+c0WLDlzY/E=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b h1:62e+1S5Mhr3e8El87fRk6Z0eQ+CEMzeqA2n7yNWba0U=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38 h1:p0EGh2kruRx0Q2BgTNuIOg+pPFYhwf9qUfnTIcbRE40=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
 github.com/kujilabo/cocotola/proto v0.0.0-20221227153357-053e2d97474b h1:2mESMSV2g283TWi2Vf1SUSTUD9fNRXKHAMoskB85jEU=
 github.com/kujilabo/cocotola/proto v0.0.0-20221227153357-053e2d97474b/go.mod h1:ZPCEcRoojgUjxBHVbs2Jjx0W2j7H7tXYKYMmD+G6+3c=
+github.com/kujilabo/cocotola/proto v0.0.0-20221230140229-27a3e1aece38 h1:YgpR9ExSJid4Imk6IAceVRFeI3jEAuIHdJKnxlVaDN8=
+github.com/kujilabo/cocotola/proto v0.0.0-20221230140229-27a3e1aece38/go.mod h1:ZPCEcRoojgUjxBHVbs2Jjx0W2j7H7tXYKYMmD+G6+3c=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221103054343-5644f3a418e7 h1:0EEVxxmIsdsjhg5/B6Ik2vQumkZ5iX8dF8mSp7XUcZE=
 github.com/kujilabo/cocotola/test-lib v0.0.0-20221103054343-5644f3a418e7/go.mod h1:36F+HRf4XZs4yckyd2ElBaCXYdhwe0mPcH+AuIyf0N0=
 github.com/leodido/go-urn v1.2.1 h1:BqpAaACuzVSgi/VLzGZIobT2z4v53pjosyNd9Yv6n/w=
