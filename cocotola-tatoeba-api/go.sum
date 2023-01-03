@@ -843,6 +843,8 @@ github.com/kujilabo/cocotola/lib v0.0.0-20221227133217-2a702f087223 h1:8uDRM0c1l
 github.com/kujilabo/cocotola/lib v0.0.0-20221227133217-2a702f087223/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b h1:62e+1S5Mhr3e8El87fRk6Z0eQ+CEMzeqA2n7yNWba0U=
 github.com/kujilabo/cocotola/lib v0.0.0-20221227153357-053e2d97474b/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38 h1:p0EGh2kruRx0Q2BgTNuIOg+pPFYhwf9qUfnTIcbRE40=
+github.com/kujilabo/cocotola/lib v0.0.0-20221230140229-27a3e1aece38/go.mod h1:jsZhcAqVnKx2QnVFXvxUV0WIa3wPRxDK1pGDeC4cHJ0=
 github.com/leodido/go-urn v1.2.1 h1:BqpAaACuzVSgi/VLzGZIobT2z4v53pjosyNd9Yv6n/w=
 github.com/leodido/go-urn v1.2.1/go.mod h1:zt4jvISO2HfUBqxjfIshjdMTYS56ZS/qv49ictyFfxY=
 github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=

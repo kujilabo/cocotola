@@ -266,6 +266,7 @@ func (s *studentUsecaseProblem) ImportProblems(ctx context.Context, organization
 			continue
 		}
 
+		// FIXME
 		logger.Infof("param.properties: %+v", param.GetProperties())
 
 		if err := s.transaction.Do(ctx, func(rf service.RepositoryFactory) error {

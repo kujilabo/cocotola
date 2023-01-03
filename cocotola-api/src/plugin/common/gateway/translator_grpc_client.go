@@ -37,8 +37,7 @@ func (c *translatorGRPCClient) DictionaryLookup(ctx context.Context, fromLang, t
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	ctx = grpcMetadata.AppendToOutgoingContext(ctx, "username", c.username)
-	ctx = grpcMetadata.AppendToOutgoingContext(ctx, "password", c.password)
+	ctx = grpcMetadata.AppendToOutgoingContext(ctx, "authorization", "basic "+base64.StdEncoding.EncodeToString([]byte(c.username+":"+c.password)))
 
 	param := pb.DictionaryLookupParameter{
 		FromLang2: fromLang.String(),

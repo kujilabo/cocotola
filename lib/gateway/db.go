@@ -15,15 +15,25 @@ import (
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
+const MYSQL_ER_DUP_ENTRY = 1062
+const MYSQL_ER_NO_REFERENCED_ROW_2 = 1452
+
+const SQLITE_CONSTRAINT_PRIMARYKEY = 1555
+const SQLITE_CONSTRAINT_UNIQUE = 2067
+
 func ConvertDuplicatedError(err error, newErr error) error {
 	var mysqlErr *mysql.MySQLError
-	if ok := errors.As(err, &mysqlErr); ok && mysqlErr.Number == 1062 {
+	if ok := errors.As(err, &mysqlErr); ok && mysqlErr.Number == MYSQL_ER_DUP_ENTRY {
 		return newErr
 	}
 
 	var sqlite3Err sqlite3.Error
-	if ok := errors.As(err, &sqlite3Err); ok && int(sqlite3Err.ExtendedCode) == 2067 {
-		return newErr
+	if ok := errors.As(err, &sqlite3Err); ok {
+		if int(sqlite3Err.ExtendedCode) == SQLITE_CONSTRAINT_PRIMARYKEY {
+			return newErr
+		} else if int(sqlite3Err.ExtendedCode) == SQLITE_CONSTRAINT_UNIQUE {
+			return newErr
+		}
 	}
 
 	return err
@@ -31,7 +41,7 @@ func ConvertDuplicatedError(err error, newErr error) error {
 
 func ConvertRelationError(err error, newErr error) error {
 	var mysqlErr *mysql.MySQLError
-	if ok := errors.As(err, &mysqlErr); ok && mysqlErr.Number == 1452 {
+	if ok := errors.As(err, &mysqlErr); ok && mysqlErr.Number == MYSQL_ER_NO_REFERENCED_ROW_2 {
 		return newErr
 	}
 
