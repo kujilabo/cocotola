@@ -103,7 +103,7 @@ func Test_userUsecase_DictionaryLookup_custom_azureRepo(t *testing.T) {
 
 		// given
 		// - customRepo has one data
-		param, err := service.NewTransalationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本c")
+		param, err := domain.NewTranslationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本c")
 		assert.NoError(t, err)
 		err = customRepo.Add(ctx, param)
 		assert.NoError(t, err)

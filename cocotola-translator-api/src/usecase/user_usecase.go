@@ -11,6 +11,7 @@ import (
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	liberrors "github.com/kujilabo/cocotola/lib/errors"
+	"github.com/kujilabo/cocotola/lib/log"
 )
 
 type UserUsecase interface {
@@ -94,6 +95,8 @@ func (u *userUsecase) azureDictionaryLookup(ctx context.Context, azureRepo servi
 }
 
 func (u *userUsecase) DictionaryLookup(ctx context.Context, fromLang, toLang domain.Lang2, text string) ([]domain.Translation, error) {
+	logger := log.FromContext(ctx)
+	logger.Infof("DictionaryLookup, %s, %s, %s", fromLang, toLang, text)
 	results := make([]domain.Translation, 0)
 	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		customRepo := rf.NewCustomTranslationRepository(ctx)

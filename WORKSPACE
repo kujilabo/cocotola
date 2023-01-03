@@ -4787,8 +4787,8 @@ go_repository(
 go_repository(
     name = "com_github_casbin_gorm_adapter_v3",
     importpath = "github.com/casbin/gorm-adapter/v3",
-    sum = "h1:0AuYv5WYihjHEZyPYDxCBpyCDwvJsVTm6VUXmT/Tgvs=",
-    version = "v3.13.1",
+    sum = "h1:zZ6AIiNHJZ3ntdf5RBrqD+0Cb4UO+uKFk79R9yJ7mpw=",
+    version = "v3.14.0",
 )
 
 go_repository(

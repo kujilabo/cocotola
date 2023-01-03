@@ -8,7 +8,6 @@ go_library(
     deps = [
         "//cocotola-translator-api/src/controller/entity",
         "//cocotola-translator-api/src/domain",
-        "//cocotola-translator-api/src/service",
         "//lib/domain",
     ],
 )

@@ -8,8 +8,6 @@ import (
 	domain "github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
 	mock "github.com/stretchr/testify/mock"
 
-	service "github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
-
 	testing "testing"
 )
 
@@ -19,11 +17,11 @@ type AdminUsecase struct {
 }
 
 // AddTranslation provides a mock function with given fields: ctx, param
-func (_m *AdminUsecase) AddTranslation(ctx context.Context, param service.TranslationAddParameter) error {
+func (_m *AdminUsecase) AddTranslation(ctx context.Context, param domain.TranslationAddParameter) error {
 	ret := _m.Called(ctx, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, service.TranslationAddParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.TranslationAddParameter) error); ok {
 		r0 = rf(ctx, param)
 	} else {
 		r0 = ret.Error(0)
@@ -116,11 +114,11 @@ func (_m *AdminUsecase) RemoveTranslation(ctx context.Context, lang2 domain.Lang
 }
 
 // UpdateTranslation provides a mock function with given fields: ctx, lang2, text, pos, param
-func (_m *AdminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param service.TranslationUpdateParameter) error {
+func (_m *AdminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param domain.TranslationUpdateParameter) error {
 	ret := _m.Called(ctx, lang2, text, pos, param)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, domain.Lang2, string, domain.WordPos, service.TranslationUpdateParameter) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, domain.Lang2, string, domain.WordPos, domain.TranslationUpdateParameter) error); ok {
 		r0 = rf(ctx, lang2, text, pos, param)
 	} else {
 		r0 = ret.Error(0)

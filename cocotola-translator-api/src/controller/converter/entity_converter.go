@@ -5,7 +5,6 @@ import (
 
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/controller/entity"
 	"github.com/kujilabo/cocotola/cocotola-translator-api/src/domain"
-	"github.com/kujilabo/cocotola/cocotola-translator-api/src/service"
 	libD "github.com/kujilabo/cocotola/lib/domain"
 )
 
@@ -38,7 +37,7 @@ func ToTranslationResposne(context context.Context, translation domain.Translati
 	return e, libD.Validator.Struct(e)
 }
 
-func ToTranslationAddParameter(ctx context.Context, param *entity.TranslationAddParameterHTTPEntity) (service.TranslationAddParameter, error) {
+func ToTranslationAddParameter(ctx context.Context, param *entity.TranslationAddParameterHTTPEntity) (domain.TranslationAddParameter, error) {
 	pos, err := domain.NewWordPos(param.Pos)
 	if err != nil {
 		return nil, err
@@ -48,9 +47,9 @@ func ToTranslationAddParameter(ctx context.Context, param *entity.TranslationAdd
 	if err != nil {
 		return nil, err
 	}
-	return service.NewTransalationAddParameter(param.Text, pos, lang2, param.Translated)
+	return domain.NewTranslationAddParameter(param.Text, pos, lang2, param.Translated)
 }
 
-func ToTranslationUpdateParameter(ctx context.Context, param *entity.TranslationUpdateParameterHTTPEntity) (service.TranslationUpdateParameter, error) {
-	return service.NewTransaltionUpdateParameter(param.Translated)
+func ToTranslationUpdateParameter(ctx context.Context, param *entity.TranslationUpdateParameterHTTPEntity) (domain.TranslationUpdateParameter, error) {
+	return domain.NewTranslationUpdateParameter(param.Translated)
 }

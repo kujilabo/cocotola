@@ -63,7 +63,7 @@ func ToTranslationAddParameter(ctx context.Context, param *entity.TranslationAdd
 	if err != nil {
 		return nil, liberrors.Errorf("appD.NewLang2. err: %w", err)
 	}
-	domainParam, err := service.NewTransalationAddParameter(param.Text, pos, lang2, param.Translated)
+	domainParam, err := domain.NewTranslationAddParameter(param.Text, pos, lang2, param.Translated)
 	if err != nil {
 		return nil, liberrors.Errorf(". err: %w", err)
 	}
