@@ -18,7 +18,7 @@ func Test_customTranslationRepository_Add(t *testing.T) {
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		defer teardownDB(t, ts)
 		customRepo := ts.rf.NewCustomTranslationRepository(ctx)
-		param, err := domain.NewTransalationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
+		param, err := domain.NewTranslationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
 		assert.NoError(t, err)
 		// first time
 		err = customRepo.Add(ctx, param)
@@ -42,7 +42,7 @@ func Test_customTranslationRepository_Update(t *testing.T) {
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		defer teardownDB(t, ts)
 		customRepo := ts.rf.NewCustomTranslationRepository(ctx)
-		addParam, err := domain.NewTransalationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
+		addParam, err := domain.NewTranslationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
 		assert.NoError(t, err)
 		// add
 		err = customRepo.Add(ctx, addParam)
@@ -67,7 +67,7 @@ func Test_customTranslationRepository_Remove(t *testing.T) {
 	fn := func(t *testing.T, ctx context.Context, ts testService) {
 		defer teardownDB(t, ts)
 		customRepo := ts.rf.NewCustomTranslationRepository(ctx)
-		addParam, err := domain.NewTransalationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
+		addParam, err := domain.NewTranslationAddParameter("book", domain.PosNoun, domain.Lang2JA, "本")
 		assert.NoError(t, err)
 		// add
 		err = customRepo.Add(ctx, addParam)

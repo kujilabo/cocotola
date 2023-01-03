@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "english.go",
         "translation.go",
+        "translator_client.go",
     ],
     importpath = "github.com/kujilabo/cocotola/cocotola-api/src/plugin/common/domain",
     visibility = ["//visibility:public"],

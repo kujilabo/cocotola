@@ -31,7 +31,7 @@ func Test_adminUsecase_RemoveTranslation(t *testing.T) {
 
 		// given
 		// - customRepo has one data
-		param, err := service.NewTransalationAddParameter("apple", domain.PosNoun, domain.Lang2JA, "りんご")
+		param, err := domain.NewTranslationAddParameter("apple", domain.PosNoun, domain.Lang2JA, "りんご")
 		assert.NoError(t, err)
 		err = customRepo.Add(ctx, param)
 		assert.NoError(t, err)

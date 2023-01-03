@@ -39,7 +39,7 @@ type translationAddParameter struct {
 	Translated string
 }
 
-func NewTransalationAddParameter(text string, pos domain.WordPos, lang2 appD.Lang2, translated string) (TranslationAddParameter, error) {
+func NewTranslationAddParameter(text string, pos domain.WordPos, lang2 appD.Lang2, translated string) (TranslationAddParameter, error) {
 	m := &translationAddParameter{
 		Text:       text,
 		Pos:        pos,

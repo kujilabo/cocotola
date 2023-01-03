@@ -195,7 +195,7 @@ func (u *adminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2
 			return nil
 		}
 
-		paramToAdd, err := domain.NewTransalationAddParameter(text, pos, lang2, param.GetTranslated())
+		paramToAdd, err := domain.NewTranslationAddParameter(text, pos, lang2, param.GetTranslated())
 		if err != nil {
 			return err
 		}

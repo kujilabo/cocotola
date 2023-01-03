@@ -1,24 +1,26 @@
 package domain
 
 import (
+	appD "github.com/kujilabo/cocotola/cocotola-api/src/app/domain"
 	libD "github.com/kujilabo/cocotola/lib/domain"
+	liberrors "github.com/kujilabo/cocotola/lib/errors"
 )
 
 type TranslationAddParameter interface {
 	GetText() string
 	GetPos() WordPos
-	GetLang2() Lang2
+	GetLang2() appD.Lang2
 	GetTranslated() string
 }
 
 type translationAddParameter struct {
 	Text       string `validate:"required"`
 	Pos        WordPos
-	Lang2      Lang2
+	Lang2      appD.Lang2
 	Translated string
 }
 
-func NewTranslationAddParameter(text string, pos WordPos, lang2 Lang2, translated string) (TranslationAddParameter, error) {
+func NewTranslationAddParameter(text string, pos WordPos, lang2 appD.Lang2, translated string) (TranslationAddParameter, error) {
 	m := &translationAddParameter{
 		Text:       text,
 		Pos:        pos,
@@ -26,7 +28,11 @@ func NewTranslationAddParameter(text string, pos WordPos, lang2 Lang2, translate
 		Translated: translated,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *translationAddParameter) GetText() string {
@@ -37,7 +43,7 @@ func (p *translationAddParameter) GetPos() WordPos {
 	return p.Pos
 }
 
-func (p *translationAddParameter) GetLang2() Lang2 {
+func (p *translationAddParameter) GetLang2() appD.Lang2 {
 	return p.Lang2
 }
 
@@ -53,12 +59,16 @@ type translationUpdateParameter struct {
 	Translated string `validate:"required"`
 }
 
-func NewTranslationUpdateParameter(translated string) (TranslationUpdateParameter, error) {
+func NewTransaltionUpdateParameter(translated string) (TranslationUpdateParameter, error) {
 	m := &translationUpdateParameter{
 		Translated: translated,
 	}
 
-	return m, libD.Validator.Struct(m)
+	if err := libD.Validator.Struct(m); err != nil {
+		return nil, liberrors.Errorf("libD.Validator.Struct. err: %w", err)
+	}
+
+	return m, nil
 }
 
 func (p *translationUpdateParameter) GetTranslated() string {
