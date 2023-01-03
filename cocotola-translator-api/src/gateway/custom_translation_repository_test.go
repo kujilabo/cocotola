@@ -34,7 +34,6 @@ func Test_customTranslationRepository_Add(t *testing.T) {
 		assert.Equal(t, domain.PosNoun, translation.GetPos())
 		assert.Equal(t, domain.Lang2JA, translation.GetLang2())
 		assert.Equal(t, "本", translation.GetTranslated())
-
 	}
 	testDB(t, fn)
 }
