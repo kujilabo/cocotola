@@ -20,9 +20,9 @@ type AdminUsecase interface {
 
 	FindTranslationByText(ctx context.Context, lang2 domain.Lang2, text string) ([]domain.Translation, error)
 
-	AddTranslation(ctx context.Context, param service.TranslationAddParameter) error
+	AddTranslation(ctx context.Context, param domain.TranslationAddParameter) error
 
-	UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param service.TranslationUpdateParameter) error
+	UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param domain.TranslationUpdateParameter) error
 
 	RemoveTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos) error
 }
@@ -163,7 +163,7 @@ func (u *adminUsecase) FindTranslationByText(ctx context.Context, lang2 domain.L
 	return results, nil
 }
 
-func (u *adminUsecase) AddTranslation(ctx context.Context, param service.TranslationAddParameter) error {
+func (u *adminUsecase) AddTranslation(ctx context.Context, param domain.TranslationAddParameter) error {
 	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		customRepo := rf.NewCustomTranslationRepository(ctx)
 		if err := customRepo.Add(ctx, param); err != nil {
@@ -176,7 +176,7 @@ func (u *adminUsecase) AddTranslation(ctx context.Context, param service.Transla
 	return nil
 }
 
-func (u *adminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param service.TranslationUpdateParameter) error {
+func (u *adminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2, text string, pos domain.WordPos, param domain.TranslationUpdateParameter) error {
 	if err := u.transaction.Do(ctx, func(rf service.RepositoryFactory) error {
 		translationFound := true
 		customRepo := rf.NewCustomTranslationRepository(ctx)
@@ -195,7 +195,7 @@ func (u *adminUsecase) UpdateTranslation(ctx context.Context, lang2 domain.Lang2
 			return nil
 		}
 
-		paramToAdd, err := service.NewTransalationAddParameter(text, pos, lang2, param.GetTranslated())
+		paramToAdd, err := domain.NewTransalationAddParameter(text, pos, lang2, param.GetTranslated())
 		if err != nil {
 			return err
 		}
